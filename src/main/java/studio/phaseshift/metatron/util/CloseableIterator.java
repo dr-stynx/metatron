@@ -16,27 +16,24 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.inst;
+package studio.phaseshift.metatron.util;
 
-import org.javatuples.*;
-import studio.phaseshift.metatron.lang.obj.*;
+import org.slf4j.*;
 
-import java.net.*;
+import java.io.*;
+import java.util.*;
 
-public final class SInst {
+public interface CloseableIterator<S> extends Iterator<S>, Closeable, AutoCloseable {
 
-    public static final URI PLUS_URI = URI.create("m:plus");
+    @Override
+    void close() throws IOException;
 
-    public static class PlusInst extends SObj.Inst implements BInst.PlusInst {
-
-        PlusInst(final BObj.Obj arg) {
-            super(new Triplet<>(SObj.Lst.single(arg), (lhs, args) -> {
-                if (lhs.isInt() && args.value().get(0).isInt())
-                    return SObj.Int.of(lhs.intValue() + args.value().get(0).intValue());
-                else
-                    throw new IllegalStateException("the operands do not support plus");
-
-            }, BObj.NoObj.of()), PLUS_URI);
+    public static void closeIterator(final Iterator<?> iterator) {
+        try {
+            if (iterator instanceof CloseableIterator)
+                ((CloseableIterator<?>) iterator).close();
+        } catch (final IOException e) {
+            LoggerFactory.getLogger(CloseableIterator.class).error(e.getMessage());
         }
     }
 }

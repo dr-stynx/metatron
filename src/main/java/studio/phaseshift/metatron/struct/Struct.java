@@ -16,27 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.inst;
+package studio.phaseshift.metatron.struct;
 
-import org.javatuples.*;
-import studio.phaseshift.metatron.lang.obj.*;
-
-import java.net.*;
-
-public final class SInst {
-
-    public static final URI PLUS_URI = URI.create("m:plus");
-
-    public static class PlusInst extends SObj.Inst implements BInst.PlusInst {
-
-        PlusInst(final BObj.Obj arg) {
-            super(new Triplet<>(SObj.Lst.single(arg), (lhs, args) -> {
-                if (lhs.isInt() && args.value().get(0).isInt())
-                    return SObj.Int.of(lhs.intValue() + args.value().get(0).intValue());
-                else
-                    throw new IllegalStateException("the operands do not support plus");
-
-            }, BObj.NoObj.of()), PLUS_URI);
-        }
-    }
+public interface Struct {
 }

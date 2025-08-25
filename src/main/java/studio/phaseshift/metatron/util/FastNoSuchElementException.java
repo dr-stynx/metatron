@@ -16,27 +16,24 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.inst;
+package studio.phaseshift.metatron.util;
 
-import org.javatuples.*;
-import studio.phaseshift.metatron.lang.obj.*;
+import java.io.*;
+import java.util.NoSuchElementException;
 
-import java.net.*;
+public final class FastNoSuchElementException extends NoSuchElementException {
+    @Serial
+    private static final long serialVersionUID = 2303108654138257697L;
+    private static final FastNoSuchElementException INSTANCE = new FastNoSuchElementException();
 
-public final class SInst {
+    private FastNoSuchElementException() {
+    }
 
-    public static final URI PLUS_URI = URI.create("m:plus");
+    public static NoSuchElementException instance() {
+        return INSTANCE;
+    }
 
-    public static class PlusInst extends SObj.Inst implements BInst.PlusInst {
-
-        PlusInst(final BObj.Obj arg) {
-            super(new Triplet<>(SObj.Lst.single(arg), (lhs, args) -> {
-                if (lhs.isInt() && args.value().get(0).isInt())
-                    return SObj.Int.of(lhs.intValue() + args.value().get(0).intValue());
-                else
-                    throw new IllegalStateException("the operands do not support plus");
-
-            }, BObj.NoObj.of()), PLUS_URI);
-        }
+    public synchronized Throwable fillInStackTrace() {
+        return this;
     }
 }
