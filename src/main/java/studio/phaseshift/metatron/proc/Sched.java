@@ -16,16 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.struct;
+package studio.phaseshift.metatron.proc;
 
-import studio.phaseshift.metatron.lang.obj.*;
-
-import java.net.*;
-
-public interface Struct {
-
-    public BObj.Obj read(final URI addr);
-
-    public void write(final URI addr, final BObj.Obj obj);
-
+public interface Sched {
 }

@@ -19,13 +19,23 @@
 package studio.phaseshift.metatron.struct;
 
 import studio.phaseshift.metatron.lang.obj.*;
+import studio.phaseshift.metatron.lang.obj.BObj.*;
+import studio.phaseshift.metatron.util.*;
 
 import java.net.*;
+import java.util.*;
 
-public interface Struct {
+public class MemoryStruct implements Struct{
 
-    public BObj.Obj read(final URI addr);
+    final Map<URI, Obj> store = new HashMap<>();
 
-    public void write(final URI addr, final BObj.Obj obj);
+    @Override
+    public Obj read(final URI addr) {
+       return ObjUtil.orNoObj(store.get(addr));
+    }
 
+    @Override
+    public void write(final URI addr, Obj obj) {
+
+    }
 }
