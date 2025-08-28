@@ -16,22 +16,23 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.util;
+package studio.phaseshift.metatron.lang.obj;
 
-import studio.phaseshift.metatron.lang.obj.*;
-import studio.phaseshift.metatron.lang.obj.BObj.*;
+import org.jline.jansi.Ansi.*;
 
-public final class ObjUtil {
+public class Palette {
 
-    private ObjUtil() {
+    public static final Palette STANDARD = new Palette();
 
+    Color typeC() {
+        return Color.BLUE;
     }
 
-    public static BObj.Obj orNoObj(final BObj.Obj obj) {
-        return null == obj ? NoObj.of() : obj;
+    Color valueC() {
+        return Color.YELLOW;
     }
 
-    public static boolean isLambda(final Object o) {
-        return o.toString().contains("$$Lambda");
+    Color formC() {
+        return Color.GREEN;
     }
 }
