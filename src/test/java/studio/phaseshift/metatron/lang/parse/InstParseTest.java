@@ -16,43 +16,19 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.obj;
+package studio.phaseshift.metatron.lang.parse;
 
-import org.jline.jansi.Ansi.Color;
+import org.junit.jupiter.api.Test;
+import studio.phaseshift.metatron.lang.obj.SObj.Obj;
 
-public class Palette {
+import static studio.phaseshift.metatron.MetatronTest.assertMEquals;
+import static studio.phaseshift.metatron.lang.parse.ObjParser.parse;
 
-    public static final Palette STANDARD = new Palette();
+public class InstParseTest {
 
-    Color typeC() {
-        return Color.BLUE;
+    @Test
+    public void testPlusInst() {
+        assertMEquals(3, parse("1 => plus(2)"));
     }
 
-    Color valueC() {
-        return Color.YELLOW;
-    }
-
-    public Color formC() {
-        return Color.GREEN;
-    }
-
-    public Color form2C() {
-        return Color.MAGENTA;
-    }
-
-    public  Color warnC() {
-        return Color.YELLOW;
-    }
-
-    public  Color infoC() {
-        return Color.GREEN;
-    }
-
-    public   Color debugC() {
-        return Color.MAGENTA;
-    }
-
-    public  Color errorC() {
-        return Color.RED;
-    }
 }
