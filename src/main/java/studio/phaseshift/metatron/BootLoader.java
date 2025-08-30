@@ -16,19 +16,18 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.inst;
+package studio.phaseshift.metatron;
 
-import org.junit.jupiter.api.Test;
-import studio.phaseshift.metatron.lang.obj.SObj.Inst;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import studio.phaseshift.metatron.lang.inst.SInst;
 
-import static studio.phaseshift.metatron.MetatronTest.assertMEquals;
-import static studio.phaseshift.metatron.lang.inst.SInst.PLUS_URI;
-import static studio.phaseshift.metatron.lang.obj.SObj.Int;
+public class BootLoader {
 
-public class STest {
+    private static final Logger LOG = LoggerFactory.getLogger(BootLoader.class);
 
-    @Test
-    public void testPlusInst() {
-        assertMEquals(35, new Inst(PLUS_URI, Int.of(25)).apply(Int.of(10)));
+    public static void load() {
+        LOG.info("booting metatron");
+        SInst.load();
     }
 }
