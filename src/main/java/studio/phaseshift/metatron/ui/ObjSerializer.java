@@ -16,36 +16,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.struct;
+package studio.phaseshift.metatron.ui;
 
-import studio.phaseshift.metatron.BootLoader;
-import studio.phaseshift.metatron.lang.fURI;
 import studio.phaseshift.metatron.lang.obj.BObj;
-import studio.phaseshift.metatron.lang.obj.Palette;
-import studio.phaseshift.metatron.ui.Graphitty;
 
-import static studio.phaseshift.metatron.lang.obj.BObj.Rec;
+public interface ObjSerializer<T> {
 
-public interface Router extends Rec {
+    T write(final BObj.Obj obj) throws IllegalStateException;
 
-    fURI ROUTER_TID = fURI.of("router");
-
-    static Router global() {
-        return BootLoader.ROUTER;
-    }
-
-    @Override
-    default fURI tid() {
-        return ROUTER_TID;
-    }
-
-    BObj.Obj read(final fURI vid);
-
-    BObj.Obj write(final fURI vid, final BObj.Obj obj);
-
-    void registerStruct(final Struct struct);
-
-    default String toString(final Palette palette) {
-        return Graphitty.global().parse("!b%s!g:[!yrouter!g]!!".formatted(this.tid().toString()));
-    }
+    BObj.Obj read(final T data) throws IllegalStateException;
 }
