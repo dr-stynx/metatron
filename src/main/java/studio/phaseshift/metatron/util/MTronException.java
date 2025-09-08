@@ -16,36 +16,35 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.struct;
+package studio.phaseshift.metatron.util;
 
-import studio.phaseshift.metatron.BootLoader;
-import studio.phaseshift.metatron.lang.fURI;
-import studio.phaseshift.metatron.lang.obj.BObj;
-import studio.phaseshift.metatron.ui.Palette;
 import studio.phaseshift.metatron.ui.Graphitty;
 
-public interface Router extends BObj.Obj {
+public class MTronException extends RuntimeException {
 
-    fURI ROUTER_TID = fURI.of("router");
-
-    static Router global() {
-        return BootLoader.ROUTER;
+    private MTronException(final String message) {
+        super(Graphitty.string(message));
     }
 
-    @Override
-    default fURI tid() {
-        return ROUTER_TID;
+    private MTronException(final String message, final Throwable cause) {
+        super(Graphitty.string(message), cause);
     }
 
-    BObj.Obj read(final fURI vid);
-
-    BObj.Obj write(final fURI vid, final BObj.Obj obj);
-
-    boolean hasStruct(final fURI vid);
-
-    void registerStruct(final Struct struct);
-
-    default String toString(final Palette palette) {
-        return Graphitty.string("!b%s!g:[!yrouter!g]!!".formatted(this.tid().toString()));
+    private MTronException(final Throwable cause) {
+        super(cause);
     }
+
+    public static MTronException of(final Throwable cause) {
+        return new MTronException(cause);
+    }
+
+    public static MTronException of(final Throwable cause, final String format, final Object... args) {
+        return new MTronException(Graphitty.string(format.formatted(args)), cause);
+    }
+
+    public static MTronException of(final String format, final Object... args) {
+        return new MTronException(Graphitty.string(format.formatted(args)));
+    }
+
+
 }
