@@ -16,17 +16,29 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.obj.base;
+package studio.phaseshift.metatron.lang.obj.mtron;
 
 import studio.phaseshift.metatron.lang.fURI;
+import studio.phaseshift.metatron.lang.obj.base.Uri;
 
-public interface Bool extends Obj {
-    public static final fURI TID = fURI.of("bool");
+public class MUri extends MObj implements Uri {
+    public MUri(final fURI value, final fURI tid, final fURI vid) {
+        super(value, tid, vid);
+    }
+
+    public MUri(final fURI value) {
+        this(value, Uri.TID, fURI.NONE);
+    }
 
     @Override
-    Bool clone(final Object value, final fURI tid, final fURI vid);
+    public Uri clone(final Object value, final fURI tid, final fURI vid) {
+        return new MUri((fURI) value, tid, vid);
+    }
 
     @Override
-    Boolean value();
-
+    public fURI value() {
+        return (fURI) this.value;
+    }
 }
+
+

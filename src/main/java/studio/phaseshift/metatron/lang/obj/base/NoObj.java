@@ -18,15 +18,52 @@
 
 package studio.phaseshift.metatron.lang.obj.base;
 
+import org.javatuples.Triplet;
 import studio.phaseshift.metatron.lang.fURI;
+import studio.phaseshift.metatron.util.IteratorUtil;
 
-public interface Bool extends Obj {
-    public static final fURI TID = fURI.of("bool");
+import java.util.Iterator;
+
+public class NoObj implements Obj, Inst {
+
+    private static final NoObj SINGLE = new NoObj();
+    public static final fURI TID = fURI.of("noobj");
+
+    private NoObj() {
+        // singleton
+    }
+
+    public static NoObj single() {
+        return NoObj.SINGLE;
+    }
 
     @Override
-    Bool clone(final Object value, final fURI tid, final fURI vid);
+    public Triplet value() {
+        return null;
+    }
 
     @Override
-    Boolean value();
+    public fURI tid() {
+        return TID;
+    }
 
+    @Override
+    public fURI vid() {
+        return fURI.NONE;
+    }
+
+    @Override
+    public NoObj clone(final Object value, final fURI tid, final fURI vid) {
+        return this;
+    }
+
+    @Override
+    public NoObj vid(final fURI furi) {
+        return this;
+    }
+
+    @Override
+    public Iterator<Obj> iterator() {
+        return IteratorUtil.of();
+    }
 }

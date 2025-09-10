@@ -16,17 +16,29 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.obj.base;
+package studio.phaseshift.metatron.lang.obj.mtron;
 
+import org.javatuples.Pair;
 import studio.phaseshift.metatron.lang.fURI;
+import studio.phaseshift.metatron.lang.obj.base.Obj;
+import studio.phaseshift.metatron.lang.obj.base.Rel;
 
-public interface Bool extends Obj {
-    public static final fURI TID = fURI.of("bool");
+public class MRel extends MObj implements Rel {
+    public MRel(final Pair<Obj, Obj> value, final fURI tid, final fURI vid) {
+        super(value, tid, vid);
+    }
+
+    public MRel(final Pair<Obj, Obj> value) {
+        this(value, Rel.TID, fURI.NONE);
+    }
 
     @Override
-    Bool clone(final Object value, final fURI tid, final fURI vid);
+    public Rel clone(final Object value, final fURI tid, final fURI vid) {
+        return new MRel((Pair<Obj, Obj>) value, tid, vid);
+    }
 
     @Override
-    Boolean value();
-
+    public Pair<Obj, Obj> value() {
+        return (Pair<Obj, Obj>) this.value;
+    }
 }

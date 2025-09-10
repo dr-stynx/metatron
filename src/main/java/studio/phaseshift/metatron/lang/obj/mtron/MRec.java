@@ -16,17 +16,30 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.obj.base;
+package studio.phaseshift.metatron.lang.obj.mtron;
 
 import studio.phaseshift.metatron.lang.fURI;
+import studio.phaseshift.metatron.lang.obj.base.Obj;
+import studio.phaseshift.metatron.lang.obj.base.Rec;
 
-public interface Bool extends Obj {
-    public static final fURI TID = fURI.of("bool");
+import java.util.Map;
+
+public class MRec extends MObj implements Rec {
+    public MRec(final Map<Obj, Obj> value, final fURI tid, final fURI vid) {
+        super(value, tid, vid);
+    }
+
+    public MRec(final Map<Obj, Obj> value) {
+        this(value, Rec.TID, fURI.NONE);
+    }
 
     @Override
-    Bool clone(final Object value, final fURI tid, final fURI vid);
+    public Rec clone(final Object value, final fURI tid, final fURI vid) {
+        return new MRec((Map<Obj, Obj>) value, tid, vid);
+    }
 
     @Override
-    Boolean value();
-
+    public Map<Obj, Obj> value() {
+        return (Map<Obj, Obj>) this.value;
+    }
 }

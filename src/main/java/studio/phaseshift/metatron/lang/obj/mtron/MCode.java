@@ -16,17 +16,32 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.obj.base;
+package studio.phaseshift.metatron.lang.obj.mtron;
 
 import studio.phaseshift.metatron.lang.fURI;
+import studio.phaseshift.metatron.lang.obj.base.Bool;
+import studio.phaseshift.metatron.lang.obj.base.Code;
+import studio.phaseshift.metatron.lang.obj.base.Inst;
 
-public interface Bool extends Obj {
-    public static final fURI TID = fURI.of("bool");
+import java.util.List;
+
+public class MCode extends MObj implements Code {
+
+    public MCode(final List<Inst> value, final fURI tid, final fURI vid) {
+        super(value, tid, vid);
+    }
+
+    public MCode(final List<Inst> value) {
+        this(value, Code.TID, fURI.NONE);
+    }
 
     @Override
-    Bool clone(final Object value, final fURI tid, final fURI vid);
+    public Code clone(final Object value, final fURI tid, final fURI vid) {
+        return new MCode((List<Inst>) value, tid, vid);
+    }
 
     @Override
-    Boolean value();
-
+    public List<Inst> value() {
+        return (List<Inst>) this.value;
+    }
 }

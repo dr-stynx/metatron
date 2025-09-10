@@ -16,17 +16,33 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.obj.base;
+package studio.phaseshift.metatron.space.q;
 
 import studio.phaseshift.metatron.lang.fURI;
 
-public interface Bool extends Obj {
-    public static final fURI TID = fURI.of("bool");
+import static studio.phaseshift.metatron.lang.obj.BObj.Obj;
 
-    @Override
-    Bool clone(final Object value, final fURI tid, final fURI vid);
+public interface Q {
 
-    @Override
-    Boolean value();
+    String query();
 
+    default void onPreWrite(final fURI source, final fURI target, final Obj obj) {
+
+    }
+
+    default void onPostWrite(final fURI source, final fURI target, final Obj original, final Obj replacement) {
+
+    }
+
+    default public void onQLessWrite(final fURI source, final fURI target, final Obj original) {
+
+    }
+
+    default Obj onPreRead(final fURI source, final fURI target) {
+        return null;
+    }
+
+    default Obj onPostRead(final fURI source, final fURI target) {
+        return null;
+    }
 }

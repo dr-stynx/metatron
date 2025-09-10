@@ -16,17 +16,28 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.obj.base;
+package studio.phaseshift.metatron.lang.monoid;
 
-import studio.phaseshift.metatron.lang.fURI;
+import studio.phaseshift.metatron.lang.obj.base.Inst;
+import studio.phaseshift.metatron.lang.obj.base.Obj;
 
-public interface Bool extends Obj {
-    public static final fURI TID = fURI.of("bool");
+public interface Monoid extends Iterable<Obj> {
 
-    @Override
-    Bool clone(final Object value, final fURI tid, final fURI vid);
+    interface Monad {
+        void halt();
 
-    @Override
-    Boolean value();
+        boolean halted();
 
+        boolean dead();
+
+        Inst inst();
+
+        Obj obj();
+
+        long bulk();
+
+        //long loops();
+
+        void run();
+    }
 }

@@ -20,13 +20,15 @@ package studio.phaseshift.metatron.lang.obj.base;
 
 import studio.phaseshift.metatron.lang.fURI;
 
-public interface Bool extends Obj {
-    public static final fURI TID = fURI.of("bool");
+import java.util.Map;
+
+public interface Rec extends Poly {
+    public static final fURI TID = fURI.of("rec");
 
     @Override
-    Bool clone(final Object value, final fURI tid, final fURI vid);
+    Rec clone(final Object value, final fURI tid, final fURI vid);
 
     @Override
-    Boolean value();
+    Map<Obj, Obj> value();
 
 }

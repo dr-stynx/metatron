@@ -16,17 +16,24 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.obj.base;
+package studio.phaseshift.metatron.space;
 
-import studio.phaseshift.metatron.lang.fURI;
+import org.junit.jupiter.api.BeforeEach;
 
-public interface Bool extends Obj {
-    public static final fURI TID = fURI.of("bool");
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-    @Override
-    Bool clone(final Object value, final fURI tid, final fURI vid);
+public class SpaceTest {
 
-    @Override
-    Boolean value();
+    public Space space;
+
+    @BeforeEach
+    public void beforeEach() {
+        assertNotNull(this.space);
+        this.space.write("#",noobj)
+    }
+
+    public void testMonoSpace() {
+        space.
+    }
 
 }
