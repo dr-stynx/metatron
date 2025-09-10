@@ -18,17 +18,7 @@
 
 package studio.phaseshift.metatron.lang.obj.base;
 
-import studio.phaseshift.metatron.lang.fURI;
+public interface ObjFactory {
 
-import java.util.List;
-
-public interface Code extends Obj {
-    public static final fURI TID = fURI.of("/mtron/code");
-
-    @Override
-    Code clone(final Object value, final fURI tid, final fURI vid);
-
-    @Override
-    List<Inst> value();
-
+    <O extends Obj> O create(final O obj);
 }
