@@ -18,21 +18,7 @@
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 
-package studio.phaseshift.metatron.ui;
+package studio.phaseshift.metatron.lang;
 
-import org.junit.jupiter.api.Test;
-
-public class MarkdownTest {
-
-    @Test
-    public void testMarkdown() {
-        System.out.println(Markdown.markdown("""
-                # Metatron
-                ## A Distributed Virtual Machine
-                
-                * uri
-                * fluent
-                * iot           
-                """));
-    }
+public interface Q {
 }
