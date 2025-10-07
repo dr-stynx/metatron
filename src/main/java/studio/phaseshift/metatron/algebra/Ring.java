@@ -16,36 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.obj;
+package studio.phaseshift.metatron.algebra;
 
-import studio.phaseshift.metatron.lang.fURI;
-import studio.phaseshift.metatron.space.Space;
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public interface Ring<R extends Ring<R>> extends Semiring<R>, Monoid<R> {
 
-import java.util.Set;
+    R neg();
 
-import static studio.phaseshift.metatron.lang.fURI.f;
-
-
-public interface InstSet extends Space {
-
-    fURI A = f("A");
-    fURI B = f("B");
-    fURI C = f("C");
-    fURI D = f("D");
-    fURI E = f("E");
-    fURI F = f("F");
-    fURI G = f("G");
-
-    @Override
-    fURI pattern();
-
-    Set<Type> types();
-
-    Set<Inst> insts();
-
-    Set<Inst> rewrites();
-
-    @Override
-    default void append(final fURI addr, final Obj... obj) {
+    default R minus(final R r) {
+        return this.plus(r.neg());
     }
 }
