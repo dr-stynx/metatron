@@ -16,33 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang;
+package studio.phaseshift.metatron.space.mem;
 
-import studio.phaseshift.metatron.lang.obj.Obj;
+import org.junit.jupiter.api.BeforeAll;
+import studio.phaseshift.metatron.lang.fURI;
+import studio.phaseshift.metatron.space.SpaceTest;
 
-import java.util.Optional;
-
-public interface Q extends Obj {
-
-    @Override
-    fURI value();
-
-    Optional<OnWrite> onWrite();
-
-    Optional<OnRead> onRead();
-
-    interface OnWrite {
-        Optional<Obj> preWrite(final fURI source, final fURI vid, final Obj obj);
-
-        Optional<Obj> postWrite(final fURI source, final fURI vid, final Obj oldObj, final Obj newObj);
-
-        Optional<Obj> qlessWrite(final fURI source, final fURI vid, final Obj obj);
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public class StackSpaceTest extends SpaceTest {
+    @BeforeAll
+    public static void setup() {
+        SPACE = () -> new StackSpace(fURI.of("/t/#"), fURI.of("/mnt/t"));
     }
-
-    interface OnRead {
-        Optional<Obj> preRead(final fURI source, final fURI vid);
-
-        Optional<Obj> postRead(final fURI source, final fURI vid, final Obj obj);
-    }
-
 }
