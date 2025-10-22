@@ -19,36 +19,35 @@
 package studio.phaseshift.metatron.lang.obj.mtron;
 
 import studio.phaseshift.metatron.lang.fURI;
-import studio.phaseshift.metatron.lang.obj.Real;
+import studio.phaseshift.metatron.lang.obj.Fail;
+import studio.phaseshift.metatron.util.MTronException;
 
-import static studio.phaseshift.metatron.lang.obj.mtron.mtronInstSet.REAL_TID;
+import static studio.phaseshift.metatron.lang.obj.mtron.mtronInstSet.FAIL_TID;
 
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public class MFail extends MObj implements Fail {
 
-public class MReal extends MObj implements Real {
-
-    public MReal(final Double value, final fURI tid, final fURI vid) {
-        super(value, tid, vid);
+    public MFail(final Throwable t, final fURI tid, final fURI vid) {
+        super(t, tid, vid);
     }
 
-    public static Real real(final Double jvm) {
-        return new MReal(jvm, REAL_TID, fURI.NULL);
+    public static Fail fail(final Throwable t) {
+        return new MFail(t, FAIL_TID, fURI.NULL);
     }
 
-    public static Real real(final Double jvm, final fURI tid, final fURI vid) {
-        return new MReal(jvm, tid, vid);
-    }
-
-    public static Real of(final double jvm) {
-        return new MReal(jvm, REAL_TID, fURI.NULL);
+    public static Fail fail(final Throwable t, final String format, final Object... args) {
+        return fail(MTronException.of(t, format, args));
     }
 
     @Override
-    public Real clone(final Object jvm, final fURI tid, final fURI vid) {
+    public Fail clone(Object jvm, fURI tid, fURI vid) {
         return super.clone(jvm, tid, vid);
     }
 
     @Override
-    public Double jvm() {
-        return (Double) this.jvm;
+    public Throwable jvm() {
+        return super.jvm();
     }
 }

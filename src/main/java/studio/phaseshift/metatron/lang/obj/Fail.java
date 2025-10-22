@@ -20,23 +20,22 @@ package studio.phaseshift.metatron.lang.obj;
 
 import studio.phaseshift.metatron.lang.fURI;
 
-public interface Int extends Mono {
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public interface Fail extends Obj {
 
     @Override
-    Int clone(final Object jvm, final fURI tid, final fURI vid);
+    Fail clone(final Object jvm, final fURI tid, final fURI vid);
 
     @Override
-    Long jvm();
+    Throwable jvm();
 
-    default Int jvm(final Long jvm) {
-        return this.clone(jvm, this.tid(), this.vid());
+    default Fail jvm(final Throwable value) {
+        return this.clone(value, this.tid(), this.vid());
     }
 
-    default Int tid(final fURI tid) {
+    default Fail tid(final fURI tid) {
         return this.clone(this.jvm(), tid, this.vid());
-    }
-
-    default Int vid(final fURI vid) {
-        return this.clone(this.jvm(), this.tid(), vid);
     }
 }
