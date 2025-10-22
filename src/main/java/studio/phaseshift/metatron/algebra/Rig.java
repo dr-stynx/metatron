@@ -23,18 +23,8 @@ import studio.phaseshift.metatron.lang.obj.Obj;
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface Monoid<R extends Monoid<R>> {
-
-    R mult(final R r);
-
-    R one();
-
-    default boolean isOne() {
-        return this.equals(this.one());
-    }
-
-    interface O<OBJ extends Monoid.O<OBJ>> extends Monoid<OBJ>, Obj {
+public interface Rig<R extends Rig<R>> extends Semiring<R>, Monoid<R> {
+    interface O<R extends Rig.O<R>> extends Rig<R>, Semiring.O<R>, Obj {
 
     }
 }
-
