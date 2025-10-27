@@ -16,24 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.algebra;
+package studio.phaseshift.metatron.io.net;
 
-import studio.phaseshift.metatron.lang.obj.Obj;
+import studio.phaseshift.metatron.lang.fURI;
+import studio.phaseshift.metatron.lang.obj.mtron.MObjs;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface PlusMonoid<R extends PlusMonoid<R>> extends Monoid<R> {
-
-    R plus(final R r);
-
-    R zero();
-
-    default boolean isZero() {
-        return this.equals(this.zero());
-    }
-
-    interface O<R extends O<R>> extends PlusMonoid<R>, Monoid.O<R>, Obj {
-
+public class FutureObjs extends MObjs {
+    
+    public FutureObjs(final fURI vid) {
+        super(new ConcurrentHashMap<>(), vid);
     }
 }

@@ -18,22 +18,16 @@
 
 package studio.phaseshift.metatron.algebra;
 
-import studio.phaseshift.metatron.lang.obj.Obj;
-
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface PlusMonoid<R extends PlusMonoid<R>> extends Monoid<R> {
+public interface PlusGroup<R extends PlusGroup<R>> extends Group<R>, PlusMonoid<R> {
 
-    R plus(final R r);
+    R neg();
+    
+    // boolean isNeg();
 
-    R zero();
-
-    default boolean isZero() {
-        return this.equals(this.zero());
-    }
-
-    interface O<R extends O<R>> extends PlusMonoid<R>, Monoid.O<R>, Obj {
+    interface O<R extends O<R>> extends PlusGroup<R>, Group.O<R>, PlusMonoid.O<R> {
 
     }
 }
