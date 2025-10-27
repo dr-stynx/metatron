@@ -23,18 +23,17 @@ import studio.phaseshift.metatron.lang.obj.Obj;
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface Monoid<R extends Monoid<R>> {
-    
-   /* R eval(final R r);
+public interface MultMonoid<R extends MultMonoid<R>> extends Monoid<R> {
 
-    R identity();
+    R mult(final R rhs);
 
-    default boolean isIdentity() {
-        return this.equals(this.identity());
-    }*/
-    
-    interface O<R extends Monoid.O<R>> extends Monoid<R>, Obj {
+    R one();
+
+    default boolean isOne() {
+        return this.equals(this.one());
+    }
+
+    interface O<R extends MultMonoid.O<R>> extends MultMonoid<R>, Obj {
 
     }
 }
-
