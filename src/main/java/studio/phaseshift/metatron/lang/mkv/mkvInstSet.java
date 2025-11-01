@@ -16,57 +16,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.mweb;
+package studio.phaseshift.metatron.lang.mkv;
 
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.lang.mtron.type.Inst;
 import studio.phaseshift.metatron.lang.mtron.type.Type;
 import studio.phaseshift.metatron.lang.mtron.type.impl.MInstSet;
+import studio.phaseshift.metatron.lang.mweb.JSONTranslator;
+import studio.phaseshift.metatron.lang.mweb.WebTranslator;
 
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static studio.phaseshift.metatron.furi.fURI.ALL;
 import static studio.phaseshift.metatron.furi.fURI.f;
-import static studio.phaseshift.metatron.lang.mtron.mtronFluent.StartLess.id_;
-import static studio.phaseshift.metatron.lang.mtron.mtronFluent.StartLess.isa_;
-import static studio.phaseshift.metatron.lang.mtron.mtronInstSet.REC_TID;
+import static studio.phaseshift.metatron.lang.mkv.mkvSpace.KVSPACE_TID;
 import static studio.phaseshift.metatron.lang.mtron.mtronInstSet.URI_TID;
 import static studio.phaseshift.metatron.lang.mtron.type.impl.MInst.instC;
 import static studio.phaseshift.metatron.lang.mtron.type.impl.MRec.rec;
 import static studio.phaseshift.metatron.lang.mtron.type.impl.MType.T;
 import static studio.phaseshift.metatron.lang.mtron.type.impl.MUri.uri;
-import static studio.phaseshift.metatron.lang.mweb.mwebSpace.WEB_TID;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class mwebInstSet extends MInstSet {
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public class mkvInstSet extends MInstSet {
 
-    public static final fURI MWEB_TID = f("/mweb");
-    public static final fURI INST_TID = MWEB_TID.extend("inst");
-    public static final fURI PAGE_TID = MWEB_TID.extend("page");
-    public static final fURI CSS_TID = MWEB_TID.extend("css");
-    private static final WebTranslator WEB_TRANSLATOR = new WebTranslator();
-    private static final JSONTranslator JSON_TRANSLATOR = new JSONTranslator();
-
-    public mwebInstSet(final fURI vid) {
-        super(MWEB_TID, vid);
+    public static final fURI MKV_TID = f("/mkv");
+    public static final fURI INST_TID = MKV_TID.extend("inst");
+    public mkvInstSet(final fURI vid) {
+        super(MKV_TID, vid);
     }
 
-    public static mwebInstSet of(final fURI vid) {
-        return new mwebInstSet(vid);
+    public static mkvInstSet of(final fURI vid) {
+        return new mkvInstSet(vid);
     }
 
     @Override
     public Set<Inst> insts() {
         return Set.of(
-                instC(INST_TID.extend("mweb").dom(ALL.maybe()).rng(WEB_TID), rec(uri("host"), T(URI_TID), uri("route"), T(REC_TID), uri("pattern"), T(URI_TID)), (lhs, inst) -> mwebSpace.of(inst.arg("host").uriValue(), inst.arg("route").as(), inst.arg("pattern").uriValue(), fURI.NULL)));
+                instC(INST_TID.extend("mkv").dom(ALL.maybe()).rng(KVSPACE_TID), rec(uri("pattern"), T(URI_TID)), (lhs, inst) -> mkvSpace.of(inst.arg("pattern").uriValue(), fURI.NULL)));
     }
 
     @Override
     public Set<Type> types() {
-        return Stream.of(T(PAGE_TID, isa_(rec(uri("html"), rec(uri("head"), id_().tryToInst(), uri("body"), id_().tryToInst())))), T(CSS_TID)).collect(Collectors.toSet());
+        return Set.of(T(KVSPACE_TID));
     }
 }
