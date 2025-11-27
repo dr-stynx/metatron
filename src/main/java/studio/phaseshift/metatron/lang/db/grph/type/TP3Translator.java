@@ -1,3 +1,21 @@
+/*
+ * Metatron: A Distributed Computing Language and Virtual Machine
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package studio.phaseshift.metatron.lang.db.grph.type;
 
 import org.apache.tinkerpop.gremlin.structure.Direction;
@@ -5,24 +23,21 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import studio.phaseshift.metatron.furi.fURI;
-import studio.phaseshift.metatron.lang.core.m.type.*;
-import studio.phaseshift.metatron.lang.sys.router.Router;
+import studio.phaseshift.metatron.lang.core.m.type.Obj;
+import studio.phaseshift.metatron.lang.core.m.type.Rec;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MObjFactory;
+import studio.phaseshift.metatron.lang.sys.router.Router;
 import studio.phaseshift.metatron.util.Translator;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.*;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.AUTO_TID;
-import static studio.phaseshift.metatron.lang.db.grph.inst.grphInstSet.EDGE_TID;
-import static studio.phaseshift.metatron.lang.db.grph.inst.grphInstSet.VERTEX_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.FROM_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.auto;
 import static studio.phaseshift.metatron.lang.core.m.obj.NoObj.noobj;
-import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instB;
-import static studio.phaseshift.metatron.lang.core.m.type.impl.MLst.lst;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MObjs.objs;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRec.rec;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MUri.uri;
+import static studio.phaseshift.metatron.lang.db.grph.inst.grphInstSet.EDGE_TID;
+import static studio.phaseshift.metatron.lang.db.grph.inst.grphInstSet.VERTEX_TID;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)

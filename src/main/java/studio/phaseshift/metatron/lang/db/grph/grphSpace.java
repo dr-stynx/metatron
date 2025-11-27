@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,10 +21,10 @@ package studio.phaseshift.metatron.lang.db.grph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory;
 import studio.phaseshift.metatron.furi.c.cInt;
 import studio.phaseshift.metatron.furi.fURI;
+import studio.phaseshift.metatron.lang.MSpace;
 import studio.phaseshift.metatron.lang.Space;
 import studio.phaseshift.metatron.lang.core.m.inst.mInstSet;
 import studio.phaseshift.metatron.lang.core.m.type.Obj;
-import studio.phaseshift.metatron.lang.MSpace;
 import studio.phaseshift.metatron.lang.core.m.type.Rec;
 import studio.phaseshift.metatron.lang.core.m.type.Type;
 import studio.phaseshift.metatron.lang.db.grph.type.TP3Translator;
@@ -97,13 +97,13 @@ public class grphSpace extends MSpace<Space> {
         /*if (vid.equals(this.pattern.retractPattern())) {
             return obj;
         } else {*/
-            return this.sjvm.write(vid, obj);
+        return this.sjvm.write(vid, obj);
         //}
     }
 
 
     public void clear() {
-        LOG.info("clearing {{b}}%s{{X}}",this.pattern);
+        LOG.info("clearing {{b}}%s{{X}}", this.pattern);
         this.sjvm().close();
         this.sjvm = kvSpace.of(this.pattern, fURI.fnull);
     }

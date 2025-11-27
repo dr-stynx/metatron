@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,9 +21,9 @@ package studio.phaseshift.metatron.lang;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import studio.phaseshift.metatron.MetatronTest;
-import studio.phaseshift.metatron.lang.sys.router.Router;
-import studio.phaseshift.metatron.lang.core.m.type.Obj;
 import studio.phaseshift.metatron.lang.core.m.parser.mParser;
+import studio.phaseshift.metatron.lang.core.m.type.Obj;
+import studio.phaseshift.metatron.lang.sys.router.Router;
 import studio.phaseshift.metatron.ui.Graphitty;
 
 import java.util.ArrayList;
@@ -55,8 +55,8 @@ public abstract class SpaceTest extends MetatronTest {
             ".                                                     % */t/2                    % c",
             "/t -> [a,[b,[c,d],e],f]                               % */t/0                    % a",
             ".                                                     % */t                      % [a,[b,[c,d],e],f]",
-        //    ".                                                     % */+                      % [a,[b,[c,d],e],f]",
-        //    ".                                                     % */+/                     % [/t=>[a,[b,[c,d],e],f]]>-",
+            //    ".                                                     % */+                      % [a,[b,[c,d],e],f]",
+            //    ".                                                     % */+/                     % [/t=>[a,[b,[c,d],e],f]]>-",
             ".                                                     % */t/+                      % {a, [b,[c,d],e],f}",
             ".                                                     % */t/+/                     % [/t/0=>a,/t/1=>[b,[c,d],e],/t/2=>f]>-",
             ".                                                     % */t/+/+                  % {b,[c,d],e}",
@@ -82,10 +82,10 @@ public abstract class SpaceTest extends MetatronTest {
             ".                                                     % */t/c                    % 3",
             ".                                                     % */t/+                    % {1,2,3}",
             ".                                                     % *</t/+>.sum?int<=int{*}()% 6",
-           // ".                                                     % *#.sum?int<=int{*}()      % .",
-           // ".                                                     % *(/+/+).sum?int<=int{*}()    % .",
+            // ".                                                     % *#.sum?int<=int{*}()      % .",
+            // ".                                                     % *(/+/+).sum?int<=int{*}()    % .",
             "/t/ -> [a=>1,b=>2,c=>3]                               % */t/                      % [/t/a=>1,/t/b=>2,/t/c=>3]>-",
-           // ".                                                     % */t                       % noobj",
+            // ".                                                     % */t                       % noobj",
             ".                                                     % */t/a                     % 1",
             "/t -> [a=>[b=>2,c=>3],d=>4]                           % */t/a/b                   % 2",
             ".                                                     % */t/#                     % [[a=>[b=>2,c=>3],d=>4],[b=>2,c=>3],2,3,4]>-",
@@ -96,7 +96,7 @@ public abstract class SpaceTest extends MetatronTest {
             ".                                                     % */t/d                     % 4",
             ".                                                     % */t/+                     % [[b=>2,c=>3],4]>-",
             ".                                                     % */t/+/#                   % [[a=>[b=>2,c=>3],d=>4],[b=>2,c=>3],2,3,4]>-",
-       //     ".                                                     % */t/+/+/#                 % [[b=>2,c=>3],2,3,4]>-",
+            //     ".                                                     % */t/+/+/#                 % [[b=>2,c=>3],2,3,4]>-",
             ".                                                     % */t/a/                    % [/t/a/b=>2,/t/a/c=>3]>-",
             ".                                                     % */t/a/+                   % {2,3}",
             ".                                                     % */t/a/+/                  % [/t/a/b=>2,/t/a/c=>3]>-"

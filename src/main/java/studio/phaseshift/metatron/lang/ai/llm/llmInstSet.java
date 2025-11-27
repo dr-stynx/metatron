@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,17 +20,21 @@ package studio.phaseshift.metatron.lang.ai.llm;
 
 import dev.langchain4j.model.ollama.OllamaModels;
 import io.github.ollama4j.Ollama;
-import io.github.ollama4j.models.chat.*;
+import io.github.ollama4j.models.chat.OllamaChatMessageRole;
+import io.github.ollama4j.models.chat.OllamaChatRequest;
+import io.github.ollama4j.models.chat.OllamaChatResult;
+import io.github.ollama4j.models.chat.OllamaChatStreamObserver;
 import io.github.ollama4j.models.generate.OllamaGenerateTokenHandler;
 import io.github.ollama4j.models.request.ThinkMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import studio.phaseshift.metatron.Tokens;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.lang.ai.llm.type.impl.Audio;
 import studio.phaseshift.metatron.lang.ai.llm.type.impl.GGUF;
 import studio.phaseshift.metatron.lang.ai.llm.type.impl.OLLM;
-import studio.phaseshift.metatron.lang.core.m.type.*;
+import studio.phaseshift.metatron.lang.core.m.type.Inst;
+import studio.phaseshift.metatron.lang.core.m.type.Obj;
+import studio.phaseshift.metatron.lang.core.m.type.Rec;
+import studio.phaseshift.metatron.lang.core.m.type.Type;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MInstSet;
 import studio.phaseshift.metatron.lang.sys.router.Router;
 import studio.phaseshift.metatron.ui.Graphitty;
@@ -48,7 +52,6 @@ import static studio.phaseshift.metatron.lang.ai.llm.type.impl.Audio.AUDIO_TID;
 import static studio.phaseshift.metatron.lang.ai.llm.type.impl.OLLM.*;
 import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.isa_;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.*;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.ID_TID;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MBool.bool;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instB;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instC;

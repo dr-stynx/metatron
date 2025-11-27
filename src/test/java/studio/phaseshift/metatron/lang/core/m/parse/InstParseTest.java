@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -35,16 +35,16 @@ public class InstParseTest extends MetatronTest {
             "|(/usr/abc?int<=int(){ plus(_) }).to(/usr/abc)                                              % 2./usr/abc()                   % 4",
             "/usr/abc -> |(/usr/abc?int<=int(a=>int::T){ mult(*a) })                                  % 2./usr/abc(a=>4)               % 8",
             "|(/usr/abc?int<=int(a=>int::T){ mult(*a) }).to(/usr/abc)                                  % 2./usr/abc(a=>/usr/abc(4))     % 16",
-           // "|(/usr/abc?int<=int(a=>isa(int::T)){ mult(*a) }).to(/usr/abc)                             % 2./usr/abc(a=>4)               % 8",
+            // "|(/usr/abc?int<=int(a=>isa(int::T)){ mult(*a) }).to(/usr/abc)                             % 2./usr/abc(a=>4)               % 8",
             "|(/usr/abc?int<=int(a=>else(10)){ mult(*a) }).to(/usr/abc)                                  % 2./usr/abc()                   % 20",
             "|(/usr/abc?int<=int(a=>else(10)){ mult(*a) }).to(/usr/abc)                                  % 2./usr/abc(a=>noobj)           % 20",
             "|(/usr/abc?int<=int(a=>int::T){ mult(*a) }).to(/usr/abc)                                  % 2./usr/abc(4)                  % 8",
             "|(/usr/abc?int<=int(a=>int::T){ mult(*a) }).to(/usr/abc)                                  % 2./usr/abc(plus(10))           % 24",
-           // "|(/usr/abc?int<=int(int::T){ mult(*<0>) }).to(/usr/abc)                                   % 2./usr/abc(10)                 % 20",
-           // "|(/usr/abc?int<=int(int::T){ mult(*<0>) }).to(/usr/abc)                                   % 2./usr/abc(10)                 % 20",
-           // "|(/usr/abc?int<=int(int::T){ mult(*<0>) }).to(/usr/abc)                                   % 2./usr/abc(plus(10))           % 24",
+            // "|(/usr/abc?int<=int(int::T){ mult(*<0>) }).to(/usr/abc)                                   % 2./usr/abc(10)                 % 20",
+            // "|(/usr/abc?int<=int(int::T){ mult(*<0>) }).to(/usr/abc)                                   % 2./usr/abc(10)                 % 20",
+            // "|(/usr/abc?int<=int(int::T){ mult(*<0>) }).to(/usr/abc)                                   % 2./usr/abc(plus(10))           % 24",
             "|(/usr/abc?int<=int(a=>int::T,b=>int::T){ mult(*a).plus(*b) }).to(/usr/abc)             % 2./usr/abc(a=>_,b=>_)          % 6",
-           // "|(/usr/abc?int<=int(int::T[],int::T[]){ mult(*<0>).plus(*<1>) }).to(/usr/abc)               % 2./usr/abc(_,_)                % 6",
+            // "|(/usr/abc?int<=int(int::T[],int::T[]){ mult(*<0>).plus(*<1>) }).to(/usr/abc)               % 2./usr/abc(_,_)                % 6",
             "|(/usr/abc?int<=int(a=>int::T,b=>int::T){ mult(*a).plus(*b) }).to(/usr/abc)             % 2./usr/abc(a=>3,b=>4)          % 10",
             "|(/usr/abc?int<=int(a=>int::T,b=>int::T){ mult(*a).plus(*b) }).to(/usr/abc)             % 2./usr/abc(b=>4,a=>3)          % 10",
             //"|(/usr/abc?int<=int(lst::T[],int::T[]){ mult(*<0>>-).plus(*<1>) }).to(/usr/abc)               % 2./usr/abc([3],4)                % 10",

@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,7 +32,6 @@ import studio.phaseshift.metatron.util.Streamable;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -250,7 +249,7 @@ public interface Obj extends Function<Obj, Obj>, Streamable<Obj>, Iterable<Obj>,
         if (rhs.isType())
             return rhs.tid().isGeneric() ||
                     (typeInferenceMatch(this, rhs.as()) &&
-                            (rhs.<Type>as().predicate() == null || 
+                            (rhs.<Type>as().predicate() == null ||
                                     this.isObjs() ||
                                     !rhs.apply(this).isNoObj()));
         return this.tid().matches(rhs.tid()) &&

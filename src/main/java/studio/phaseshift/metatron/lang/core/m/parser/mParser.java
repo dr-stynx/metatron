@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,10 +24,10 @@ import org.petitparser.parser.combinators.*;
 import org.petitparser.parser.primitive.CharacterParser;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.lang.core.m.inst.mInstSet;
+import studio.phaseshift.metatron.lang.core.m.obj.NoObj;
 import studio.phaseshift.metatron.lang.core.m.type.Call;
 import studio.phaseshift.metatron.lang.core.m.type.Fail;
 import studio.phaseshift.metatron.lang.core.m.type.Inst;
-import studio.phaseshift.metatron.lang.core.m.obj.NoObj;
 import studio.phaseshift.metatron.lang.core.m.type.Obj;
 import studio.phaseshift.metatron.lang.core.m.type.impl.*;
 import studio.phaseshift.metatron.ui.Graphitty;
@@ -90,9 +90,9 @@ public class mParser {
         list.toArray(PARSERS);
         furi_parser.set(seq(word().or(seq(of("::").not(),
                         anyOf(REDUCED_FURI_CHARS))).plus().flatten(),
-                opt(true ? m_furi_poly_type() : none(), null),
-                opt(true ? m_furi_coefficient() : none(), null),
-                opt(false ? m_furi_query() : none(), null)).map(t -> new fURI(pick(t, 0)).big().poly(pick(t, 1)).c(pick(t, 2)).query(pick(t, 3))));
+                opt(m_furi_poly_type(), null),
+                opt(m_furi_coefficient(), null),
+                opt(none(), null)).map(t -> new fURI(pick(t, 0)).big().poly(pick(t, 1)).c(pick(t, 2)).query(pick(t, 3))));
 
 
         branch_parser.set(seq(opt(of("-<"), ""), of('{').trim(), m_code().separatedBy(of(',').trim()), of('}').trim()).pick(2)
@@ -401,7 +401,7 @@ public class mParser {
         return seq(m_type_prefix(TYPE_TID), of("T"),
                 opt(seq(of("["), opt(m_obj(), null), of("]")).map(t -> pick(t, 1)), null),
                 opt(seq(of("["), opt(m_obj(), null), of("]")).map(t -> pick(t, 1)), null))
-                .map(t -> T(pick(t, 0), pick(t, 2), (Inst)pick(t, 3)));
+                .map(t -> T(pick(t, 0), pick(t, 2), (Inst) pick(t, 3)));
     }
 
     public static Parser sugar_code() {

@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -51,7 +51,7 @@ public class WebTranslator implements Translator<Obj, Document> {
 
     private Element writeElement(final Rec rec, final Element element) {
         //Graphitty.log(this).warn(rec);
-        rec.<Rel>elements().forEach(e -> {
+        rec.elements().forEach(e -> {
             final Element newElement = new Element(e.first().uriValue().toString());
             element.appendChild(e.second().isRec() ? writeElement(e.second().as(), newElement) : newElement);
         });

@@ -1,8 +1,28 @@
+/*
+ * Metatron: A Distributed Computing Language and Virtual Machine
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package studio.phaseshift.metatron.lang.ai.llm.type.impl;
 
 import studio.phaseshift.metatron.furi.fURI;
-import studio.phaseshift.metatron.lang.core.m.inst.mInstSet;
-import studio.phaseshift.metatron.lang.core.m.type.*;
+import studio.phaseshift.metatron.lang.core.m.type.Obj;
+import studio.phaseshift.metatron.lang.core.m.type.Rec;
+import studio.phaseshift.metatron.lang.core.m.type.Type;
+import studio.phaseshift.metatron.lang.core.m.type.Uri;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MInt;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MRec;
 import studio.phaseshift.metatron.ui.Graphitty;
@@ -13,14 +33,14 @@ import studio.phaseshift.metatron.util.Tuple;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
-import static studio.phaseshift.metatron.furi.fURI.ALL;
 import static studio.phaseshift.metatron.Tokens.NAME;
 import static studio.phaseshift.metatron.lang.ai.llm.llmInstSet.LLM_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.*;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.*;
-import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instC;
+import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.isa_;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.INT_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.URI_TID;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MInt.jnt;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MLst.lst;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRel.rel;
@@ -41,7 +61,7 @@ public class GGUF extends MRec {
 
     public static final fURI GGUF_TID = LLM_TID.extend("gguf");
     public static final fURI TENSOR_REF_TID = GGUF_TID.extend("tensor_ref");
-    private com.llama4j.gguf.GGUF rawData;
+    private final com.llama4j.gguf.GGUF rawData;
     public static final String VERSION = "version";
     public static final String PATH = "path";
     public static final String FILE = "file";
@@ -78,7 +98,7 @@ public class GGUF extends MRec {
                         uri(NAME), uri(ti.name()),
                         uri(OFFSET), jnt(ti.offset()),
                         uri(GGML), uri(ti.ggmlType().name()),
-                        uri(SHAPE), lst(Arrays.stream(ti.shape()).mapToObj(MInt::jnt).map(Obj::<Obj>as).toList())).tid(TENSOR_REF_TID))
+                        uri(SHAPE), lst((List)Arrays.stream(ti.shape()).mapToObj(MInt::jnt).map(Obj::as).toList())).tid(TENSOR_REF_TID))
                 .map(r -> rel(r.at(NAME), r))
                 .collect(new Common.RecCollector());
     }

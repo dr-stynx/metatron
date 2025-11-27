@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,7 +22,6 @@ import org.petitparser.context.Result;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.lang.core.m.parser.mParser;
 import studio.phaseshift.metatron.lang.core.m.type.*;
-
 import studio.phaseshift.metatron.ui.Graphitty;
 import studio.phaseshift.metatron.ui.Palette;
 import studio.phaseshift.metatron.util.MTronException;
@@ -246,7 +245,7 @@ public record ObjStringSerializer(Builder b) implements ObjSerializer<String> {
             AtomicBoolean first = new AtomicBoolean(true);
             lst.elements().forEach(v -> {
                 if (nested)
-                    sb.append(" ".repeat(false && first.getAndSet(false) ? 0 : (depth * 2) + 1));
+                    sb.append(" ".repeat(false ? 0 : (depth * 2) + 1));
                 if (v.isRec()) {
                     this.generateRec(sb, v.as(), depth + 1);
                 } else if (v.isLst()) {
@@ -296,7 +295,7 @@ public record ObjStringSerializer(Builder b) implements ObjSerializer<String> {
             AtomicBoolean first = new AtomicBoolean(true);
             rec.recValue().forEach((k, v) -> {
                 if (nested)
-                    sb.append(" ".repeat(false && first.getAndSet(false) ? 0 : (depth * 2) + 1));
+                    sb.append(" ".repeat(false ? 0 : (depth * 2) + 1));
                 sb.append(k.isUri() ? recKey(k) : write(k)).append("{{g}}=>");
                 if (v.isRec()) {
                     this.generateRec(sb, v.as(), depth + 1);
@@ -367,7 +366,7 @@ public record ObjStringSerializer(Builder b) implements ObjSerializer<String> {
         private boolean ignoreRewrites;
         private int strClip = 50;
         private boolean prettyPrint = true;
-        private Set<fURI> hideTypes = new HashSet<>();
+        private final Set<fURI> hideTypes = new HashSet<>();
 
         private Builder() {
         }

@@ -1,3 +1,21 @@
+/*
+ * Metatron: A Distributed Computing Language and Virtual Machine
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package studio.phaseshift.metatron.lang.db.grph.type.mtp3;
 
 import org.apache.tinkerpop.gremlin.structure.Direction;
@@ -7,10 +25,8 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.util.wrapped.WrappedEdge;
 import studio.phaseshift.metatron.furi.c.cInt;
 import studio.phaseshift.metatron.furi.fURI;
-import studio.phaseshift.metatron.lang.core.m.type.Rec;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MObjFactory;
 import studio.phaseshift.metatron.lang.db.grph.type.REdge;
-import studio.phaseshift.metatron.lang.db.grph.type.tp.MProperty;
 
 import java.util.Iterator;
 
@@ -44,7 +60,7 @@ public class mEdge extends mElement implements Edge, WrappedEdge<REdge> {
 
     @Override
     public <V> Iterator<Property<V>> properties(String... propertyKeys) {
-        return this.getBaseEdge().<V>properties(stringToUriLabels(propertyKeys)).map(p -> mProperty.of(this, p)).map(p -> (Property<V>) p).iterator();
+        return this.getBaseEdge().properties(stringToUriLabels(propertyKeys)).map(p -> mProperty.of(this, p)).map(p -> (Property<V>) p).iterator();
     }
 
     @Override

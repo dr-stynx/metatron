@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,13 +21,12 @@ package studio.phaseshift.metatron.lang.db.grph.inst;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.lang.core.m.type.*;
+import studio.phaseshift.metatron.lang.core.m.type.impl.MInstSet;
 import studio.phaseshift.metatron.lang.db.grph.grphSpace;
 import studio.phaseshift.metatron.lang.db.grph.type.REdge;
 import studio.phaseshift.metatron.lang.db.grph.type.RElement;
 import studio.phaseshift.metatron.lang.db.grph.type.RVertex;
 import studio.phaseshift.metatron.lang.sys.router.Router;
-
-import studio.phaseshift.metatron.lang.core.m.type.impl.MInstSet;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -38,15 +37,14 @@ import static studio.phaseshift.metatron.furi.fURI.ALL;
 import static studio.phaseshift.metatron.furi.fURI.f;
 import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.id_;
 import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.isa_;
-import static studio.phaseshift.metatron.lang.core.m.type.impl.MUri.uri;
-import static studio.phaseshift.metatron.lang.db.grph.type.TP3Translator.LABEL;
-import static studio.phaseshift.metatron.lang.db.grph.type.TP3Translator.PROPS;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.*;
 import static studio.phaseshift.metatron.lang.core.m.obj.NoObj.noobj;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instC;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MLst.lst;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MObjs.objs;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MType.T;
+import static studio.phaseshift.metatron.lang.db.grph.type.TP3Translator.LABEL;
+import static studio.phaseshift.metatron.lang.db.grph.type.TP3Translator.PROPS;
 
 public class grphInstSet extends MInstSet {
 
@@ -90,7 +88,7 @@ public class grphInstSet extends MInstSet {
         return inst.args().isEmpty() ?
                 EMPTY_STRING_ARRAY :
                 inst.args().elements()
-                        .flatMap(Obj::<Obj>stream)
+                        .flatMap(Obj::stream)
                         .map(Obj::uriValue)
                         .map(Object::toString)
                         .toArray(String[]::new);
@@ -101,7 +99,7 @@ public class grphInstSet extends MInstSet {
         return inst.args().isEmpty() ?
                 EMPTY_STRING_ARRAY :
                 inst.args().elements()
-                        .flatMap(Obj::<Obj>stream)
+                        .flatMap(Obj::stream)
                         .map(Obj::jvm)
                         .map(o -> o instanceof fURI ? ((fURI) o).name() : o)
                         .toArray(Object[]::new);

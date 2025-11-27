@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -36,18 +36,7 @@ import java.util.stream.Stream;
 
 import static studio.phaseshift.metatron.furi.fURI.ALL;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.*;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.BOOL_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.GTE_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.GT_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.INT_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.LT_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.MINUS_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.MULT_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.PLUS_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.PROD_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.SUM_TID;
 import static studio.phaseshift.metatron.lang.core.m.obj.NoObj.noobj;
-import static studio.phaseshift.metatron.lang.core.m.type.impl.MBool.bool;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instC;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MInt.jnt;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MLst.lst;
@@ -136,7 +125,7 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
 
     default Rec put(final Obj key, final Obj value) {
         if (key.isNoObj()) return this;
-        return this.put(key, value, (BiFunction) IMMUTABLE);
+        return this.put(key, value, IMMUTABLE);
     }
 
     default Rec put(final String key, final Obj value, final BiFunction<Poly<?, ?>, Object, Poly<?, ?>> operation) {
@@ -158,7 +147,7 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
     @Override
     default Rec plus(final Rec rhs) {
         final Map<Obj, Obj> newMap = new LinkedHashMap<>(this.recValue());
-        rhs.stream().flatMap(Obj::<Obj>elements).map(Obj::<Rel>as).forEach(o -> newMap.compute(o.first(), (k, v) -> null == v ? o.second() : v.isPlusMonoid() ? (Obj) v.<PlusMonoid.O>as().plus(o.second().<PlusMonoid.O>as()) : v.append(o.second())));
+        rhs.stream().flatMap(Obj::elements).map(o -> (Rel) o).forEach(o -> newMap.compute(o.first(), (k, v) -> null == v ? o.second() : v.isPlusMonoid() ? (Obj) v.<PlusMonoid.O>as().plus(o.second().<PlusMonoid.O>as()) : v.append(o.second())));
         return this.jvm(newMap);
     }
 
@@ -216,7 +205,7 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
                 instC(PLUS_TID.dom(REC_TID).rng(REC_TID), lst(T(REC_TID)), (lhs, inst) -> lhs.jvm(Stream.concat(lhs.<Rec>as().elements(), inst.arg(0).<Rec>as().elements().map(Obj::<Rel>as)).collect(Collectors.toMap(Rel::first, Rel::second, Obj::append, LinkedHashMap::new)))),
                 instC(SELECT_TID.dom(REC_TID).rng(REC_TID.maybe()), lst(T(REC_TID)), (lhs, inst) -> mInstSet.crossPoly(lhs, inst.arg(0))),
 
-                instC(WITHIN_TID.dom(REC_TID).rng(REC_TID), lst(T(ALL_STAR)), (lhs, inst) -> rec(lhs.elements().map(r -> inst.arg(0).apply(r).<Rel>as()))),
+                instC(WITHIN_TID.dom(REC_TID).rng(REC_TID), lst(T(ALL_STAR)), (lhs, inst) -> rec(lhs.elements().map(r -> inst.arg(0).apply(r).as()))),
                 instC(PROD_TID.dom(INT_TID.maybeSome()).rng(INT_TID), lst(), (lhs, inst) -> inst.seed().jvm(lhs.stream().reduce(inst.seed(), (a, b) -> jnt(a.intValue() * (b.intValue() * b.c().max()))).intValue()/* * inst.c().max()*/), jnt(1)));
 
     }

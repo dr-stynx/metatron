@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -209,7 +209,7 @@ public interface Inst extends Call {
                     .map(i -> Helpers.bindGenerics(lhs, i, this))
                     .filter(i -> lhs.matches(i.dom()))
                     .map(i -> {
-                        final Poly<?,?> resolvedArgs = resolveArgs(this, i, lhs);
+                        final Poly<?, ?> resolvedArgs = resolveArgs(this, i, lhs);
                         if (null == resolvedArgs)
                             return null; // TODO: backtrack the resolution to the outer inst to see if adjusting the coefficient can resolve the internal resolution
                         return i.args(resolvedArgs);
@@ -417,7 +417,7 @@ public interface Inst extends Call {
                             generics.computeIfAbsent(argD.tid().cLess(), k -> argS.tid().cLess()); // beware of int[0] yielding noobj across all bindings
                         }
                         if (argD.isInst()) {
-                            argD = Helpers.bindGenerics(lhs, argD.<Inst>as(), argS);
+                            argD = Helpers.bindGenerics(lhs, argD.as(), argS);
                         } else if (argD.tid().cLess().isGeneric()) {
                             argD = argD.tid(generics.getOrDefault(argD.tid().cLess(), argS.tid())).c(argD.c());
                         }

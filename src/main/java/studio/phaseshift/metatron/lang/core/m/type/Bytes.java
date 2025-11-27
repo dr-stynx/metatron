@@ -1,3 +1,21 @@
+/*
+ * Metatron: A Distributed Computing Language and Virtual Machine
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package studio.phaseshift.metatron.lang.core.m.type;
 
 import studio.phaseshift.metatron.algebra.PlusMonoid;
@@ -58,7 +76,7 @@ public interface Bytes extends Mono, PlusMonoid<Bytes> {
         final ByteBuffer buffer = ByteBuffer.allocate(this.jvm().capacity());
         if (rhs.c().isPos()) {
             buffer.put(rhs.jvm());
-            buffer.put(this.jvm().duplicate().slice(0,this.jvm().capacity() - rhs.jvm().array().length));
+            buffer.put(this.jvm().duplicate().slice(0, this.jvm().capacity() - rhs.jvm().array().length));
         } else if (rhs.c().isNeg()) {
             buffer.put(this.jvm().duplicate().position(rhs.bytesValue().remaining()));
             buffer.put(rhs.jvm());

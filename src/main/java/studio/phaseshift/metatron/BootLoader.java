@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,6 +32,7 @@ import studio.phaseshift.metatron.lang.db.kv.kvSpace;
 import studio.phaseshift.metatron.lang.db.vec.vecInstSet;
 import studio.phaseshift.metatron.lang.net.clstr.clstrInstSet;
 import studio.phaseshift.metatron.lang.net.web.webInstSet;
+import studio.phaseshift.metatron.lang.sys.console.Console;
 import studio.phaseshift.metatron.lang.sys.router.Router;
 import studio.phaseshift.metatron.lang.sys.router.impl.MRouter;
 import studio.phaseshift.metatron.lang.sys.sysInstSet;
@@ -39,7 +40,6 @@ import studio.phaseshift.metatron.lang.util.logObj;
 import studio.phaseshift.metatron.ui.Graphitty;
 import studio.phaseshift.metatron.ui.GraphittyLogger;
 import studio.phaseshift.metatron.ui.Mode;
-import studio.phaseshift.metatron.lang.sys.console.Console;
 import studio.phaseshift.metatron.ui.mode.server.Server;
 import studio.phaseshift.metatron.util.MTronException;
 
@@ -130,11 +130,11 @@ public class BootLoader implements Rec, Feature.SelfClone {
             } catch (final Exception e) {
                 LOG.warn("booting metatron on a non-networked jvm");
             }
-           // startMode(options);
+            // startMode(options);
             LOG.info("known instruction sets: %s", Registry.open().registrants());
             ROUTER = new MRouter(remoteAuthority, f("/sys/router"));
             sysInstSet.create();
-            kvSpace.of(f("/sys/#"),f("/sys"));
+            kvSpace.of(f("/sys/#"), f("/sys"));
             Router.writeToSpace(mInstSet.create(f("/sys/router/lang/m")));
             Router.writeToSpace(Router.global());
             Router.writeToSpace(f("boot/option"), options);
@@ -185,7 +185,7 @@ public class BootLoader implements Rec, Feature.SelfClone {
             MODE = Console.of(options);
         else
             throw MTronException.of("unknown mode %s (see --help): %s", mode.uriValue(), options);
-       // MODE.start();
+        // MODE.start();
     }
 
     public static void close() {

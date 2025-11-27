@@ -1,12 +1,28 @@
+/*
+ * Metatron: A Distributed Computing Language and Virtual Machine
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package studio.phaseshift.metatron.lang.sys;
 
 import studio.phaseshift.metatron.furi.fURI;
-import studio.phaseshift.metatron.lang.net.remote.remoteSpace;
 import studio.phaseshift.metatron.lang.core.m.type.Inst;
-import studio.phaseshift.metatron.lang.core.m.type.Type;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MInstSet;
+import studio.phaseshift.metatron.lang.net.remote.remoteSpace;
 import studio.phaseshift.metatron.lang.sys.console.Console;
-import studio.phaseshift.metatron.lang.sys.fs.fileSpace;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,9 +67,9 @@ public class sysInstSet extends MInstSet {
                 T(ROUTER_TID),
                 T(SPACE_TID),
                 Console.CONSOLE_TYPE,
-               // fileSpace.FS_TYPE,
-               // fileSpace.FILE_TYPE,
-               // T(fileSpace.DIR_TID),
+                // fileSpace.FS_TYPE,
+                // fileSpace.FILE_TYPE,
+                // T(fileSpace.DIR_TID),
                 remoteSpace.REMOTE_TYPE, DOCQ_TYPE, SUBQ_TYPE);
     }
 
@@ -76,7 +92,7 @@ public class sysInstSet extends MInstSet {
                         }
                     });
                     return noobj();
-                }),"an str to page","noobj terminal",Map.of(jnt(0),"number of lines per page"),"an f(x)->0 terminal page through the lines of an str")
+                }), "an str to page", "noobj terminal", Map.of(jnt(0), "number of lines per page"), "an f(x)->0 terminal page through the lines of an str")
         ));
     }
 }

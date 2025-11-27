@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC 
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -18,8 +18,8 @@
 
 package studio.phaseshift.metatron.lang.core.m.obj;
 
-import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.furi.c.cInt;
+import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.lang.core.m.type.*;
 import studio.phaseshift.metatron.util.IteratorUtil;
 
@@ -37,7 +37,7 @@ public final class NoObj implements Obj, Inst {
     private NoObj() {
         // singleton
     }
-    
+
     public static NoObj noobj() {
         return NoObj.SINGLE;
     }
@@ -132,7 +132,7 @@ public final class NoObj implements Obj, Inst {
     public f f() {
         return f.of(o -> NoObj.noobj());
     }
-    
+
     @Override
     public Call plus(final Call rhs) { // a no-op branch
         return rhs;
@@ -147,27 +147,27 @@ public final class NoObj implements Obj, Inst {
     public Type rng() {
         return NoObj.noobj().type();
     }
-    
+
     @Override
     public fURI uriValue() {
         return fURI.NOOBJ;
     }
-    
+
     @Override
     public Long intValue() {
         return 0L;
     }
-    
+
     @Override
     public String strValue() {
         return "";
     }
-    
+
     @Override
     public List<Obj> lstValue() {
         return List.of();
     }
-    
+
     @Override
     public Double realValue() {
         return 0.0d;

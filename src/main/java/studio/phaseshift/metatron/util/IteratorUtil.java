@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -77,7 +77,7 @@ public final class IteratorUtil {
         return ix;
     }
 
-    public static final long count(final Iterable iterable) {
+    public static long count(final Iterable iterable) {
         return count(iterable.iterator());
     }
 
@@ -113,7 +113,7 @@ public final class IteratorUtil {
 
 
                 } else {
-                    return (S) iterator.next();
+                    return iterator.next();
                 }
             }
 
@@ -207,7 +207,7 @@ public final class IteratorUtil {
         Map<K, V> map = new HashMap();
 
         while (iterator.hasNext()) {
-            S obj = (S) iterator.next();
+            S obj = iterator.next();
             map.put(key.apply(obj), value.apply(obj));
         }
 
@@ -219,8 +219,8 @@ public final class IteratorUtil {
         Map<K, List<S>> map = new HashMap();
 
         while (iterator.hasNext()) {
-            S obj = (S) iterator.next();
-            ((List) map.computeIfAbsent(groupBy.apply(obj), (k) -> new ArrayList())).add(obj);
+            S obj = iterator.next();
+            map.computeIfAbsent(groupBy.apply(obj), (k) -> new ArrayList()).add(obj);
         }
 
         CloseableIterator.closeIterator(iterator);
@@ -229,7 +229,7 @@ public final class IteratorUtil {
 
     public static <S> S reduce(final Iterator<S> iterator, final S identity, final BinaryOperator<S> accumulator) {
         S result;
-        for (result = identity; iterator.hasNext(); result = (S) accumulator.apply(result, iterator.next())) {
+        for (result = identity; iterator.hasNext(); result = accumulator.apply(result, iterator.next())) {
         }
 
         CloseableIterator.closeIterator(iterator);
@@ -237,12 +237,12 @@ public final class IteratorUtil {
     }
 
     public static <S> S reduce(final Iterable<S> iterable, final S identity, final BinaryOperator<S> accumulator) {
-        return (S) reduce(iterable.iterator(), identity, accumulator);
+        return reduce(iterable.iterator(), identity, accumulator);
     }
 
     public static <S, E> E reduce(final Iterator<S> iterator, final E identity, final BiFunction<E, S, E> accumulator) {
         E result;
-        for (result = identity; iterator.hasNext(); result = (E) accumulator.apply(result, iterator.next())) {
+        for (result = identity; iterator.hasNext(); result = accumulator.apply(result, iterator.next())) {
         }
 
         CloseableIterator.closeIterator(iterator);
@@ -250,7 +250,7 @@ public final class IteratorUtil {
     }
 
     public static <S, E> E reduce(final Iterable<S> iterable, final E identity, final BiFunction<E, S, E> accumulator) {
-        return (E) reduce(iterable.iterator(), identity, accumulator);
+        return reduce(iterable.iterator(), identity, accumulator);
     }
 
     public static <S> Iterator<S> consume(final Iterator<S> iterator, final Consumer<S> consumer) {
@@ -264,7 +264,7 @@ public final class IteratorUtil {
             }
 
             public S next() {
-                S s = (S) iterator.next();
+                S s = iterator.next();
                 consumer.accept(s);
                 return s;
             }
@@ -290,7 +290,7 @@ public final class IteratorUtil {
             }
 
             public E next() {
-                return (E) function.apply(iterator.next());
+                return function.apply(iterator.next());
             }
 
             public void close() {
@@ -318,7 +318,7 @@ public final class IteratorUtil {
             }
 
             public S next() {
-                S next = (S) iterator.next();
+                S next = iterator.next();
                 function.accept(next);
                 return next;
             }
@@ -365,7 +365,7 @@ public final class IteratorUtil {
 
                     var1 = this.nextResult;
                 } finally {
-                    this.nextResult = (S) null;
+                    this.nextResult = null;
                 }
 
                 return (S) var1;
@@ -376,10 +376,10 @@ public final class IteratorUtil {
             }
 
             private void advance() {
-                this.nextResult = (S) null;
+                this.nextResult = null;
 
                 while (iterator.hasNext()) {
-                    S s = (S) iterator.next();
+                    S s = iterator.next();
                     if (predicate.test(s)) {
                         this.nextResult = s;
                         return;
@@ -403,7 +403,7 @@ public final class IteratorUtil {
                     return true;
                 } else {
                     while (iterator.hasNext()) {
-                        this.currentIterator = (Iterator) function.apply(iterator.next());
+                        this.currentIterator = function.apply(iterator.next());
                         if (this.currentIterator.hasNext()) {
                             return true;
                         }
@@ -419,7 +419,7 @@ public final class IteratorUtil {
 
             public E next() {
                 if (this.hasNext()) {
-                    return (E) this.currentIterator.next();
+                    return this.currentIterator.next();
                 } else {
                     throw FastNoSuchElementException.instance();
                 }
@@ -495,7 +495,7 @@ public final class IteratorUtil {
             }
 
             public T next() {
-                return (T) iterator.next();
+                return iterator.next();
             }
 
             public void close() {
@@ -515,7 +515,7 @@ public final class IteratorUtil {
             }
 
             public T next() {
-                T object = (T) iterator.next();
+                T object = iterator.next();
                 iterator.remove();
                 return object;
             }

@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
- * Copyright (C) 2025- PhaseShift Studio, LLC
- *
+ *  Copyright (C) 2025- PhaseShift Studio, LLC
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -33,22 +33,22 @@ import org.jline.utils.*;
 import org.jline.widget.Widgets;
 import studio.phaseshift.metatron.BootLoader;
 import studio.phaseshift.metatron.furi.fURI;
+import studio.phaseshift.metatron.lang.core.m.inst.mInstSet;
 import studio.phaseshift.metatron.lang.core.m.obj.NoObj;
+import studio.phaseshift.metatron.lang.core.m.parser.mParser;
 import studio.phaseshift.metatron.lang.core.m.type.Obj;
 import studio.phaseshift.metatron.lang.core.m.type.Rec;
 import studio.phaseshift.metatron.lang.core.m.type.Type;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MObjs;
-import studio.phaseshift.metatron.lang.core.m.inst.mInstSet;
-import studio.phaseshift.metatron.lang.core.m.parser.mParser;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MRec;
+import studio.phaseshift.metatron.lang.core.mach.type.impl.MMachine;
 import studio.phaseshift.metatron.lang.util.logObj;
+import studio.phaseshift.metatron.lang.util.serial.ObjStringSerializer;
 import studio.phaseshift.metatron.ui.Graphitty;
 import studio.phaseshift.metatron.ui.GraphittyLogger;
 import studio.phaseshift.metatron.ui.Mode;
-import studio.phaseshift.metatron.lang.util.serial.ObjStringSerializer;
 import studio.phaseshift.metatron.util.Common;
 import studio.phaseshift.metatron.util.MTronException;
-import studio.phaseshift.metatron.lang.core.mach.type.impl.MMachine;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -61,9 +61,9 @@ import java.util.function.BiConsumer;
 
 import static org.jline.keymap.KeyMap.ctrl;
 import static org.jline.keymap.KeyMap.key;
-import static studio.phaseshift.metatron.furi.fURI.*;
+import static studio.phaseshift.metatron.furi.fURI.ALL;
+import static studio.phaseshift.metatron.furi.fURI.fnull;
 import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.id_;
-import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.isa_;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.INST_TID;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.REC_TID;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instC;
@@ -356,7 +356,6 @@ public class Console extends MRec implements Mode {
                if(!buffer.isEmpty())
                   builder.append(buffer.replaceAll("\\(",Graphitty.string("{{g}}({{/g}}")).replaceAll("\\)",Graphitty.string("{{g}}){{/g}}")));
             })*/
-            ;
             this.highlighters.add((builder, buffer) -> {
                 if (RESOLVE_MODE) {
                     try {
