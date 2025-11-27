@@ -42,6 +42,7 @@ import java.util.Map;
 import static studio.phaseshift.metatron.furi.fURI.f;
 import static studio.phaseshift.metatron.furi.fURI.fnull;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.*;
+import static studio.phaseshift.metatron.lang.core.m.obj.NoObj.noobj;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MBool.bool;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MBytes.bytes;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MFail.fail;
@@ -81,7 +82,7 @@ public record JSONTranslator(ObjSerializer<String> serializer) implements Transl
     @Override
     public Obj translate(final JsonElement json) {
         if (json.isJsonNull())
-            return NoObj.noobj();
+            return noobj();
         Obj obj = null;
         final fURI tid = json.isJsonObject() && json.getAsJsonObject().has(TID_KEY) ? Router.global().rewrite(f(json.getAsJsonObject().get(TID_KEY).getAsString()), true) : null;
         final fURI bid = json.isJsonObject() && json.getAsJsonObject().has(BID_KEY) ? Router.global().rewrite(f(json.getAsJsonObject().get(BID_KEY).getAsString()), true) : null == tid ? null : tid.basePath();
@@ -102,6 +103,8 @@ public record JSONTranslator(ObjSerializer<String> serializer) implements Transl
                     if (null != bid) {
                         if (bid.equals(BYTES_TID)) {
                             obj = bytes(ByteBuffer.wrap(jpstr.getBytes()), tid, fnull);
+                        } else if (bid.equals(URI_TID)) {
+                            obj = uri(f(jpstr), tid, fnull);
                         } else if (bid.equals(STR_TID)) {
                             obj = str(jpstr, tid, fnull);
                         } else if (bid.equals(CODE_TID)) {
@@ -113,9 +116,9 @@ public record JSONTranslator(ObjSerializer<String> serializer) implements Transl
                         }
                     }
                     if (null == obj)
-                        obj = uri(f(jpstr), tid, fnull);
-                } catch (Exception e) {
-                    throw MTronException.of(e);
+                        obj = mParser.parse(jpstr);
+                } catch (final Exception e) {
+                    LOG.debug("ignoring unparsable element: " + jpstr);
                 }
             }
         } else if (value.isJsonArray()) {
@@ -123,7 +126,7 @@ public record JSONTranslator(ObjSerializer<String> serializer) implements Transl
             if (null != bid && bid.equals(REL_TID)) {
                 obj = rel(translate(jp.get(0)), translate(jp.get(1)), tid, fnull);
             } else if (null != bid && bid.toString().equals("/m/type")) {
-                obj = T(tid, (Call) translate(jp.get(0)), (Call) translate(jp.get(1)));
+                obj = T(tid, (Call) translate(jp.get(0)), (Inst) translate(jp.get(1)));
             } else {
                 final List<Obj> list = new ArrayList<>();
                 for (var j : jp.getAsJsonArray()) {
@@ -144,8 +147,10 @@ public record JSONTranslator(ObjSerializer<String> serializer) implements Transl
             }
             obj = rec(map, tid, fnull);
         }
-        if (null == obj)
-            throw new IllegalStateException("unknown type: " + json + "::" + json.getAsInt());
+        if (null == obj) {
+            LOG.debug("unknown type: " + json + "::" + json.getAsInt());
+            return noobj();
+        }
         return null == vid ? obj : obj.self(obj.jvm(), obj.tid(), vid);
     }
 
@@ -218,7 +223,8 @@ public record JSONTranslator(ObjSerializer<String> serializer) implements Transl
             reader.setStrictness(Strictness.LENIENT);
             return this.translate(JsonParser.parseReader(reader));
         } catch (final Exception e) {
-            throw MTronException.of(e);
+            LOG.debug(e);
+            return noobj();
         }
     }
 }

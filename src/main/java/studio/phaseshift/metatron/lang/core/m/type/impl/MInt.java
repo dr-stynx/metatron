@@ -19,7 +19,12 @@
 package studio.phaseshift.metatron.lang.core.m.type.impl;
 
 import studio.phaseshift.metatron.furi.fURI;
+import studio.phaseshift.metatron.lang.core.m.type.Inst;
 import studio.phaseshift.metatron.lang.core.m.type.Int;
+import studio.phaseshift.metatron.util.Tuple;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static studio.phaseshift.metatron.furi.fURI.fnull;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.INT_TID;
@@ -46,5 +51,13 @@ public class MInt extends MObj implements Int {
     @Override
     public Long jvm() {
         return (Long) this.jvm;
+    }
+
+    public static class MIntType extends MType implements IntType {
+        public static final IntType single = new MIntType();
+
+        public MIntType() {
+            super(IntType.INT_INSTS, INT_TID);
+        }
     }
 }

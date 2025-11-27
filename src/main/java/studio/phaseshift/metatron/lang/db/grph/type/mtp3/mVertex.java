@@ -112,4 +112,9 @@ public class mVertex extends mElement implements Vertex, WrappedVertex<RVertex> 
     public RVertex getBaseVertex() {
         return (RVertex) this.base;
     }
+
+    @Override
+    public void remove() {
+        Router.global().write(this.getBaseVertex().vid(), noobj());
+    }
 }

@@ -22,6 +22,8 @@ import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.lang.core.m.obj.NoObj;
 import studio.phaseshift.metatron.lang.core.m.type.*;
 import studio.phaseshift.metatron.lang.Space;
+import studio.phaseshift.metatron.ui.Graphitty;
+import studio.phaseshift.metatron.ui.GraphittyLogger;
 
 
 import java.util.Map;
@@ -33,9 +35,10 @@ import static studio.phaseshift.metatron.lang.core.m.type.impl.MType.T;
 public final class noobjSpace implements Space, InstSet {
 
     private static final noobjSpace INSTANCE = new noobjSpace();
+    private GraphittyLogger LOG;
 
     private noobjSpace() {
-
+        LOG = Graphitty.log(this);
     }
 
     public static <S extends Space> S single() {
@@ -84,11 +87,13 @@ public final class noobjSpace implements Space, InstSet {
 
     @Override
     public Obj read(final fURI vid) {
+        //LOG.warn("reading %s from noobj space", vid);
         return NoObj.noobj();
     }
 
     @Override
     public Obj write(final fURI vid, final Obj obj) {
+        //LOG.warn("writing to noobj space: %s => %s", vid, obj);
         return obj;
     }
 

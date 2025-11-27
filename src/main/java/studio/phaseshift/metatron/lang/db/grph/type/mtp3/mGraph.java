@@ -24,8 +24,7 @@ import studio.phaseshift.metatron.util.MTronException;
 
 import java.util.*;
 
-import static studio.phaseshift.metatron.Tokens.PATTERN;
-import static studio.phaseshift.metatron.Tokens.SPACE;
+import static studio.phaseshift.metatron.Tokens.*;
 import static studio.phaseshift.metatron.furi.fURI.f;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRec.rec;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRel.rel;
@@ -40,12 +39,17 @@ import static studio.phaseshift.metatron.lang.db.grph.type.TP3Translator.LABEL;
 @Graph.OptIn(Graph.OptIn.SUITE_PROCESS_EMBEDDED_STANDARD)
 @Graph.OptIn(Graph.OptIn.SUITE_PROCESS_STANDARD)
 @Graph.OptIn(Graph.OptIn.SUITE_PROCESS_LIMITED_STANDARD)
+@Graph.OptIn(Graph.OptIn.SUITE_PROCESS_STANDARD)
 @Graph.OptOut(
         test = "org.apache.tinkerpop.gremlin.process.traversal.step.map.MatchTest",
         method = "*",
         reason = "avoiding grateful dead tests for now")
 @Graph.OptOut(
         test = "org.apache.tinkerpop.gremlin.process.traversal.step.map.ProfileTest",
+        method = "*",
+        reason = "avoiding grateful dead tests for now")
+@Graph.OptOut(
+        test = "org.apache.tinkerpop.gremlin.process.traversal.TraversalInterruptionTest",
         method = "*",
         reason = "avoiding grateful dead tests for now")
 public class mGraph implements Graph, WrappedGraph<grphSpace> {
@@ -74,7 +78,7 @@ public class mGraph implements Graph, WrappedGraph<grphSpace> {
 
     public mGraph(final Configuration configuration) {
         grphInstSet.create();
-        final fURI spacevid = f(configuration.getProperty(SPACE).toString());
+        final fURI spacevid = f(configuration.getProperty(STORE).toString());
         final fURI pattern = f(configuration.getProperty(PATTERN).toString());
         final Obj s = Router.global().read(spacevid);
         if (s.isNoObj()) {

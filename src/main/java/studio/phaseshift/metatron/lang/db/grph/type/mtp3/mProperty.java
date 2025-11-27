@@ -8,6 +8,8 @@ import studio.phaseshift.metatron.lang.core.m.type.Rel;
 
 import java.util.NoSuchElementException;
 
+import static studio.phaseshift.metatron.lang.core.m.obj.NoObj.noobj;
+
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -32,12 +34,14 @@ public class mProperty<V> implements Property<V>, WrappedProperty<Rel> {
 
     @Override
     public V value() throws NoSuchElementException {
-        return this.property.second().jvm() instanceof Long ? (V)(Integer)((Long) this.property.second().jvm()).intValue() : this.property.second().jvm();
+        if (!this.isPresent())
+            throw new NoSuchElementException();
+        return this.property.second().jvm() instanceof Long ? (V) (Integer) ((Long) this.property.second().jvm()).intValue() : this.property.second().jvm();
     }
 
     @Override
     public boolean isPresent() {
-        return null != this.property && !property.isNoObj();
+        return null != this.property && !property.isNoObj() && this.property.second() != null;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class mProperty<V> implements Property<V>, WrappedProperty<Rel> {
 
     @Override
     public void remove() {
-
+        this.property = this.property.second(null);
     }
 
     @Override

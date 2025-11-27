@@ -46,6 +46,7 @@ import studio.phaseshift.metatron.util.Tuple;
 import java.util.Arrays;
 import java.util.Map;
 
+import static studio.phaseshift.metatron.Tokens.HOST;
 import static studio.phaseshift.metatron.Tokens.STORE;
 import static studio.phaseshift.metatron.furi.fURI.*;
 import static studio.phaseshift.metatron.lang.ai.llm.llmInstSet.OLLAMA_TID;
@@ -75,10 +76,10 @@ public class ollamaSpace extends MSpace<OllamaModels> {
                     instC(mInstSet.INST_TID.dom(ALL.maybe()).rng(OLLAMA_TID),
                             lst(T(REC_TID, isa_(rec(
                                     uri(Tokens.PATTERN), T(URI_TID),
-                                    uri(Tokens.HOST), T(URI_TID),
+                                    uri(HOST), T(URI_TID),
                                     uri(STORE).maybe(), T(REC_TID))))), (lhs, inst) -> {
                                 final fURI pattern = inst.arg(0).<Rec>as().at(Tokens.PATTERN).uriValue();
-                                final fURI ollamaHost = inst.arg(0).<Rec>as().at(Tokens.HOST).uriValue();
+                                final fURI ollamaHost = inst.arg(0).<Rec>as().at(HOST).uriValue();
                                 final OllamaModels models = OllamaModels.builder().baseUrl(ollamaHost.toString()).build();
                                 final Space ollama = new ollamaSpace(models, inst.arg(0).jvm(), pattern, inst.arg(0).vid());
                                 Router.global().addSpace(ollama);
@@ -98,7 +99,7 @@ public class ollamaSpace extends MSpace<OllamaModels> {
     public static ollamaSpace of(final fURI ollamaHost, final fURI pattern) {
         final OllamaModels models = OllamaModels.builder().baseUrl(ollamaHost.toString()).build();
         return new ollamaSpace(models, Map.of(
-                uri(Tokens.HOST), ollamaHost.toUri(),
+                uri(HOST), ollamaHost.toUri(),
                 uri(Tokens.PATTERN), pattern.toUri(),
                 uri(Tokens.STORE), new kvSpace(pattern, fnull)),
                 pattern,
@@ -122,7 +123,7 @@ public class ollamaSpace extends MSpace<OllamaModels> {
             try {
                 LOG.info("attempting to pull model: {{y}}%s{{X}}", vid.removePrefix(this.pattern.retractPattern()).toString());
                 final String version = vid.name();
-                new Ollama(this.at(Tokens.HOST).uriValue().toString()).pullModel(vid.removePrefix(this.pattern.retractPattern()).retract().toString() + ":" + version);
+                new Ollama(this.at(HOST).uriValue().toString()).pullModel(vid.removePrefix(this.pattern.retractPattern()).retract().toString() + ":" + version);
             } catch (final Exception e) {
                 LOG.warn(e.getMessage());
             }
@@ -155,7 +156,7 @@ public class ollamaSpace extends MSpace<OllamaModels> {
         this.sjvm().availableModels().content().stream()
                 .map(model -> {
                     final OllamaModelCard card = this.sjvm().modelCard(model.getName()).content();
-                    final OLLM ollm = ollm(Tuple.Pair.with(model, card), OLLM.OLLM_TID, modelToVid(model.getName()));
+                    final OLLM ollm = ollm(this.at(HOST), Tuple.Pair.with(model, card), OLLM.OLLM_TID, modelToVid(model.getName()));
                     return Tuple.Pair.with(card, ollm);
                 })
                 .filter(pair -> pair.get1().vid().matches(modelPattern))

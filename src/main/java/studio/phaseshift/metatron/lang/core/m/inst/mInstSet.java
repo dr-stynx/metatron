@@ -236,7 +236,7 @@ public class mInstSet extends MInstSet {
                 Tuple.Triplet.with(Tuple.Pair.with("!*", null), List.of(AUTO_TID, FROM_TID), 1)));
     }
 
-    private Obj crossPoly(Obj lhs, Obj rhs) {
+    public static Obj crossPoly(Obj lhs, Obj rhs) {
         //  if(lhs.isObjs())
         //     return lhs.<Objs>as().stream().map(l -> crossPoly(l,rhs)).reduce(rec(), Obj::append);
         if (lhs.isLst() && rhs.isLst()) {

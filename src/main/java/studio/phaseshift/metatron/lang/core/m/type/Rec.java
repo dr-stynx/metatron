@@ -21,18 +21,40 @@ package studio.phaseshift.metatron.lang.core.m.type;
 
 import studio.phaseshift.metatron.algebra.PlusMonoid;
 import studio.phaseshift.metatron.furi.fURI;
+import studio.phaseshift.metatron.lang.core.m.inst.mInstSet;
 import studio.phaseshift.metatron.lang.core.m.obj.NoObj;
 import studio.phaseshift.metatron.util.IteratorUtil;
 import studio.phaseshift.metatron.util.Tuple;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static studio.phaseshift.metatron.furi.fURI.ALL;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.*;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.BOOL_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.GTE_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.GT_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.INT_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.LT_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.MINUS_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.MULT_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.PLUS_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.PROD_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.SUM_TID;
+import static studio.phaseshift.metatron.lang.core.m.obj.NoObj.noobj;
+import static studio.phaseshift.metatron.lang.core.m.type.impl.MBool.bool;
+import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instC;
+import static studio.phaseshift.metatron.lang.core.m.type.impl.MInt.jnt;
+import static studio.phaseshift.metatron.lang.core.m.type.impl.MLst.lst;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MObjs.objs;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRec.rec;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRel.rel;
+import static studio.phaseshift.metatron.lang.core.m.type.impl.MType.T;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MUri.uri;
 
 public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
@@ -68,7 +90,7 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
         return this.clone(jvm, this.tid(), this.vid());
     }
 
-    default Rec at(final Obj key, final Obj value, final BiFunction<Poly<?,?>, Object, Poly<?,?>> operation) {
+    default Rec at(final Obj key, final Obj value, final BiFunction<Poly<?, ?>, Object, Poly<?, ?>> operation) {
         return this.put(key, value, operation);
     }
 
@@ -113,18 +135,22 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
     }
 
     default Rec put(final Obj key, final Obj value) {
-        if(key.isNoObj()) return this;
+        if (key.isNoObj()) return this;
         return this.put(key, value, (BiFunction) IMMUTABLE);
     }
 
-    default Rec put(final Obj key, final Obj value, final BiFunction<Poly<?,?>, Object, Poly<?,?>> operation) {
+    default Rec put(final String key, final Obj value, final BiFunction<Poly<?, ?>, Object, Poly<?, ?>> operation) {
+        return this.put(uri(key), value, operation);
+    }
+
+    default Rec put(final Obj key, final Obj value, final BiFunction<Poly<?, ?>, Object, Poly<?, ?>> operation) {
         final fURI k = key.uriValue();
         if (k.segments().isEmpty())
             return this;
         final Map<Obj, Obj> map = new LinkedHashMap<>(this.recValue());
         map.compute(uri(k.segments().get(0)), (k1, v) ->
                 k.segments().size() == 1 ?
-                        (value.isNoObj()? null : (null != v && v.isObjs() ? v.append(value) : value)) :
+                        (value.isNoObj() ? null : (null != v && v.isObjs() ? v.append(value) : value)) :
                         (null != v && v.isRec() ? v.<Rec>as() : rec()).put(k.pretract().toUri(), value, operation));
         return (Rec) operation.apply(this, map);
     }
@@ -170,4 +196,28 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
 
     @Override
     Rec self(final Object jvm, final fURI tid, final fURI vid);
+
+    interface RecType extends Type {
+
+        List<Inst> REC_INSTS = List.of(
+                instC(ID_TID.dom(REC_TID).rng(REC_TID), lst(), (lhs, inst) -> lhs),
+                instC(HAS_TID.dom(REC_TID).rng(REC_TID.maybe()), lst(T(ALL)), (lhs, inst) -> inst.arg(0).isRel() ?
+                        (lhs.<Rec>as().elements().anyMatch(r -> r.matches(inst.arg(0))) ? lhs : noobj()) :
+                        (lhs.<Rec>as().elements().map(Rel::first).anyMatch(r -> r.matches(inst.arg(0))) ? lhs : noobj())),
+                instC(GET_TID.dom(REC_TID).rng(ALL_STAR), lst(T(URI_TID)), (lhs, inst) -> lhs.<Rec>as().at(inst.arg(0))),
+                instC(SPLIT_TID.dom(ALL).rng(REC_TID), lst(T(REC_TID)), (lhs, inst) -> rec(inst.arg(0).<Rec>as().elements().map(Obj::<Rel>as).map(e -> e.first().apply(lhs).choose(Obj::isNoObj, x -> null, x -> rel(x, e.second().apply(lhs)))).filter(x -> !Objects.isNull(x)))),
+
+                instC(MERGE_TID.dom(REC_TID).rng(REL_TID.maybeSome()), lst(), (lhs, inst) -> objs(lhs.elements())),
+                instC(MERGE_TID.dom(REC_TID).rng(REC_TID), lst(T(REC_TID)), (lhs, inst) -> inst.arg(0).<Rec>as().plus(lhs.as())),//objs(lhs.elementStream())),
+                instC(DOM_TID.dom(REC_TID).rng(ALL_STAR), lst(), (lhs, inst) -> objs(lhs.recValue().keySet())),
+                instC(RNG_TID.dom(REC_TID).rng(ALL_STAR), lst(), (lhs, inst) -> objs(lhs.recValue().values())),
+                instC(LSHIFT_TID.dom(REC_TID).rng(ALL_STAR), lst(), (lhs, inst) -> objs(lhs.<Rec>as().elements().map(Rel::first))),
+                instC(RSHIFT_TID.dom(REC_TID).rng(ALL_STAR), lst(), (lhs, inst) -> objs(lhs.<Rec>as().elements().map(Rel::second))),
+                instC(PLUS_TID.dom(REC_TID).rng(REC_TID), lst(T(REC_TID)), (lhs, inst) -> lhs.jvm(Stream.concat(lhs.<Rec>as().elements(), inst.arg(0).<Rec>as().elements().map(Obj::<Rel>as)).collect(Collectors.toMap(Rel::first, Rel::second, Obj::append, LinkedHashMap::new)))),
+                instC(SELECT_TID.dom(REC_TID).rng(REC_TID.maybe()), lst(T(REC_TID)), (lhs, inst) -> mInstSet.crossPoly(lhs, inst.arg(0))),
+
+                instC(WITHIN_TID.dom(REC_TID).rng(REC_TID), lst(T(ALL_STAR)), (lhs, inst) -> rec(lhs.elements().map(r -> inst.arg(0).apply(r).<Rel>as()))),
+                instC(PROD_TID.dom(INT_TID.maybeSome()).rng(INT_TID), lst(), (lhs, inst) -> inst.seed().jvm(lhs.stream().reduce(inst.seed(), (a, b) -> jnt(a.intValue() * (b.intValue() * b.c().max()))).intValue()/* * inst.c().max()*/), jnt(1)));
+
+    }
 }

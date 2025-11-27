@@ -401,7 +401,7 @@ public class mParser {
         return seq(m_type_prefix(TYPE_TID), of("T"),
                 opt(seq(of("["), opt(m_obj(), null), of("]")).map(t -> pick(t, 1)), null),
                 opt(seq(of("["), opt(m_obj(), null), of("]")).map(t -> pick(t, 1)), null))
-                .map(t -> T(pick(t, 0), pick(t, 2), pick(t, 3)));
+                .map(t -> T(pick(t, 0), pick(t, 2), (Inst)pick(t, 3)));
     }
 
     public static Parser sugar_code() {

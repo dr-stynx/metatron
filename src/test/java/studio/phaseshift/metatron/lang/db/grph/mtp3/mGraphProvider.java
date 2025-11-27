@@ -5,6 +5,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.tinkerpop.gremlin.AbstractGraphProvider;
 import org.apache.tinkerpop.gremlin.GraphProvider;
 import org.apache.tinkerpop.gremlin.LoadGraphWith;
+import org.apache.tinkerpop.gremlin.process.traversal.TraversalInterruptionTest;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.io.Io;
 import org.apache.tinkerpop.gremlin.structure.io.IoRegistry;
@@ -26,9 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static studio.phaseshift.metatron.Tokens.PATTERN;
-import static studio.phaseshift.metatron.Tokens.SPACE;
-import static studio.phaseshift.metatron.Tokens.NAME;
+import static studio.phaseshift.metatron.Tokens.*;
 import static studio.phaseshift.metatron.furi.fURI.f;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRec.rec;
 
@@ -62,7 +61,7 @@ public class mGraphProvider extends AbstractGraphProvider {
         if (graph != null) {
             ((mGraph) graph).getBaseGraph().clear();
         } else {
-            final Obj g = Router.global().read(f(configuration.getProperty(SPACE).toString()));
+            final Obj g = Router.global().read(f(configuration.getProperty(STORE).toString()));
             if (!g.isNoObj())
                 ((grphSpace) g).clear();
         }
@@ -73,7 +72,7 @@ public class mGraphProvider extends AbstractGraphProvider {
         Router.global().addSpace(kvSpace.of(f("/mnt/#"), f("/sys/router/space/kv")));
         final Map<String, Object> config = new LinkedHashMap<>();
         config.put(Graph.GRAPH, f(mGraph.class.getCanonicalName()));
-        config.put(SPACE, f("/mnt/test/mtp3"));
+        config.put(STORE, f("/mnt/test/mtp3"));
         config.put(PATTERN, f("/test/g/#"));
         config.put(NAME, f(graphName));
         config.put("guice.injector-source", f("studio.phaseshift.metatron.lang.db.grph.mtp3.mGraphFeatureTest$WorldInjectorSource"));

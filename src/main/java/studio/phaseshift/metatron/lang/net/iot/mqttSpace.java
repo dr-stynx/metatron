@@ -164,7 +164,11 @@ public class mqttSpace extends MSpace<Mqtt5Client> {
 
     @Override
     public Obj read(final fURI vid) {
-        return this.cache.read(vid);
+        final Obj ret = Q.Helper.processPreRead(this.qs(), vid, vid).orElse(null);
+        if (null != ret)
+            return ret;
+        final Obj result = this.cache.read(vid.qLess());
+        return Q.Helper.processPostRead(this.qs(), vid, vid, result).orElse(result);
     }
 
     @Override
@@ -172,11 +176,11 @@ public class mqttSpace extends MSpace<Mqtt5Client> {
         final Obj ret = Q.Helper.processPreWrite(this.qs(), vid, vid, obj).orElse(null);
         if (null != ret)
             return ret;
-        Space.Helper.resolveWrite(this, vid.basePath(), obj, (key, value) -> {
-            this.send(vid, value);
+        final Obj result = Space.Helper.resolveWrite(this, vid.basePath(), obj, (key, value) -> {
+            this.send(vid.qLess(), value);
             return value;
         }, this.cache.directReader());
-        return obj;
+        return Q.Helper.processPostWrite(this.qs(), vid, vid, result).orElse(Q.Helper.processQlessWrite(this.qs(), vid, vid, obj).orElse(result));
     }
 
     private void send(final fURI vid, final Obj obj) {

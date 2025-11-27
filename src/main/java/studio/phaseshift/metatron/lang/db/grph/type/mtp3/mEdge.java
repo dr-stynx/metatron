@@ -5,13 +5,16 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.util.wrapped.WrappedEdge;
+import studio.phaseshift.metatron.furi.c.cInt;
 import studio.phaseshift.metatron.furi.fURI;
+import studio.phaseshift.metatron.lang.core.m.type.Rec;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MObjFactory;
 import studio.phaseshift.metatron.lang.db.grph.type.REdge;
 import studio.phaseshift.metatron.lang.db.grph.type.tp.MProperty;
 
 import java.util.Iterator;
 
+import static studio.phaseshift.metatron.lang.core.m.type.Poly.MUTABLE;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRel.rel;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MUri.uri;
 
@@ -35,8 +38,8 @@ public class mEdge extends mElement implements Edge, WrappedEdge<REdge> {
 
     @Override
     public <V> Property<V> property(final String key, final V value) {
-      this.getBaseEdge().property(fURI.f(key), MObjFactory.of().create(value));
-      return mProperty.of(this,rel(uri(key),MObjFactory.of().create(value)));
+        this.getBaseEdge().property(fURI.f(key), MObjFactory.of().create(value));
+        return mProperty.of(this, rel(uri(key), MObjFactory.of().create(value)));
     }
 
     @Override
@@ -47,6 +50,12 @@ public class mEdge extends mElement implements Edge, WrappedEdge<REdge> {
     @Override
     public REdge getBaseEdge() {
         return (REdge) this.base;
+    }
+
+    @Override
+    public void remove() {
+        ((mVertex) this.outVertex()).getBaseVertex().put(Direction.OUT.name(), this.base.c(cInt::neg), MUTABLE);
+        ((mVertex) this.inVertex()).getBaseVertex().put(Direction.IN.name(), this.base.c(cInt::neg), MUTABLE);
     }
 }
 

@@ -73,13 +73,13 @@ public class mGraphFeatureTest {
         private static final mGraph grateful = mGraph.open(new MapConfiguration(getBaseConfiguration(LoadGraphWith.GraphData.GRATEFUL)));
         private static final mGraph empty = mGraph.open(new MapConfiguration(getBaseConfiguration(null)));
 
-        /*static {
-            createIndices();
-            readIntoGraph(modern, GraphData.MODERN);
-            readIntoGraph(classic, GraphData.CLASSIC);
-            readIntoGraph(sink, GraphData.SINK);
-            readIntoGraph(grateful, GraphData.GRATEFUL);
-        }*/
+        static {
+            //createIndices();
+            readIntoGraph(modern, LoadGraphWith.GraphData.MODERN);
+            readIntoGraph(classic, LoadGraphWith.GraphData.CLASSIC);
+            readIntoGraph(sink, LoadGraphWith.GraphData.SINK);
+            readIntoGraph(grateful, LoadGraphWith.GraphData.GRATEFUL);
+        }
 
         @Override
         public GraphTraversalSource getGraphTraversalSource(final LoadGraphWith.GraphData graphData) {
@@ -128,7 +128,7 @@ public class mGraphFeatureTest {
             Router.global().addSpace(kvSpace.of(f("/mnt/#"), f("/sys/router/space/kv")));
             final Map<String, Object> config = new LinkedHashMap<>();
             config.put(Graph.GRAPH, f(mGraph.class.getCanonicalName()));
-            config.put(SPACE, f("/mnt/test/mtp3"));
+            config.put(STORE, f("/mnt/test/mtp3"));
             config.put(PATTERN, f("/test/g/#"));
             config.put(NAME, f(graphData.name()));
             config.put(IoRegistry.IO_REGISTRY, f(mIoRegistry.class.getCanonicalName()));

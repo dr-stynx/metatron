@@ -79,7 +79,6 @@ public class OLLM extends MRec implements LLM {
 
     public OLLM(final Tuple.Pair<OllamaModel, OllamaModelCard> model, final fURI tid, final fURI vid) {
         super(modelToRec(model), tid, vid);
-        this.put(uri(HOST), Router.global().getSpace(this.vid).at(HOST));
     }
 
     private static Map<Obj, Obj> modelToRec(final Tuple.Pair<OllamaModel, OllamaModelCard> model) {
@@ -91,8 +90,9 @@ public class OLLM extends MRec implements LLM {
 
     }
 
-    public static OLLM ollm(final Tuple.Pair<OllamaModel, OllamaModelCard> model, final fURI tid, final fURI vid) {
-        return new OLLM(model, tid, vid);
+    public static OLLM ollm(final fURI host, final Tuple.Pair<OllamaModel, OllamaModelCard> model, final fURI tid, final fURI vid) {
+        final OLLM ollm = new OLLM(model, tid, vid);
+        return ollm.put(uri(HOST), uri(host), MUTABLE).as();
     }
 
     public String name() {

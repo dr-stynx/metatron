@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.REC_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.URI_TID;
 import static studio.phaseshift.metatron.lang.core.m.obj.NoObj.noobj;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRel.rel;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MUri.uri;
@@ -79,8 +80,8 @@ public class MRec extends MObj implements Rec {
 
     public static <K, V> Rec rec(final Map<K, V> map, final ObjFactory factory) {
         return rec(map.entrySet().stream()
-              //  .filter(kv -> !(kv.getKey() instanceof Obj) || !((Obj) kv.getKey()).isNoObj())
-              //  .filter(kv -> !(kv.getValue() instanceof Obj) || !((Obj) kv.getValue()).isNoObj())
+                //  .filter(kv -> !(kv.getKey() instanceof Obj) || !((Obj) kv.getKey()).isNoObj())
+                //  .filter(kv -> !(kv.getValue() instanceof Obj) || !((Obj) kv.getValue()).isNoObj())
                 .map(kv -> rel(kv.getKey() instanceof String && !((String) kv.getKey()).contains(" ") ? uri((String) kv.getKey()) : factory.create(kv.getKey()), factory.create(kv.getValue()))));
     }
 
@@ -122,5 +123,13 @@ public class MRec extends MObj implements Rec {
     @Override
     public Rec jvm(final Object jvm) {
         return super.jvm(cleanMap((Map<Obj, Obj>) jvm));
+    }
+
+    public static class MRecType extends MType implements RecType {
+        public static final RecType single = new MRecType();
+
+        public MRecType() {
+            super(RecType.REC_INSTS, REC_TID);
+        }
     }
 }

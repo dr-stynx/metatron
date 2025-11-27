@@ -18,38 +18,45 @@
 
 package studio.phaseshift.metatron.lang.ai.llm;
 
+import dev.langchain4j.model.ollama.OllamaModels;
 import io.github.ollama4j.Ollama;
 import io.github.ollama4j.models.chat.*;
 import io.github.ollama4j.models.generate.OllamaGenerateTokenHandler;
 import io.github.ollama4j.models.request.ThinkMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import studio.phaseshift.metatron.Tokens;
 import studio.phaseshift.metatron.furi.fURI;
-import studio.phaseshift.metatron.lang.ai.llm.ollama.ollamaSpace;
 import studio.phaseshift.metatron.lang.ai.llm.type.impl.Audio;
 import studio.phaseshift.metatron.lang.ai.llm.type.impl.GGUF;
 import studio.phaseshift.metatron.lang.ai.llm.type.impl.OLLM;
 import studio.phaseshift.metatron.lang.core.m.type.*;
 import studio.phaseshift.metatron.lang.core.m.type.impl.MInstSet;
-import studio.phaseshift.metatron.lang.core.m.type.impl.MObjs;
 import studio.phaseshift.metatron.lang.sys.router.Router;
 import studio.phaseshift.metatron.ui.Graphitty;
 import studio.phaseshift.metatron.util.MTronException;
+import studio.phaseshift.metatron.util.Tuple;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import static studio.phaseshift.metatron.Tokens.HOST;
 import static studio.phaseshift.metatron.furi.fURI.f;
+import static studio.phaseshift.metatron.furi.fURI.fnull;
 import static studio.phaseshift.metatron.lang.ai.llm.type.impl.Audio.AUDIO_TID;
 import static studio.phaseshift.metatron.lang.ai.llm.type.impl.OLLM.*;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.REC_TID;
-import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.STR_TID;
+import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.isa_;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.*;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.ID_TID;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MBool.bool;
+import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instB;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MInst.instC;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MInt.jnt;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MLst.lst;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MStr.str;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MType.T;
+import static studio.phaseshift.metatron.lang.core.m.type.impl.MUri.uri;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -59,9 +66,11 @@ public class llmInstSet extends MInstSet {
     public static final fURI LLM_TID = f("/llm");
     public static final fURI INST_TID = LLM_TID.extend("inst");
     public static final fURI SPACE_TID = LLM_TID.extend("space");
-    public static final fURI OLLAMA_TID = SPACE_TID.extend("ollama");
+    public static final fURI OLLAMA_TID = LLM_TID.extend("ollama");
     public static final fURI TOOL_TID = LLM_TID.extend("tool");
     public static final fURI MEMORY_TID = LLM_TID.extend("memory");
+    public static final String MODEL = "model";
+    public static final fURI LOAD_INST_TID = OLLAMA_TID.extend("inst/load");
 
     public llmInstSet(final fURI vid) {
         super(LLM_TID, vid);
@@ -76,15 +85,33 @@ public class llmInstSet extends MInstSet {
         return Set.of(
                 T(TOOL_TID),
                 T(MEMORY_TID),
-                ollamaSpace.OLLAMA_TYPE,
+                //ollamaSpace.OLLAMA_TYPE,
                 GGUF.GGUF_TYPE,
                 GGUF.TENSOR_REF_TYPE,
-                OLLM.OLLM_TYPE);
+                OLLM.OLLM_TYPE,
+                T(OLLAMA_TID, isa_(rec(uri(HOST), T(URI_TID), uri(MODEL).maybe(), isa_(lst(T(OLLM_TID))).else_(lst()))), List.of(
+                        instB(ID_TID, lst()),
+                        instC(LOAD_INST_TID.dom(OLLAMA_TID).rng(OLLAMA_TID), lst(), (lhs, inst) -> {
+                            try {
+                                OllamaModels models = new OllamaModels.OllamaModelsBuilder().baseUrl(lhs.<Rec>as().at(HOST).uriValue().toString()).build();
+                                if (inst.arg(0).isNoObj()) {
+                                    lhs.<Rec>as().put(uri(MODEL), lst((List) models.availableModels().content().stream().map(m -> ollm(lhs.<Rec>as().at(HOST).uriValue(), Tuple.Pair.with(m, models.modelCard(m.getName()).content()), OLLM_TID, fnull)).toList()), MUTABLE);
+                                } else {
+                                    final List<fURI> names = inst.arg(0).stream().map(Obj::uriValue).toList();
+                                    lhs.<Rec>as().put(uri(MODEL), lst((List) models.availableModels().content().stream().filter(x -> names.contains(x.getName())).map(m -> ollm(lhs.<Rec>as().at(HOST).uriValue(), Tuple.Pair.with(m, models.modelCard(m.getName()).content()), OLLM_TID, fnull)).toList()), MUTABLE);
+                                }
+
+                            } catch (final Exception e) {
+                                e.printStackTrace();
+                            }
+                            return lhs;
+                        })
+                )));
     }
 
     @Override
     public Set<Inst> insts() {
-        return new LinkedHashSet<>(List.of(
+        final Set<Inst> set = new LinkedHashSet<>(List.of(
                 instC(INST_TID.extend("play").dom(REC_TID).rng(AUDIO_TID), lst(), (lhs, inst) -> {
                     new Audio(lhs.jvm(), AUDIO_TID, lhs.vid()).play();
                     return lhs;
@@ -141,11 +168,18 @@ public class llmInstSet extends MInstSet {
                                                 "load", jnt(result.getResponseModel().getLoadDuration()),
                                                 "eval", jnt(result.getResponseModel().getEvalDuration()),
                                                 "total", jnt(result.getResponseModel().getTotalDuration())));
-                                Router.writeToSpace(lhs.vid().extend("history/"), new MObjs(List.of(last)));
+                                if (lhs.vid() == null)
+                                    lhs.<Rec>as().put(uri("history"), lhs.<Rec>as().at("history").orElse(lst()).add(last, MUTABLE), MUTABLE);
+                                else
+                                    Router.writeToSpace(lhs.vid().extend("history"), Router.readFromSpace(lhs.vid().extend("history")).orElse(lst()).add(last, MUTABLE));
                                 return str(response.toString());
                             } catch (final Exception e) {
                                 throw MTronException.of(e);
                             }
                         })));
+        this.types().forEach(t -> {
+            set.addAll(t.insts());
+        });
+        return set;
     }
 }

@@ -64,6 +64,10 @@ public interface Obj extends Function<Obj, Obj>, Streamable<Obj>, Iterable<Obj>,
         return (O) this.c(cInt::maybe);
     }
 
+    default <O extends Obj> O maybeSome() {
+        return (O) this.c(cInt::maybeSome);
+    }
+
     <J> J jvm();
 
     fURI tid();
@@ -246,7 +250,9 @@ public interface Obj extends Function<Obj, Obj>, Streamable<Obj>, Iterable<Obj>,
         if (rhs.isType())
             return rhs.tid().isGeneric() ||
                     (typeInferenceMatch(this, rhs.as()) &&
-                            (rhs.<Type>as().predicate() == null || this.isObjs() || !rhs.apply(this).isNoObj()));
+                            (rhs.<Type>as().predicate() == null || 
+                                    this.isObjs() ||
+                                    !rhs.apply(this).isNoObj()));
         return this.tid().matches(rhs.tid()) &&
                 Objects.equals(this.jvm(), rhs.jvm());
     }
@@ -549,7 +555,7 @@ public interface Obj extends Function<Obj, Obj>, Streamable<Obj>, Iterable<Obj>,
                 return ((FObj<?>) obj).base().clone(jvm instanceof Obj ? ((Obj) jvm).jvm() : jvm, tid, vid);
             if (!Objects.equals(tid, obj.tid())) {
                 final Obj type = Router.readFromSpace(tid);
-                if (!type.isNoObj() && type.isType() && type.<Type>as().hasConstructor()) {
+                if (!type.isNoObj() && type.isType() && type.<Type>as().hasConstructor() && !type.<Type>as().isBaseType()) {
                     clone = type.<Type>as().constructor().apply(obj);
                     if (clone.isFail())
                         throw (MTronException) clone.<Fail>as().jvm();

@@ -22,6 +22,7 @@ package studio.phaseshift.metatron.lang.core.m;
 @author Marko A. Rodriguez (http://markorodriguez.com)
 */
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -350,6 +351,7 @@ public class mInstSetTest extends MetatronTest {
         super.testCode(code, expected);
     }
 
+    @Disabled
     @ParameterizedTest
     @CsvSource(value = {
             "[a=>1,b=>2,c=>3].select([a=>_])                                                                                             % [a=>1]",

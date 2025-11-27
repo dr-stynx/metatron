@@ -129,15 +129,19 @@ public record ObjStringSerializer(Builder b) implements ObjSerializer<String> {
             /// ///////////////////////////////////////////////////////////////
             /// ///////////////////////////////////////////////////////////////
             else if (obj instanceof final Lst lst) {
-                if (this.b.prettyPrint && lst.count() > 1) {
-                    this.generateLst(sb, lst, 2);
+                if (lst.isEmpty()) {
+                    sb.append("{{g}}[,]{{X}}");
                 } else {
-                    generateTID(sb, obj.tid(), true).append("{{g}}[{{y}}");
-                    for (final Obj o : lst.jvm()) {
-                        sb.append(o).append("{{g}},");
+                    if (this.b.prettyPrint && lst.count() > 1) {
+                        this.generateLst(sb, lst, 2);
+                    } else {
+                        generateTID(sb, obj.tid(), true).append("{{g}}[{{y}}");
+                        for (final Obj o : lst.jvm()) {
+                            sb.append(o).append("{{g}},");
+                        }
+                        if (!lst.jvm().isEmpty()) sb.deleteCharAt(sb.length() - 1);
+                        sb.append("{{g}}]");
                     }
-                    if (!lst.jvm().isEmpty()) sb.deleteCharAt(sb.length() - 1);
-                    else sb.append("{{g}}],");
                 }
                 return generateVID(sb, lst).append("{{X}}").toString();
             }
@@ -165,7 +169,7 @@ public record ObjStringSerializer(Builder b) implements ObjSerializer<String> {
                     } else {
                         generateTID(sb, obj.tid(), true).append("{{g}}[");
                         for (final Map.Entry<Obj, Obj> o : rec.jvm().entrySet()) {
-                            sb.append(o.getKey().isUri() ? ("{{b}}" + o.getKey().uriValue()) : o.getKey()).append("{{g}}=>").append(o.getValue()).append("{{g}},");
+                            sb.append(o.getKey().isUri() ? recKey(o.getKey()) : o.getKey()).append("{{g}}=>").append(o.getValue()).append("{{g}},");
                         }
                     }
                     if (rec.count() == 1) sb.deleteCharAt(sb.length() - 1).append("{{g}}]");
@@ -265,6 +269,19 @@ public record ObjStringSerializer(Builder b) implements ObjSerializer<String> {
         return sb;
     }
 
+    private String recKey(final Obj key) {
+        if (!key.isUri())
+            return this.write(key);
+        else {
+            if (key.c().isOne())
+                return "{{b}}" + key.uriValue();
+            if (key.c().isMaybe())
+                return "{{b}}" + key.uriValue() + "{{g}}{{{y}}?{{g}}}";
+            else
+                return this.write(key);
+        }
+    }
+
     private StringBuilder generateRec(final StringBuilder sb, final Rec rec, final int depth) {
         generateTID(sb, rec.tid(), true);
         if (rec.isEmpty()) {
@@ -280,7 +297,7 @@ public record ObjStringSerializer(Builder b) implements ObjSerializer<String> {
             rec.recValue().forEach((k, v) -> {
                 if (nested)
                     sb.append(" ".repeat(false && first.getAndSet(false) ? 0 : (depth * 2) + 1));
-                sb.append(k.isUri() ? ("{{b}}" + k.uriValue()) : write(k)).append("{{g}}=>");
+                sb.append(k.isUri() ? recKey(k) : write(k)).append("{{g}}=>");
                 if (v.isRec()) {
                     this.generateRec(sb, v.as(), depth + 1);
                 } else if (v.isLst()) {

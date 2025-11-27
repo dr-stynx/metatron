@@ -106,7 +106,7 @@ public class PubSubQ extends BaseQ {
         @Override
         public Optional<Obj> preRead(final fURI source, final fURI vid) {
             LOG.trace("evaluating {{y}}preread{{/y}}: %s", vid);
-            return subscriptions.stream().map(Obj::<Subscription>as).filter(s -> vid.basePath().matches(s.target())).map(Obj::<Obj>as).reduce(Obj::append);
+            return Optional.of(subscriptions.stream().map(Obj::<Subscription>as).filter(s -> vid.basePath().matches(s.target())).map(Obj::<Obj>as).reduce(Obj::append).orElse(noobj()));
         }
     }
 

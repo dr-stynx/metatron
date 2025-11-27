@@ -61,8 +61,8 @@ import java.util.function.BiConsumer;
 
 import static org.jline.keymap.KeyMap.ctrl;
 import static org.jline.keymap.KeyMap.key;
-import static studio.phaseshift.metatron.furi.fURI.ALL;
-import static studio.phaseshift.metatron.furi.fURI.f;
+import static studio.phaseshift.metatron.furi.fURI.*;
+import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.id_;
 import static studio.phaseshift.metatron.lang.core.m.inst.mFluent.StartLess.isa_;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.INST_TID;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.REC_TID;
@@ -85,14 +85,14 @@ public class Console extends MRec implements Mode {
     private final LineReader reader;
     private Thread mainThread;
 
-    public static final Type CONSOLE_TYPE = T(CONSOLE_TID, isa_(rec()), instC(INST_TID.dom(ALL.maybe()).rng(CONSOLE_TID), lst(T(REC_TID)), (lhs, inst) -> {
+    public static final Type CONSOLE_TYPE = T(CONSOLE_TID, id_(), instC(INST_TID.dom(ALL.maybe()).rng(CONSOLE_TID), lst(T(REC_TID)), (lhs, inst) -> {
         final Console console = new Console(inst.arg(0).as());
         console.start();
         return console;
     }));
 
     public Console(final Rec options) {
-        super(options.jvm(), CONSOLE_TID, f("/sys/obj/console"));
+        super(options.jvm(), CONSOLE_TID, fnull);
         try {
             final DefaultParser parser = new DefaultParser()
                     .quoteChars(new char[]{'\'', '"'})

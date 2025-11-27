@@ -23,7 +23,12 @@ import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.lang.core.m.inst.mInstSet;
 import studio.phaseshift.metatron.lang.core.m.obj.NoObj;
 import studio.phaseshift.metatron.lang.sys.router.Router;
+import studio.phaseshift.metatron.util.MTronException;
 import studio.phaseshift.metatron.util.Tuple;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.INT_TID;
 import static studio.phaseshift.metatron.lang.core.m.obj.NoObj.noobj;
@@ -35,39 +40,28 @@ public interface Type extends Obj, PlusMonoid<Type> {
     Type clone(final Object jvm, final fURI tid, final fURI vid);
 
     @Override
-    Tuple.Pair<Call, Call> jvm();
+    Tuple.Pair<Call, List<Inst>> jvm();
 
-    @Override
-    default Type dom() {
-        return this;
+    default List<Inst> insts() {
+        return null == this.jvm().get1() ? List.of() : this.jvm().get1();
     }
 
-    @Override
-    default Type rng() {
-        return this;
-    }
+    default Type addInst(final Inst inst) {
+        if (inst.hasDom() && !inst.dom().tid().isGeneric() && !inst.dom().tid().basePath().equals(this.tid().basePath()))
+            throw MTronException.of("type inst must have a domain that can resolve to type %s: %s", this.tid(), inst);
 
-    @Override
-    default Obj clone() {
-        return null;
-    }
-
-    @Override
-    default fURI tid() {
-        return null;
-    }
-
-    @Override
-    default fURI vid() {
-        return null;
+        final List<Inst> insts = this.jvm().get1();
+        final List<Inst> clone = null == insts ? new ArrayList<>() : new ArrayList<>(insts);
+        clone.add(inst);
+        return this.clone(Tuple.Pair.with(this.jvm().get0(), clone), this.tid(), this.vid());
     }
 
     default boolean isBaseType() {
         return mInstSet.BASE_TYPES.contains(this.tid().basePath());
     }
 
-    default Call constructor() {
-        return this.jvm().get1();
+    default Inst constructor() {
+        return this.jvm().get1() == null ? null : this.jvm().get1().get(0);
     }
 
     default Call predicate() {
@@ -79,7 +73,7 @@ public interface Type extends Obj, PlusMonoid<Type> {
     }
 
     default boolean hasConstructor() {
-        return null != this.jvm().get1();
+        return null != this.jvm().get1() && !this.jvm().get1().isEmpty();
     }
 
     @Override
@@ -92,7 +86,7 @@ public interface Type extends Obj, PlusMonoid<Type> {
                 if (subType.apply(obj).isNoObj())
                     return noobj();
         }
-        return null == this.predicate() || obj.matches(predicate().apply(obj)) ?
+        return !this.hasPredicate() || !this.predicate().apply(obj).isNoObj() ?
                 obj :
                 noobj();
     }

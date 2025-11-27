@@ -13,9 +13,8 @@ import studio.phaseshift.metatron.lang.sys.router.Router;
 
 import java.util.Map;
 
-import static studio.phaseshift.metatron.Tokens.SPACE;
+import static studio.phaseshift.metatron.Tokens.*;
 import static studio.phaseshift.metatron.furi.fURI.f;
-import static studio.phaseshift.metatron.Tokens.PATTERN;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MRec.rec;
 import static studio.phaseshift.metatron.lang.core.m.type.impl.MUri.uri;
 
@@ -28,7 +27,7 @@ public class RGraphTest extends MetatronTest {
         MetatronTest.begin();
         grphInstSet.create().vid(f("/sys/lang/grph"));
         grphSpace space = new grphSpace(kvSpace.of(f("/g/#"), fURI.fnull), Map.of(
-                uri(SPACE), kvSpace.of(f("/g/#"), fURI.fnull),
+                uri(STORE), kvSpace.of(f("/g/#"), fURI.fnull),
                 uri(PATTERN), uri("/g/#"),
                 uri("load"), uri("tinkerpop-modern")), f("/g/#"), f("/sys/space/grph"));
         Router.global().addSpace(space);
@@ -117,8 +116,8 @@ public class RGraphTest extends MetatronTest {
             /// ///////////////////////////////////////////////////////////////////////////////
             "*/g/V/1.out().out().values(name)                                             % {'lop','ripple'}",
             "{*/g/V/1/LABEL,*/g/V/1/LABEL}                                                % uri{2}::person",
-        //    "{*/g/V/1,*/g/V/1}.label()                                                    % uri{2}::person",
-         //   "{*/g/V/1,*/g/V/1}.out().out().values(name)                                   % {str{2}::'lop',str{2}::'ripple'}",
+            //    "{*/g/V/1,*/g/V/1}.label()                                                    % uri{2}::person",
+            //   "{*/g/V/1,*/g/V/1}.out().out().values(name)                                   % {str{2}::'lop',str{2}::'ripple'}",
             "*/g/V/1.out().out().values(lang)                                             % str{2}::'java'",
             //  "g.V().out().out().values(name)                                             % {\"lop\",\"ripple\"}",
             //  "g.V().out().out().values(lang)                                             % str{2}::\"java\"",

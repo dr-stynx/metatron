@@ -1,5 +1,7 @@
 [-- metatron example boot --];
-print('\nnothing is defined in this boot.\n');
+print('\n\t{{y}}nothing {{g}}is {{b}}defined {{r}}in {{m}}this {{c}}boot.{{X}}\n\n');
+console::[=>];
+
 
 
 

@@ -180,7 +180,26 @@ public interface Inst extends Call {
         final GraphittyLogger LOG = Graphitty.log(lhs);
         LOG.trace("%s => %s is %s resolved", lhs, this, this.isResolved() ? "" : "not");
         try {
-            final Inst resolved = Router.global().read(this.tid())
+            final Inst resolved =/* lhs.type().insts()  ///  search type domain rooted instructions first
+                    .stream()
+                    .filter(i -> (i.args().isEmpty() && this.arg(0).isNoObj()) || i.args().isRec() || i.args().count() >= this.args().count())
+                    .map(i -> Helpers.bindGenerics(lhs, i, this))
+                    .filter(i -> lhs.matches(i.dom()))
+                    .map(i -> {
+                        final Poly<?,?> resolvedArgs = resolveArgs(this, i, lhs);
+                        if (null == resolvedArgs)
+                            return null; // TODO: backtrack the resolution to the outer inst to see if adjusting the coefficient can resolve the internal resolution
+                        return i.args(resolvedArgs);
+                    })
+                    .filter(i -> !Objects.isNull(i))
+                    //.map(i -> i.tid(i.tid().dom(lhs.tid())).vid(this.vid()))
+                    .map(Obj::<Inst>as)
+                    .map(i -> i.isInitial() ? i.rng(i.arg(0).type()) : i) // TODO: only start()?
+                    .map(i -> i.resolve(lhs)) // TODO: return resolve(lhs) if failing
+                    .map(i -> i.c(this.c()))
+                    .map(i -> i.hasRng() ? i : i.rng(T(ALL_STAR)))
+                    .findFirst()
+                    .orElse(*/ Router.global().read(this.tid()) /// search global instructions second
                     .stream()
                     .map(Obj::<Inst>as)
                     //.peek(i -> LOG.warn("%s ==?==> %s [%s]", this, i, this.args()))
@@ -190,7 +209,7 @@ public interface Inst extends Call {
                     .map(i -> Helpers.bindGenerics(lhs, i, this))
                     .filter(i -> lhs.matches(i.dom()))
                     .map(i -> {
-                        final Poly resolvedArgs = resolveArgs(this, i, lhs);
+                        final Poly<?,?> resolvedArgs = resolveArgs(this, i, lhs);
                         if (null == resolvedArgs)
                             return null; // TODO: backtrack the resolution to the outer inst to see if adjusting the coefficient can resolve the internal resolution
                         return i.args(resolvedArgs);

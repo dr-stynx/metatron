@@ -19,9 +19,11 @@
 package studio.phaseshift.metatron.lang.core.m.type.impl;
 
 import studio.phaseshift.metatron.furi.fURI;
+import studio.phaseshift.metatron.lang.core.m.type.Int;
 import studio.phaseshift.metatron.lang.core.m.type.Uri;
 
 import static studio.phaseshift.metatron.furi.fURI.f;
+import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.INT_TID;
 import static studio.phaseshift.metatron.lang.core.m.inst.mInstSet.URI_TID;
 
 public class MUri extends MObj implements Uri {
@@ -63,6 +65,14 @@ public class MUri extends MObj implements Uri {
     @Override
     public fURI jvm() {
         return (fURI) this.jvm;
+    }
+
+    public static class MUriType extends MType implements UriType {
+        public static final UriType single = new MUriType();
+
+        public MUriType() {
+            super(UriType.URI_INSTS, URI_TID);
+        }
     }
 }
 

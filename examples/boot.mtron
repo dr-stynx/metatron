@@ -6,7 +6,7 @@
 /sys/router/lang/grph  -> */grph;
 /sys/router/lang/vec   -> */vec;
 /sys/router/lang/mach  -> */mach;
-/sys/router/lang/llm   -> */llm;
+[--/sys/router/lang/llm   -> */llm;
 /sys/router/lang/clstr -> */clstr;
 [-- mount spaces --];
      kv::[pattern => </usr/#>]@/sys/router/space/usr;
@@ -15,13 +15,13 @@
           pattern => <http://#>,
           route   => [/     => examples/www,
                       /docs => target/docs ]]@/sys/router/space/web;
- ollama::[host    => <http://localhost:11434>,
+ [--- ollama::[host    => <http://localhost:11434>,
           pattern => /ollama/#,
           store   => mqtt::[pattern => /mqtt/ollama/#,
                             host    => <mqtt://chibi.local:1883>,
-                            prefix  => /mqtt/]@/sys/router/space/ollama/mqtt]@/sys/router/space/ollama;
+                            prefix  => /mqtt/]@/sys/router/space/ollama/mqtt]@/sys/router/space/ollama ---];
    grph::[pattern => /g/#,
-          space   => kv::[pattern => /g/#],
+          store   => kv::[pattern => /g/#],
           load    => <tinkerpop-modern>]@/sys/router/space/tp3;
   clstr::[pattern => <ws://#>]@/sys/router/space/clstr;
    mqtt::[pattern => /mqtt/zigbee2mqtt/#,
@@ -29,7 +29,8 @@
           prefix  => </mqtt>]@/sys/router/space/mqtt/zigbee2mqtt;
    
      fs::[pattern => </home/#>]@/sys/router/space/fs;
-console::[        => ];
+     console::[   => ];
+      ollama:[host=><http://localhost:11434>]@/usr/ai;
  [-- *boot/option/mode.-<|[?=server   => print('\n\t{{g}}-<{{c}}server mode{{g}}>-{{X}}'), 
  [--                       ?=console => print('\n\t{{g}}-<{{c}}client mode{{g}}>-{{X}}').map(console::[=>]), 
  [--                      _         => print(_,'\n\t')];
