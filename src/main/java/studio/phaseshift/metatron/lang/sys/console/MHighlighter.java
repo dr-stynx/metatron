@@ -16,31 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.sys.router.impl;
+package studio.phaseshift.metatron.lang.sys.console;
 
-import studio.phaseshift.metatron.furi.fURI;
-import studio.phaseshift.metatron.lang.core.m.type.Obj;
-import studio.phaseshift.metatron.lang.sys.router.IOStat;
-import studio.phaseshift.metatron.lang.util.serial.ObjSerializer;
+import org.jline.builtins.SyntaxHighlighter;
+import org.jline.reader.Highlighter;
+import org.jline.reader.LineReader;
+import org.jline.utils.AttributedString;
 
-import java.io.Closeable;
+import java.nio.file.Paths;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface MConnection extends Closeable {
+public class MHighlighter implements Highlighter {
+    private final Console console;
+    private final SyntaxHighlighter highlighter;
+  
+    private MHighlighter(final Console console) {
+        this.console = console;
+        this.highlighter = SyntaxHighlighter.build(Paths.get("/home/killswitch/software/metatron/conf/mtron.nanorc"), "mtron");
+    }
 
-    <T> ObjSerializer<T> getSerializer();
-
-    void sendObj(final Obj obj);
-
-    <O extends Obj> FutureObj<O> sendRecvObj(final Obj obj);
-
-    void close();
-
-    fURI remoteHost();
-
-    IOStat stats();
-
-
+    @Override
+    public AttributedString highlight(final LineReader reader, final String buffer) {
+        return this.highlighter.highlight(reader.getBuffer().toString());
+    }
 }

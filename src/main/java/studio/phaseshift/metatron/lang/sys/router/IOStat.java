@@ -16,31 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.sys.router.impl;
-
-import studio.phaseshift.metatron.furi.fURI;
-import studio.phaseshift.metatron.lang.core.m.type.Obj;
-import studio.phaseshift.metatron.lang.sys.router.IOStat;
-import studio.phaseshift.metatron.lang.util.serial.ObjSerializer;
-
-import java.io.Closeable;
+package studio.phaseshift.metatron.lang.sys.router;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface MConnection extends Closeable {
-
-    <T> ObjSerializer<T> getSerializer();
-
-    void sendObj(final Obj obj);
-
-    <O extends Obj> FutureObj<O> sendRecvObj(final Obj obj);
-
-    void close();
-
-    fURI remoteHost();
-
-    IOStat stats();
-
-
+public class IOStat {
+    
+    public long totalBytesSent = 0L;
+    public long totalBytesReceived = 0L;
+    
+    public void incrTotalByteReceived(final long bytes) {
+        this.totalBytesReceived += bytes;
+    }
+    
+    public void incrTotalByteSent(final long bytes) {
+        this.totalBytesSent += bytes;
+    }   
+    
+    public long getBytesSent() {
+        return this.totalBytesSent;
+    }
+    
+    public long getBytesReceived() {
+        return this.totalBytesReceived;
+    } 
+    
 }
