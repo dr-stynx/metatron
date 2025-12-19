@@ -14,11 +14,10 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from metatron.soc.esp32.esp32 import ESP32
-from metatron.util.furi import f
 
-WEMOS_D1_MINI_TID = f("/soc/esp32/wemos_d1_mini")
+from metatron.soc.soc import SoC
 
-class WemosD1Mini(ESP32):
-    def __init__(self, vid=None):
-        ESP32.__init__(self, WEMOS_D1_MINI_TID, vid)
+
+class ESP32(SoC):
+    def __init__(self, tid, vid=None):
+        SoC.__init__(self, range(0, 34), tid, vid)
