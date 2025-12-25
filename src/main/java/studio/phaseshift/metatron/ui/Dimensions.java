@@ -16,12 +16,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.core.m.type;
+package studio.phaseshift.metatron.ui;
 
-public interface Mono extends Obj {
-    
-    @Override
-    default boolean isResolved(final boolean nested) {
-        return true;
+import java.util.Arrays;
+
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public interface Dimensions {
+
+    default int width() {
+        return Arrays.stream(this.toString().split("\n")).map(Graphitty::strip).map(String::length).max(Integer::compareTo).orElse(0);
+    }
+
+    default int height() {
+        return this.toString().split("\n").length;
+    }
+
+    default String rowString(int i) {
+        return this.toString().split("\n")[i];
+    }
+
+    public static class StringDimensions implements Dimensions {
+        final String string;
+
+        public StringDimensions(final String string) {
+            this.string = string;
+        }
+
+        @Override
+        public String toString() {
+            return this.string;
+        }
     }
 }

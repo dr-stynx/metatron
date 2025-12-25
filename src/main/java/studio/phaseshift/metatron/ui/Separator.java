@@ -16,12 +16,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.core.m.type;
+package studio.phaseshift.metatron.ui;
 
-public interface Mono extends Obj {
-    
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public class Separator implements Dimensions {
+
+    private final String sepToken;
+    private final Dimensions coupledWidth;
+
+    public Separator(final String sepToken, final Dimensions coupledWidth) {
+        this.sepToken = sepToken;
+        this.coupledWidth = coupledWidth;
+    }
+
     @Override
-    default boolean isResolved(final boolean nested) {
-        return true;
+    public int height() {
+        return 1;
+    }
+
+    @Override
+    public int width() {
+        return this.coupledWidth.width();
+    }
+
+    @Override
+    public String toString() {
+        int tokenWidth = Graphitty.strip(this.sepToken).length();
+        return this.sepToken.repeat((int) ((float) this.coupledWidth.width() / (float) tokenWidth)) + "{{X}}";
     }
 }
