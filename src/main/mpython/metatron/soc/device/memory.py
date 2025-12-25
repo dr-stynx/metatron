@@ -13,21 +13,34 @@
 # 
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from metatron.obj import Rec
+import gc
+import micropython
+import os
+
+from metatron.soc.device.device import Device
 from metatron.util.mach import router
 
+MEMORY_TID = "/soc/memory"
 
-class Device(Rec):
-    def __init__(self, soc_vid, pvm: dict, tid, name:str):
-        Rec.__init__(self, pvm, tid)
-        self.soc_vid = soc_vid
-        self.name = name
+class Memory(Device):
+    def __init__(self, soc_vid, name="memory"):
+        Device.__init__(self, soc_vid, {}, MEMORY_TID, name)
+    
+    def __getitem__(self,key):
+        key = key if isinstance(key,str) else str(key)
+        if key == "free": 
+            return gc.mem_free()
+        elif key == "alloc":
+            return gc.mem_alloc()
+        else:
+            raise KeyError(key)
+    
+    def broadcast(self, key):
+        micropython.mem_info(True)
         if self.soc_vid is not None:
-            try:
-                router().get_space(soc_vid).subscribe(soc_vid.extend(name).extend('get'),lambda s,k: self.broadcast(k))
-            except Exception as e:
-                pass
-
-    def broadcast(self,key):
-        if self.vid is not None:
-            router().write(self.vid, self.pvm if key == "" else self.pvm[key])
+            stats = {
+                "free": gc.mem_free(),
+                "alloc" : gc.mem_alloc(),
+                "filesystem": os.statvfs("/")
+            }
+            router().write(self.soc_vid.extend(self.name),stats)
