@@ -21,34 +21,7 @@ package studio.phaseshift.metatron.ui;
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Separator implements Dimensions, Colorable<Separator> {
+public interface Colorable<T extends Colorable<T>> {
 
-    private final String sepToken;
-    private final Dimensions coupledWidth;
-
-    public Separator(final String sepToken, final Dimensions coupledWidth) {
-        this.sepToken = sepToken;
-        this.coupledWidth = coupledWidth;
-    }
-
-    @Override
-    public int height() {
-        return 1;
-    }
-
-    @Override
-    public int width() {
-        return this.coupledWidth.width();
-    }
-
-    @Override
-    public String toString() {
-        int tokenWidth = Graphitty.strip(this.sepToken).length();
-        return this.sepToken.repeat((int) ((float) this.coupledWidth.width() / (float) tokenWidth)) + "{{X}}";
-    }
-
-    @Override
-    public Separator color(final String graphitty) {
-        return new Separator(graphitty + this.sepToken + "{{X}}", this.coupledWidth);
-    }
+    T color(final String graphitty);
 }
