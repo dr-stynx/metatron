@@ -16,34 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.sys.console;
+package studio.phaseshift.metatron.ui.widget;
 
-import org.jline.keymap.BindingReader;
-import org.jline.keymap.KeyMap;
-import org.jline.terminal.Attributes;
 import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
-import org.jline.utils.Display;
-import org.jline.utils.InfoCmp;
-import studio.phaseshift.metatron.lang.Space;
-import studio.phaseshift.metatron.lang.core.m.type.InstSet;
-import studio.phaseshift.metatron.lang.core.m.type.Rel;
-import studio.phaseshift.metatron.lang.sys.router.Router;
-import studio.phaseshift.metatron.ui.Border;
-import studio.phaseshift.metatron.ui.widget.Panel;
-import studio.phaseshift.metatron.ui.graphitty.Graphitty;
-import studio.phaseshift.metatron.ui.widget.Table;
-import studio.phaseshift.metatron.util.IteratorUtil;
-
-import java.util.*;
-
-import static org.jline.keymap.KeyMap.key;
-import static studio.phaseshift.metatron.furi.fURI.f;
+import studio.phaseshift.metatron.ui.Widget;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Subscriptions {
+public class Selector implements Widget {
+
     private enum Operation {
         DOWN_ROW,
         UP_ROW,
@@ -52,32 +35,19 @@ public class Subscriptions {
         EXIT
     }
 
-    private final Console console;
-    private final Terminal terminal;
+    private final Widget base;
+    private int current;
+    private Terminal terminal;
     private final Size size = new Size();
-    private final BindingReader bindingReader;
-    private final Map<String,Table> states = new LinkedHashMap<>();
-    
-    public Subscriptions(Console console) {
-        this.console = console;
-        this.terminal = console.getTerminal();
-        /// ///////////////////////////////////////////////////////
-        final Table spaceTable = new Table(List.of("vid","pattern"));
-        Router.global().spaces().elements().filter(r -> !(r.second() instanceof InstSet)).forEach(r -> {
-            spaceTable.addRow(List.of(r.<Rel>as().first().toString(), r.<Rel>as().second().<Space>as().pattern()));
-        });
-        this.states.put("space",spaceTable);
-        /// ///////////////////////////////////////////////////////
-        final Table instTable = new Table(List.of("vid","pattern"));
-        Router.global().spaces().elements().filter(r -> r.second() instanceof InstSet).forEach(r -> {
-            instTable.addRow(List.of(r.<Rel>as().first().toString(), r.<Rel>as().second().<Space>as().pattern()));
-        });
-        this.states.put("inst",instTable);
-        ///  states: machines and clusters
-        this.bindingReader = new BindingReader(terminal.reader());
+    private int rows = 0;
+    private int cols = 0;
+
+    public Selector(final Terminal terminal, final Widget base) {
+        this.terminal = terminal;
+        this.base = base;
     }
-    
-    public String select() {
+
+   /* public void run() {
         Display display = new Display(terminal, true);
         Attributes attr = terminal.enterRawMode();
         try {
@@ -90,56 +60,58 @@ public class Subscriptions {
             int selectRow = 0;
             int selectCol = 0;
             KeyMap<Operation> keyMap = new KeyMap<>();
-            keyMap.bind(Operation.DOWN_ROW, key(terminal, InfoCmp.Capability.key_down));
-            keyMap.bind(Operation.UP_ROW, key(terminal, InfoCmp.Capability.key_up));
-            keyMap.bind(Operation.RIGHT_COL, key(terminal, InfoCmp.Capability.key_right));
-            keyMap.bind(Operation.LEFT_COL, key(terminal, InfoCmp.Capability.key_left));
-            keyMap.bind(Operation.EXIT, "\r");
+            keyMap.bind(DOWN_ROW, key(terminal, InfoCmp.Capability.key_down));
+            keyMap.bind(UP_ROW, key(terminal, InfoCmp.Capability.key_up));
+            keyMap.bind(RIGHT_COL, key(terminal, InfoCmp.Capability.key_right));
+            keyMap.bind(LEFT_COL, key(terminal, InfoCmp.Capability.key_left));
+            keyMap.bind(EXIT, "\r");
             Router.global().logger().none(Graphitty.string("{{.}}"));
             while (true) {
                 display.resize(size.getRows(), size.getColumns());
                 final int selectRowFinal = selectRow;
                 final int selectColFinal = selectCol;
                 final List<String> currentStateDisplay = new ArrayList<>();
-                final String selectedState = new ArrayList<>(this.states.keySet()).get(selectCol);
+                final String selectedState = this.base.rowString(selectCol);
                 /// ///////////////////////////////////////////////////////////////////////////////////////////////
-                currentStateDisplay.add(Graphitty.string(IteratorUtil.indexedStream(this.states.keySet().iterator())
+                /*currentStateDisplay.add(Graphitty.string(IteratorUtil.indexedStream(this.states.keySet().iterator())
                         .map(s -> ((s.get0() == selectColFinal) ? "{{c}}" : "{{y}}") + s.get1() + "{{X}}")
                         .map(Graphitty::string)
                         .reduce("",(a,b)->a + "{{g}} | {{X}}" + b)));
                 currentStateDisplay.addAll(
-                        IteratorUtil.indexedStream(this.states.get(selectedState).formattedRows().iterator())
-                                .map(s -> ((s.get0() == selectRowFinal) ? "{{c}}>{{X}}" : " ") + s.get1())
-                                .map(Graphitty::string)
-                                .toList());
+                                IntStream.range(0, this.base.height()).map(i -> (i == selectRow ? "{{r}}>{{X}}" : "") + this.base.rowString(i))
+
+                                        .formattedRows().iterator())
+                        .map(s -> ((s.get0() == selectRowFinal) ? "{{c}}>{{X}}" : " ") + s.get1())
+                        .map(Graphitty::string)
+                        .toList());
                 /// ////////////////////////////////////////////////////////////////////////////////////////////////
-                display.updateAnsi(currentStateDisplay,
-                        size.cursorPos(1, this.states.get(selectedState).formattedWidth() + 2));
-                Operation op = bindingReader.readBinding(keyMap);
+               // display.updateAnsi(currentStateDisplay,
+               //         size.cursorPos(1, this.rowString(selectRow).formattedWidth() + 2));
+                Operation op = terminal.readBinding(keyMap);
                 switch (op) {
                     case RIGHT_COL:
                         selectCol++;
-                        if (selectCol > this.states.size() - 1)
+                        if (selectCol > this.base.columnCount() - 1)
                             selectCol = 0;
                         break;
                     case LEFT_COL:
                         selectCol--;
                         if (selectCol < 0)
-                            selectCol = this.states.size() - 1;
+                            selectCol = this.base.columnCount() - 1;
                         break;
                     case DOWN_ROW:
                         selectRow++;
-                        if (selectRow > this.states.get(selectedState).rows().size() - 1)
+                        if (selectRow > this.base.rowCount() - 1)
                             selectRow = 0;
                         break;
                     case UP_ROW:
                         selectRow--;
                         if (selectRow < 0)
-                            selectRow = this.states.get(selectedState).rows().size() - 1;
+                            selectRow = this.base.rowCount() - 1;
                         break;
                     case EXIT:
                         Router.global().logger().none(Graphitty.string("{{*}}"));
-                        return this.states.get(selectedState).row(selectRow).toString();
+                        return this.base.rowString(selectRow).toString();
                 }
                 Router.global().logger().none(Graphitty.erase(25));
                 final String location = this.states.get(selectedState).entry(selectRow, 0).toString();
@@ -159,4 +131,7 @@ public class Subscriptions {
             terminal.writer().flush();
         }
     }
+}*/
+
+
 }
