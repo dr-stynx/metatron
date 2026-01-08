@@ -19,40 +19,20 @@
 package studio.phaseshift.metatron.ui.widget;
 
 import studio.phaseshift.metatron.lang.sys.console.Highlighter;
-import studio.phaseshift.metatron.ui.Widget;
+
+import java.util.Arrays;
+import java.util.List;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Separator extends AbstractWidget<Separator> {
-    
-    private final String sepToken;
-    private final Widget coupledWidth;
+public class Utilities {
 
-    public Separator(final String sepToken, final Widget coupledWidth) {
-        this.sepToken = sepToken;
-        this.coupledWidth = coupledWidth;
+    private Utilities() {
+        //do nothing
     }
 
-    @Override
-    public int height() {
-        return 1;
-    }
-
-    @Override
-    public int width() {
-        return this.coupledWidth.width();
-    }
-
-    @Override
-    public String toString() {
-        int tokenWidth = Highlighter.visualLength(this.sepToken);
-        return this.sepToken.repeat((int) ((float) this.coupledWidth.width() / (float) tokenWidth)) + "{{X}}";
-    }
-
-    @Override
-    public Separator style(final Style<Separator> style) {
-        this.style = style;
-        return new Separator(style.foreground + this.sepToken + "{{X}}", this.coupledWidth);
+    public static int maxWidth(final List<String> strings) {
+        return strings.stream().flatMap(s -> Arrays.stream(s.split("\n"))).map(Highlighter::visualLength).max(Integer::compareTo).orElse(0);
     }
 }
