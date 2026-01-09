@@ -13,23 +13,16 @@
 # 
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from metatron.furi import f
 from metatron.obj import Rec
-from metatron.util.mach import router
 
 
-class Device(Rec):
-    def __init__(self, soc_vid, pvm: dict, tid, name:str):
-        Rec.__init__(self, pvm, tid)
-        self.soc_vid = soc_vid
-        self.name = name
+class Space(Rec):
+    def __init__(self):
+        Rec.__init__(self, {}, f("/iot/space"))
 
-    def start(self) -> 'Device':
-        return self
+    def connect(self):
+        pass
 
-    def stop(self):
-        router().unsubscribe(self.soc_vid.extend(self.name).extend("+"))
-        router().write(self.soc_vid.extend(self.name), None)
-    
-    def broadcast(self,key):
-        if self.vid is not None:
-            router().write(self.vid, self.pvm if key == "" else self.pvm[key])
+    def disconnect(self):
+        pass
