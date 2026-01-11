@@ -13,23 +13,22 @@
 # 
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from metatron.obj import Rec
+import machine
+
+from metatron.furi import f
+from metatron.soc.device.device import Device
+from metatron.util.graphitty import LOG
 from metatron.util.mach import router
 
+I2C_TID = f("/soc/i2c")
 
-class Device(Rec):
-    def __init__(self, soc_vid, pvm: dict, tid, name: str):
-        Rec.__init__(self, pvm, tid)
-        self.soc_vid = soc_vid
-        self.name = name
 
-    def start(self) -> 'Device':
+class I2c(Device):
+    def __init__(self, scl_pin: int, sda_pin: int, soc_vid, name="i2c"):
+        Device.__init__(self, soc_vid, machine.I2C(sda=machine.Pin(sda_pin), scl=machine.Pin(scl_pin)), I2C_TID, name)
+
+    def start(self) -> 'I2c':
+        devices = self.pvm.scan()
+        for device in devices:
+            LOG.info("located i2c device at {{y}}{}", hex(device))
         return self
-
-    def stop(self) -> 'Device':
-        router().unsubscribe(self.soc_vid.extend(self.name).extend("+"))
-        router().write(self.soc_vid.extend(self.name), None)
-
-    def broadcast(self, key):
-        if self.vid is not None:
-            router().write(self.vid, self.pvm if key == "" else self.pvm[key])
