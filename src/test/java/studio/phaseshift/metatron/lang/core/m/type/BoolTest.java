@@ -25,28 +25,30 @@ import studio.phaseshift.metatron.lang.MetatronObjTest;
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RealTest extends MetatronObjTest {
+public class BoolTest extends MetatronObjTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-            "-2.0.as(int::T)                          % -2",
-            "-102.1.as(int::T)                        % -102",
-            "2.0.as(int::T)                           % 2",
-            "2.1.as(int::T)                           % 2",
-            "2.9.as(int::T)                           % 2",
-            "3.9.as(int::T)                           % 3",
+            "true.as(str::T)                                                               % \"true\"",
+            "false.as(str::T)                                                              % \"false\"",
+            "true.as(int::T)                                                               % 1",
+            "false.as(int::T)                                                              % 0",
+            "true.as(real::T)                                                              % 1.0",
+            "false.as(real::T)                                                             % 0.0"
     }, delimiter = '%')
-    public void testAs(final String code, final String expected) {
+    public void testAsInst(final String code, final String expected) {
         super.testCode(code, expected);
     }
 
     @ParameterizedTest
     @CsvSource(value = {
-            "2.0.pow(4.0)                              % 16.0",
-            "2.0.pow(4.0).plus(1.0)                    % 17.0",
-            "2.0.pow(4.0).plus(1.0).mult(2.0)          % 34.0",
+            "true.plus(false)                                                                  % true",
+            "false.plus(true)                                                                  % true",
+            "true.plus(true)                                                                   % true",
+            "false.plus(false)                                                                 % false"
     }, delimiter = '%')
-    public void testMath(final String code, final String expected) {
+    public void testPlusInst(final String code, final String expected) {
         super.testCode(code, expected);
     }
+
 }
