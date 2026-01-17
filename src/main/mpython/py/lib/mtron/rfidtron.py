@@ -23,6 +23,12 @@ import sys
 import time
 import webrepl
 from machine import Pin, SoftSPI
+
+from metatron.util.graphitty import LOG
+from metatron.util.homeassistant import HomeAssistant
+import _thread
+from metatron.soc.device.i2c import I2c
+from metatron.soc.device.ssd1306 import Ssd1306
 from metatron.space.mqtt_space import MqttSpace
 from metatron.soc.device.gpio import Gpio
 from metatron.soc.device.memory import Memory
@@ -36,7 +42,7 @@ from metatron.util.mach import router
 from metatron.util.homeassistant import HomeAssistant
 
 
-class Walltron(Architecture):
+class RFIDtron(Architecture):
     def __init__(self, secrets: dict):
         Architecture.__init__(self, secrets)
         router().register(MqttSpace(f(f"{secrets['host']}/#"), f("/sys/space/mqtt")).start())
@@ -46,28 +52,14 @@ class Walltron(Architecture):
         self.soc.attach(Memory(soc_vid=self.soc_vid).start())
         self.soc.attach(Gpio(pin_range=range(0, 35), soc_vid=self.soc_vid).start())
         self.soc.attach(Pwm(soc_vid=self.soc_vid).start())
+        self.soc.attach(I2c(scl_pin=22, sda_pin=21, soc_vid=self.soc_vid).start())
+        self.soc.attach(Ssd1306(i2c=self.soc.i2c, addr=0x3c, height=64, width=128, soc_vid=self.soc_vid, name="oled").start())
         #####################################################################################################
-        self.ha = HomeAssistant(self.soc, secrets.get("homeassistant", {}).get("prefix", "homeassistant"))
-        self.ha.register(self.soc.vid.extend('wifi/signal')).sensor().diagnostic().on_read(
-            lambda s: f"{s.wifi.strength():.0f}").device_class("signal_strength").unit_of_measurement('dBm').create()
-        self.ha.register(self.soc.vid.extend('memory/free')).sensor().diagnostic().on_read(
-            lambda s: f"{s.memory['free']}").device_class("data_size").unit_of_measurement("B").create()
-        self.ha.register(self.soc.vid.extend('memory/alloc')).sensor().diagnostic().on_read(
-            lambda s: f"{s.memory['alloc']}").device_class("data_size").unit_of_measurement("B").create()
-        counter = 0
-        for i in [5, 23, 19, 18]:
-            (self.ha.register(self.soc.vid.extend(f'pwm/light_{counter}')).
-             number().
-             config().
-             on_read(make_pwm_read_lambda(i)).
-             on_write(make_pwm_write_lambda(i)).
-             icon("mdi:light-flood-up").
-             device_class("power_factor").
-             unit_of_measurement('pwm').
-             mode("slider").
-             min_max(0, 255).create())
-            counter = counter + 1
-        self.ha.announce()
-        self.ha.update() 
-        
-     
+        from lib.mfrc522 import MFRC522
+        sck = Pin(18, Pin.OUT)
+        mosi = Pin(23, Pin.OUT)
+        miso = Pin(19, Pin.OUT)
+        spi = SoftSPI(baudrate=100000, polarity=0, phase=0, sck=sck, mosi=mosi, miso=miso)
+    
+        sda = Pin(5, Pin.OUT)
+        reader = MFRC522(spi,sda)
