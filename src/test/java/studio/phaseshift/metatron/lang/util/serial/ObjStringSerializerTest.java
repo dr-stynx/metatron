@@ -16,28 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.furi.q;
+package studio.phaseshift.metatron.lang.util.serial;
 
-import studio.phaseshift.metatron.mTest;
-import studio.phaseshift.metatron.furi.c.cInt;
-import studio.phaseshift.metatron.lang.core.m.type.Inst;
-import studio.phaseshift.metatron.lang.core.m.type.InstSet;
-import studio.phaseshift.metatron.lang.core.m.type.Obj;
-
-import static studio.phaseshift.metatron.Tokens.DESC;
+import org.junit.jupiter.api.Disabled;
+import studio.phaseshift.metatron.mSerializerTest;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class DocQTest extends mTest {
-
-    public void analyzeDocs(final InstSet instSet) {
-        for (final Inst inst : instSet.insts()) {
-            Obj doc = instSet.read(inst.tid().qLess().cLess().query("doc"));
-            // LOG.info("HERE %s:", doc.type());
-            if (doc.c().equals(cInt.ONE())) {
-                LOG.warn("%s has no associated documentation %s", inst, doc.<DocQ.Doc>as().at(DESC));
-            }
-        }
+@Disabled
+public class ObjStringSerializerTest extends mSerializerTest<String> {
+    public ObjStringSerializerTest() {
+        super(ObjStringSerializer.build().prettyPrint(false).simpleColon(false).create());
     }
 }

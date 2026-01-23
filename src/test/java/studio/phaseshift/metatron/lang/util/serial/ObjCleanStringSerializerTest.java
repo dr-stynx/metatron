@@ -16,14 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.lang.sys.router;
+package studio.phaseshift.metatron.lang.util.serial;
 
-import studio.phaseshift.metatron.mTest;
+import studio.phaseshift.metatron.mSerializerTest;
 
-/*
- * @author Marko A. Rodriguez (http://markorodriguez.com)
- */
-public class RouterTest extends mTest {
-
-
+public class ObjCleanStringSerializerTest extends mSerializerTest<String> {
+    public ObjCleanStringSerializerTest() {
+        super(new ObjCleanStringSerializer());
+    }
 }
+
+
