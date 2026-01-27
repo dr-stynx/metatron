@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
  *  Copyright (C) 2025- PhaseShift Studio, LLC
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,15 +20,22 @@ package studio.phaseshift.metatron.isa.m.space;
 
 import studio.phaseshift.metatron.isa.SpaceTest;
 
-import static studio.phaseshift.metatron.Tokens.PATTERN;
-import static studio.phaseshift.metatron.Tokens.PERSIST;
+import static studio.phaseshift.metatron.Tokens.*;
 import static studio.phaseshift.metatron.furi.fURI.f;
+import static studio.phaseshift.metatron.isa.m.type.impl.MLst.lst;
 import static studio.phaseshift.metatron.isa.m.type.impl.MRec.rec;
 import static studio.phaseshift.metatron.isa.m.type.impl.MUri.uri;
 
-public class memSpaceTest extends SpaceTest {
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public class mtronSpaceTest extends SpaceTest {
 
-    public memSpaceTest() {
-        super(() -> memSpace.of(rec(uri(PATTERN),uri("/t/#"),uri(PERSIST),uri("/tmp/mem")),f("/sys/space/mem")));
+    public mtronSpaceTest() {
+        super(f("ws://localhost:6666/t"), () -> mtronSpace.of(rec(
+                        uri(PATTERN), uri("ws://localhost:6666/t/#"),
+                        uri(HOST), uri("ws://localhost:6666"),
+                        uri(PEERS), lst(uri("ws://localhost:6666"))),
+                f("/sys/space/mtron")));
     }
 }
