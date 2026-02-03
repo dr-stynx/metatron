@@ -18,41 +18,43 @@
 
 package studio.phaseshift.metatron.isa.grph.type;
 
-import studio.phaseshift.metatron.isa.m.type.Inst;
-import studio.phaseshift.metatron.isa.m.type.Type;
+import studio.phaseshift.metatron.isa.m.type.*;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.function.BiFunction;
 
+import static studio.phaseshift.metatron.furi.fURI.ALL;
 import static studio.phaseshift.metatron.isa.grph.grphInstSet.*;
-import static studio.phaseshift.metatron.isa.grph.type.Vrtx.VrtxType.VRTX_TYPE;
-import static studio.phaseshift.metatron.isa.m.parser.mFluent.StartLess.isa_;
+import static studio.phaseshift.metatron.isa.m.mInstSet.REC_TID;
+import static studio.phaseshift.metatron.isa.m.mInstSet.URI_TID;
 import static studio.phaseshift.metatron.isa.m.type.impl.MInst.instC;
 import static studio.phaseshift.metatron.isa.m.type.impl.MLst.lst;
-import static studio.phaseshift.metatron.isa.m.type.impl.MObjs.objs;
-import static studio.phaseshift.metatron.isa.m.type.impl.MRec.rec;
+import static studio.phaseshift.metatron.isa.m.type.impl.MType.T;
+import static studio.phaseshift.metatron.isa.m.type.impl.MUri.uri;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface Edge extends Elmt {
+public interface Elmt extends Rec {
 
-    public static class EdgeType {
+    public static class ElmtType {
 
-        public static final Type EDGE_TYPE = Type.Builder.build()
-                .tid(ELMT_TID)
-                .vid(EDGE_TID)
-                .predicate(isa_(rec(
-                        OUT, VRTX_TYPE,
-                        IN, VRTX_TYPE))).create();
+        public static final Type ELMT_TYPE = Type.Builder.build()
+                .tid(REC_TID)
+                .vid(ELMT_TID).create();
+
+        private static BiFunction<Obj, Inst, Obj> PROPERTY_FUNCTION(final Uri key) {
+            return (lhs, inst) -> lhs.asRec().at(key);
+        }
 
         public static Set<Inst> insts() {
+
             return new LinkedHashSet<>(List.of(
-                    instC(INV_INST_TID.dom(EDGE_TID).rng(VRTX_TID), lst(), (lhs, inst) -> lhs.asRec().at(IN)),
-                    instC(OUTV_INST_TID.dom(EDGE_TID).rng(VRTX_TID), lst(), (lhs, inst) -> lhs.asRec().at(OUT)),
-                    instC(BOTHV_INST_TID.dom(EDGE_TID).rng(VRTX_TID), lst(), (lhs, inst) -> objs(Stream.concat(lhs.asRec().at(IN).stream(), lhs.asRec().at(OUT).stream())))));
+                    instC(VALUES_INST_TID.dom(ELMT_TID).rng(ALL.maybeSome()), lst(T(URI_TID.maybeSome())), (lhs, inst) -> lhs.asRec().at(inst.arg(0).isNoObj() ? uri("+") : inst.arg(0).asUri()))
+                   // instC(VALUES_INST_TID.dom(ELMT_TID).rng(ALL.maybeSome()), lst(T(URI_TID.maybeSome())), PROPERTY_FUNCTION(uri("+")))
+            ));
         }
     }
 }
