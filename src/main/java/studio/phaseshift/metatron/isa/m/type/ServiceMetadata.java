@@ -18,37 +18,14 @@
 
 package studio.phaseshift.metatron.isa.m.type;
 
-import studio.phaseshift.metatron.furi.fURI;
-import studio.phaseshift.metatron.isa.Space;
-
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.Set;
 
-import static studio.phaseshift.metatron.furi.fURI.f;
-
-public interface InstSet extends Space {
-
-
-
-    fURI A = f("A");
-    fURI B = f("B");
-    fURI C = f("C");
-    fURI D = f("D");
-    fURI E = f("E");
-    fURI F = f("F");
-    fURI G = f("G");
-    
-    @Override
-    fURI pattern();
-
-    Set<Obj> consts();
-
-    Set<Type> types();
-
-    Set<Inst> insts();
-
-    Set<Inst> rewrites();
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ServiceMetadata {
+    String tid();
+    String vid() default "";
 }
