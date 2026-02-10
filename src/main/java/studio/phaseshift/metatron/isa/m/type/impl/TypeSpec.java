@@ -16,27 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.isa.m.type;
+package studio.phaseshift.metatron.isa.m.type.impl;
 
 import studio.phaseshift.metatron.furi.fURI;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import static studio.phaseshift.metatron.furi.fURI.f;
+import java.lang.annotation.Target;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ServiceMetadata {
+public @interface TypeSpec {
     String tid();
-
-
+    String vid() default "";
+    
     public static class Helper {
-        public static fURI tid(final Class<?> spec) {
-            return f(spec.getAnnotation(ServiceMetadata.class).tid());
-        }
+        public static fURI vidOrTid(final TypeSpec spec) {
+            return spec.vid().isEmpty() ? fURI.of(spec.tid()) : fURI.of(spec.vid());
+        }   
     }
-
 }
