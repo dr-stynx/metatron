@@ -16,40 +16,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.isa.m.type.reflect;
+package studio.phaseshift.metatron.isa.mach.type;
 
-import studio.phaseshift.metatron.furi.fURI;
-import studio.phaseshift.metatron.isa.m.type.Obj;
 import studio.phaseshift.metatron.isa.m.type.impl.MRec;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static studio.phaseshift.metatron.isa.m.mInstSet.REC_TID;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TypedRec<A extends Obj, B extends Obj> extends MRec {
+public class MStats extends MRec implements Stats {
 
-    public TypedRec(final Map<A, B> map, final fURI tid, final fURI vid) {
-        super((Map<Obj, Obj>) map, tid, vid);
+    private final MIOStats ioStats = new MIOStats();
+    private final MMonadicStats monadicStats = new MMonadicStats();
 
+    public MStats() {
+        super(Map.of(), Stats.STATS_TID, null);
     }
 
-    public TypedRec<A, B> putTyped(final A key, final B value) {
-        return (TypedRec<A, B>) super.at(key, value);
+    public class MIOStats extends MRec implements Stats.IOStats {
+
+        public MIOStats() {
+            super(Map.of(), Stats.IOStats.STATS_IO_TID, null);
+        }
     }
 
-    public B atTyped(final A key) {
-        return super.at(key);
+    public class MMonadicStats extends MRec implements Stats.MonadicStats {
+
+        public MMonadicStats() {
+            super(Map.of(), Stats.MonadicStats.MACH_ISA_STATS_MONADIC_TID, null);
+        }
     }
 
-    public Map<A, B> jvmTyped() {
-        return (Map<A, B>) super.jvm();
+    @Override
+    public Stats.IOStats ioStats() {
+        return this.ioStats;
     }
 
-    public static <A extends Obj, B extends Obj> TypedRec<A, B> typedRec() {
-        return new TypedRec<>(new LinkedHashMap<>(), REC_TID, fURI.fnull);
+    @Override
+    public Stats.MonadicStats monadicStats() {
+        return this.monadicStats;
     }
 }
