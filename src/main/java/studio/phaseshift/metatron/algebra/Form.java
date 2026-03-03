@@ -21,21 +21,12 @@ package studio.phaseshift.metatron.algebra;
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface MultGroup<R extends MultGroup<R>> extends Group<R>, MultMonoid<R> {
-
-    R inv();
-
-    R div(final R rhs);
-    
-    R one();
-    
-    // boolean isInv();
-
-    interface O<R extends O<R>> extends MultGroup<R>, Group.O<R>, MultMonoid.O<R> {
-        R div(R rhs);
-        
-        R inv();
-        
-        R one();
-    }
+public enum Form {
+    PLUS_GROUP,
+    PLUS_MONOID,
+    MULT_GROUP,
+    MULT_MONOID,
+    RIG,
+    RING,
+    FIELD
 }

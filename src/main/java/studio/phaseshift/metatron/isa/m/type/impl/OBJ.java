@@ -16,26 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.algebra;
+package studio.phaseshift.metatron.isa.m.type.impl;
+
+import studio.phaseshift.metatron.isa.m.type.Obj;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface MultGroup<R extends MultGroup<R>> extends Group<R>, MultMonoid<R> {
-
-    R inv();
-
-    R div(final R rhs);
-    
-    R one();
-    
-    // boolean isInv();
-
-    interface O<R extends O<R>> extends MultGroup<R>, Group.O<R>, MultMonoid.O<R> {
-        R div(R rhs);
-        
-        R inv();
-        
-        R one();
-    }
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface OBJ {
+    Class<? extends Obj> value();
 }

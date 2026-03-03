@@ -16,26 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.algebra;
+package studio.phaseshift.metatron.isa.m.type;
 
-/*
- * @author Marko A. Rodriguez (http://markorodriguez.com)
- */
-public interface MultGroup<R extends MultGroup<R>> extends Group<R>, MultMonoid<R> {
+import studio.phaseshift.metatron.algebra.AbstractAlgebraTest;
 
-    R inv();
+import java.nio.ByteBuffer;
+import java.util.Set;
 
-    R div(final R rhs);
-    
-    R one();
-    
-    // boolean isInv();
+import static studio.phaseshift.metatron.algebra.Form.PLUS_MONOID;
+import static studio.phaseshift.metatron.isa.m.type.impl.MBytes.bytes;
 
-    interface O<R extends O<R>> extends MultGroup<R>, Group.O<R>, MultMonoid.O<R> {
-        R div(R rhs);
-        
-        R inv();
-        
-        R one();
+public class BytesTest extends AbstractAlgebraTest<Bytes> {
+    public BytesTest() {
+        super(bytes(ByteBuffer.wrap(new byte[]{1, 2, 3})), Set.of(PLUS_MONOID));
     }
 }
