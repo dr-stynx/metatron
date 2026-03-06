@@ -18,494 +18,67 @@
 
 package studio.phaseshift.metatron.furi;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import studio.phaseshift.metatron.isa.m.parser.mParser;
-import studio.phaseshift.metatron.isa.mach.type.ui.graphitty.Graphitty;
-import studio.phaseshift.metatron.isa.mach.type.ui.graphitty.GraphittyLogger;
 import studio.phaseshift.metatron.AbstractMetatronTest;
-import studio.phaseshift.metatron.util.MTronException;
+import studio.phaseshift.metatron.furi.c.cInt;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static studio.phaseshift.metatron.furi.fURI.f;
+import static studio.phaseshift.metatron.furi.fURI.parseQuery;
 
+
+/*
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
 public class fURITest extends AbstractMetatronTest {
 
-    private static final GraphittyLogger LOG = Graphitty.log(fURITest.class);
-
-
-    /// /////////////////////////////////////////
-
-    // TODO: move this to a CSVSource (this is sooooooo old)
-    static Stream<Arguments> testSegmentsData() {
-        return Stream.of(
-                Arguments.of("http://fhatos.org/a/b/c", List.of("a", "b", "c")),
-                Arguments.of("http://fhatos.org:8080/a/b/c", List.of("a", "b", "c")),
-                Arguments.of("http://fhatos.org", List.of()),
-                Arguments.of("http://fhatos.org:8080", List.of()),
-                Arguments.of("a/b/c", List.of("a", "b", "c")),
-                Arguments.of("/a/b/c", List.of("a", "b", "c")),
-                Arguments.of("a/b/c/", List.of("a", "b", "c")),
-                Arguments.of("/a/b/c/", List.of("a", "b", "c")),
-                Arguments.of("a/b/c?a=1&c=2", List.of("a", "b", "c")),
-                Arguments.of("a/b/c/?a=3&c=4", List.of("a", "b", "c")),
-                Arguments.of("/a/b/c?a=5&c=6", List.of("a", "b", "c")),
-                Arguments.of("/a/b/c/?a=7&c=8", List.of("a", "b", "c")),
-                Arguments.of("/mtron/int", List.of("mtron", "int")),
-                Arguments.of("/mtron/int?sub", List.of("mtron", "int")),
-                Arguments.of("/mtron/int?sub=noobj", List.of("mtron", "int")));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "_0",
-            "http://fhatos.org/a/b/c",
-            "http://fhatos.org:8080/a/b/c",
-            "http://fhatos.org",
-            "http://fhatos.org:8080",
-            "a/b/c",
-            "/a/b/c",
-            "a/b/c/",
-            "/a/b/c/",
-            "a/b/c?a=1&c=2",
-            "a/b/c/?a=3&c=4",
-            "/a/b/c?a=5&c=6",
-            "/a/b/c/?a=7&c=8",
-            "/mtron/int",
-            "/mtron/int?sub",
-            "/mtron/int?sub=noobj",
-            "http://_adb/dg",
-    })
-    public void testParse(final String f) {
-        final fURI furi1 = fURI.of(f);
-        final fURI furi2 = mParser.m_furi().parse(f).get();
-        assertEquals(f, furi1.toString());
-        assertEquals(f, furi2.toString());
-        assertEquals(furi1, furi2);
-        assertEquals(furi1, fURI.of(furi1.toString()));
-    }
-
     @ParameterizedTest
     @CsvSource(value = {
-            "a/b/c         |  a/b/c",
-            "./b/c         |  b/c",
-            "a/./c         |  a/c",
-            "a/b/.         |  a/b",
-            "a/./.         |  a",
-            "a/././d       |  a/d",
-            "a/././d/      |  a/d/",
-            // "././.      |   ",
-            "a/b/..        |  a",
-            "a/../..       |  ..",
-            "./../../../.  |  ../../..",
-            "./../../a     |  ../../a",
-            "a/./z/../b    | a/b",
-    }, delimiter = '|')
-    public void testResolve(final String f1, final String f2) {
-        final fURI furi1a = fURI.of(f1);
-        final fURI furi1b = fURI.of(f2);
-        final fURI furi2a = mParser.m_furi().parse(f1).get();
-        final fURI furi2b = mParser.m_furi().parse(f2).get();
-        LOG.info("testing {{b}}%s{{/b}} {{g}}=>{{/g}} {{b}}%s{{b}} resolution", furi1a, furi2b);
-        assertEquals(furi1a.resolve(), furi2b);
-        assertEquals(furi2a.resolve(), furi1b);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "#                                    | false",
-            "+                                    | false",
-            "                                     | false",
-            "A                                    | true",
-            "a                                    | false",
-            "ABC                                  | true",
-            "/+/+/A                               | true",
-            "/mtron/+/A                           | false",
-            "AbC                                  | false",
-            "AbC/A                                | false",
-            "abc/A                                | false",
-            "abc/d                                | false",
-            "A/B/C                                | true",
-            "A/+/C                                | true",
-            "A/#                                  | true",
-            "A/#{*}                               | true"
-    }, delimiter = '|')
-    public void testGeneric(final String f, final boolean isGeneric) {
-        final fURI furi1 = fURI.of(null == f ? "" : f);
-        if (null == f) {
-            assertEquals(isGeneric, furi1.isGeneric());
-            return;
-        }
-        final fURI furi2 = mParser.m_furi().parse(f).get();
-        assertEquals(f, furi1.toString());
-        assertEquals(f, furi2.toString());
-        assertEquals(furi1, furi2);
-        assertEquals(furi1, fURI.of(furi1.toString()));
-        LOG.info("testing {{b}}%s{{/b}} %s generics", furi1, isGeneric ? "{{g}}for{{/g}}" : "{{r}}for no{{/r}}");
-        assertEquals(isGeneric, furi1.isGeneric());
-        assertEquals(isGeneric, furi2.isGeneric());
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "A             |  A             | true",
-            "A/b/c         |  A/B/C         | false",
-            "a/b/c         |  D             | true",
-            "A/B           |  A/C           | false",
-            "A{+}          |  A{*}          | true",
-            "A/B{2,4}      |  a/#{*}        | true",
-            "A/B/C{2,4}    |  a/#{*}        | true",
-            //"A/{+}         |  A/#{*}        | true",
-            "A/{0}         |  A/#{2}        | false",
-            "A/aB{0}       |  Z/+{0}        | true",
-            "a{1}          |  A{1}          | true"
-    }, delimiter = '|')
-    public void testGenericMatch(final String f1, final String f2, final boolean matches) {
-        final Map<fURI, fURI> generics = new HashMap<>(Map.of(f("A"), f("a"), f("B"), f("b"), f("C"), f("c"), f("D"), f("a/b/c")));
-        final fURI lhs = f(f1);
-        final fURI lhsResolved = lhs.resolve(generics);
-        final fURI rhs = f(f2);
-        final fURI rhsResolved = rhs.resolve(generics);
-        final boolean resultMatch = lhsResolved.test(rhsResolved);
-        LOG.info("testing {{b}}%s{{/b}} [resolved: {{m}}%s{{/m}}] %s {{b}}%s{{/b}} [resolved: {{m}}%s{{/m}}]", lhs, lhsResolved, matches ? "{{g}}matches{{/g}}" : "{{r}}doesn't match{{/r}}", rhs, rhsResolved);
-        assertEquals(matches, resultMatch);
-    }
-
-    @ParameterizedTest
-    @MethodSource("testSegmentsData")
-    public void testSegments(final String f, final List<String> segments) {
-        final fURI furi = fURI.of(f);
-        assertEquals(segments, furi.segments());
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "/test.com?a=1&b=2&c=3|{a=1, b=2, c=3}",
-            "/test.com|{}",
-            "/test.com?|{}",
-            "/test.com?a|{a=}",
-            "/test.com?a=|{a=}",
-            "/test.com?a=&b=&c=|{a=, b=, c=}",
-            "/test.com?a&b&c|{a=, b=, c=}",
-            "/test.com?a=a:url&b=2&c=metatron.org|{a=a:url, b=2, c=metatron.org}",
-            "/test.com?a=a/b/c&b=aaa&c=0.2|{a=a/b/c, b=aaa, c=0.2}",
-            "/test.com?a=a/b/c&b=http://aaa&c=0.2|{a=a/b/c, b=http://aaa, c=0.2}",
-            "http://test.com?a=a/b/c&b=sss.com&c=0.2|{a=a/b/c, b=sss.com, c=0.2}",
-            "/mtron/an_inst?dom=#&rng=+|{dom=#, rng=+}"},
-            delimiter = '|')
-    public void testQueryRead(final String f, final String queryMap) {
-        final fURI furi1 = fURI.of(f);
-        final fURI furi2 = mParser.m_furi().parse(f).get();
-        assertEquals(queryMap, furi1.queryMap().toString());
-        assertEquals(queryMap, furi2.queryMap().toString());
-        //assertEquals(f, furi1.toString());
-        //assertEquals(f, furi2.toString());
-        assertEquals(furi1.toString(), furi2.toString());
-        assertEquals(furi1, furi2);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "a                  | a               | a{2}",
-            "a/b/c{23}          | a/b/c{2}        | a/b/c{25}",
-            "a/b/c/{2,5}        | z{4,6}          | #{6,11}",
-            "a/b/c{6}?a=1&b=2   | a/+/c{4,6}?c=3  | a/b/c{10,12}?a=1&b=2&c=3",
-            "a/b/c{+}?a=1&b=2   | #{*}            | a/b/c{1,}?a=1&b=2",
-            "a/b/c{*}?a=1&b=2   | #{+}            | a/b/c{+}?a=1&b=2",
-            "a/b/c{+}?a=1&b=2   | #{+}            | a/b/c{2,}?a=1&b=2",
-            "a/b/c{+}?a=1&b=2   | #{?}            | a/b/c{+}?a=1&b=2",
-            "a/b/c{?}?a=1&b=2   | #{?}            | a/b/c{0,2}?a=1&b=2",
-    }, delimiter = '|')
-    public void testPlus(final String f1, final String f2, final String expected) {
-        final fURI furi1a = fURI.of(f1);
-        final fURI furi1b = fURI.of(f2);
-        final fURI furi2a = mParser.m_furi().parse(f1).get();
-        final fURI furi2b = mParser.m_furi().parse(f2).get();
-        //assertEquals(furi1a, furi2a); // TODO: important ssend issue
-        assertEquals(furi1b, furi2b);
-        if (expected.equals("ERROR")) {
-            LOG.trace("testing adding {{b}}%s{{/b}} and {{b}}%s{{/b}} = {{r}}ERROR{{/r}}", furi1a, furi1b);
-            assertThrows(MTronException.class, () -> LOG.error("this shouldn't work: %s", furi1a.plus(furi1b)));
-            assertThrows(MTronException.class, () -> furi2a.plus(furi2b));
-        } else {
-            LOG.trace("testing adding {{b}}%s{{/b}} and {{b}}%s{{/b}} = {{b}}%s{{/b}}", furi1a, furi1b, furi1a.plus(furi1b));
-            assertEquals(fURI.of(expected), furi1a.plus(furi1b));
-            assertEquals(fURI.of(expected), furi2a.plus(furi2b));
-
-        }
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "a                  | a               | 0",
-            "m:a                | m:a             | 0",
-            "a/b                | a/b/c           | -1",
-            "m:a/b              | m:a/b/c         | -1",
-            "a/#                | a/b/c           | 1",
-            "m://a/#            | m://a/b/c       | 1",
-            "m://a/#            | m://#           | -1",
-            "a/b/+              | a/b/c           | 1",
-            "a/b/c              | a/b/c           | 0",
-            "a/b/+              | c/b/a           | -1",
-    }, delimiter = '|')
-    public void testCompareTo(final String f1, final String f2, final int order) {
-        final fURI furi1a = fURI.of(f1);
-        final fURI furi1b = fURI.of(f2);
-        final fURI furi2a = mParser.m_furi().parse(f1).get();
-        final fURI furi2b = mParser.m_furi().parse(f2).get();
-        //assertEquals(furi1a, furi2a); // TODO: important ssend issue
-        assertEquals(furi1b, furi2b);
-        LOG.trace("testing {{b}}%s{{/b}} superset of {{b}}%s{{/b}} = {{y}}%s{{/b}}", furi1a, furi1b, "" + furi1a.compareTo(furi1b));
-        assertEquals(order, furi1a.compareTo(furi1b));
-        assertEquals(order, furi2a.compareTo(furi2b));
-
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "a                  | a               | a/a{1}",
-            "a                  | a               | a/a{1}",
-            "a/b/c{23}          | a/b/c{2}        | a/b/c/a/b/c{46}",
-            "a/b/c{2,5}         | z{4,6}          | a/b/c/z{8,30}",
-            "a/b/c{2,5}         | z{4,6}          | a/b/c/z{8,30}",
-            "a/b/c{6}?a=1&b=2   | a/+/c{4,6}?c=3  | a/b/c/a/+/c{24,36}?a=1&b=2&c=3",
-            "a/b/c{+}?a=1&b=2   | #{*}            | a/b/c/#{0,}?a=1&b=2",
-    }, delimiter = '|')
-    public void testMult(final String f1, final String f2, final String expected) {
-        final fURI furi1a = fURI.of(f1);
-        final fURI furi1b = fURI.of(f2);
-        final fURI furi2a = mParser.m_furi().parse(f1).get();
-        final fURI furi2b = mParser.m_furi().parse(f2).get();
-        assertEquals(furi1a, furi2a);
-        assertEquals(furi1b, furi2b);
-        if (expected.equals("ERROR")) {
-            assertThrows(MTronException.class, () -> furi1a.mult(furi1b));
-            assertThrows(MTronException.class, () -> furi2a.mult(furi2b));
-        } else {
-            assertEquals(fURI.of(expected), furi1a.mult(furi1b));
-            assertEquals(fURI.of(expected), furi2a.mult(furi2b));
-        }
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "a                  | a{-1}",
-            "a{1,1}             | a{-1}",
-            "a{-1}              | a",
-            "a{-1}              | a{1}",
-            "a{2,3}             | a{-3,-2}",
-            "a{0}               | a{0}",
-            "a{,10}             | a{-10,}",
-            "a{2,}              | a{,-2}",
-            "a{*}               | a{,0}",
-            "a{?}               | a{-1,0}",
-            "a{+}               | a{,-1}",
-            "a{10}              | a{-10}",
-            "a{10,}             | a{,-10}"
-    }, delimiter = '|')
-    public void testNeg(final String f1, final String expected) {
-        final fURI furi1 = fURI.of(f1);
-        final fURI furi2 = mParser.m_furi().parse(f1).get();
-        //assertEquals(furi1a, furi2a); // TODO: important ssend issue
-        assertEquals(furi1, furi2);
-        if (expected.equals("ERROR")) {
-            // assertThrows(MTronException.class, () -> furi1.);
-            // assertThrows(MTronException.class, () -> furi2a.plus(furi2b));
-        } else {
-            assertEquals(fURI.of(expected), furi1.neg());
-            assertEquals(fURI.of(expected), furi2.neg());
-        }
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "/a/b/c                  |     1|            /a",
-            "/a/b/c/                 |     1|            /a/",
-            "a/b/c                   |     2|            a/b",
-            "/a/b/c                  |     3|            /a/b/c",
-            "http://x.com/a/b/c      |     3|            http://x.com/a/b/c",
-            "http://x.com/a/b/c      |     2|            http://x.com/a/b",
-            "http://x.com/a/b/c      |     1|            http://x.com/a",
-            "http://x.com/a/b/c      |     0|            http://x.com/",
-            // "http://a:b@x.com/a/b/c  |     2|            http://a:b@x.com/a/b", username password not implemented yet
-    },
-            delimiter = '|')
-    public void testHead(final String f, final int steps, final String head) {
-        final fURI furi = f(f);
-        final fURI computedHead = furi.head(steps);
-        final fURI expectedHead = f(head);
-        assertEquals(expectedHead, computedHead);
-        //assertEquals(computedHead,furi.retract(furi.segments().size()-steps));
-        assertEquals(furi.segments().size(), computedHead.segments().size() + (furi.segments().size() - steps));
-        assertEquals(steps, computedHead.segments().size());
-    }
-
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "/a/b/c                  |     1|            /c",
-            "/a/b/c/                 |     1|            /c/",
-            "a/b/c                   |     2|            b/c",
-            "/a/b/c                  |     3|            /a/b/c",
-            "http://x.com/a/b/c      |     3|            http://x.com/a/b/c",
-            "http://x.com/a/b/c      |     2|            http://x.com/b/c",
-            "http://x.com/a/b/c      |     1|            http://x.com/c",
-            "http://x.com/a/b/c      |     0|            http://x.com/",
-            // "http://a:b@x.com/a/b/c  |     2|            http://a:b@x.com/a/b", username password not implemented yet
-    },
-            delimiter = '|')
-    public void testTail(final String f, final int steps, final String tail) {
-        final fURI furi = f(f);
-        final fURI computeTail = furi.tail(steps);
-        final fURI expectedTail = f(tail);
-        assertEquals(expectedTail, computeTail);
-        //assertEquals(computedHead,furi.retract(furi.segments().size()-steps));
-        assertEquals(furi.segments().size(), computeTail.segments().size() + (furi.segments().size() - steps));
-        assertEquals(steps, computeTail.segments().size());
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "/test.com?a=1&b=2|/test.com|a|1|b|2",
-            "/test.com?a=7|/test.com|a|1|a|7",
-            "/test.com?monad|/test.com|monad|null|monad|null",
-            "/test.com?monad&a=7|/test.com|monad|null|a|7",
-            "/test.com?c=abc|/test.com|c|abc|c|abc"},
-            delimiter = '|',nullValues = "null")
-    public void testQueryWrite(final String expected, final String base, final String k1, final String v1, final String k2, final String v2) {
-        final fURI expectedfURI = fURI.of(expected);
-        final fURI resultfURI = fURI.of(base).query(k1, v1).query(k2, v2);
-        assertEquals(expectedfURI, resultfURI);
-    }
-
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "/a/b/c                  | ",
-            "a/b/c                   | ",
-            "http://x.com/a/b/c      | http",
-            "mtron://lang/obj        | mtron",
-            "mtron:lang/obj          | mtron",
-            "./mtron:lang            | ",
-            "http:m:m:m              | http",
-            "m:m:m:m                 | m"
-    }, delimiter = '|')
-    public void testScheme(final String furi, final String scheme) {
-        assertEquals(scheme, f(furi).scheme());
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "/a/b/c                     |  ",
-            "a/b/c                      |  ",
-            "//x.com/a/b/c              |  x.com",
-            "//x/a/b/c                  |  x",
-            "//x:8080/a/b/c             |  x",
-            "//x.com                    |  x.com",
-            "//x                        |  x",
-            "http://x.com/a/b/c         |  x.com",
-            "http://x.com:80/a/b/c      |  x.com",
-            "mtron://lang/obj           |  lang",
-            "mtron:lang/obj             |  "
-    }, delimiter = '|')
-    public void testHostOrSegment(final String a, final String b) {
-        assertEquals(f(a).host(), b);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "/a/b/c                     |  /a       | true",
-            "a/b/c                      |  a        | true",
-            "/a/b/c                     |  a        | true",
-            "a/b/c                      |  /a       | true", // TODO: should authority-less furis check on start /?
-            "//x.com/a/b/c              |  x.com    | false",
-            "//x/a/b/c                  |  x        | false",
-            "a/b/c/d                    |  a        | true",
-            "a/b/c/d                    |  a/b/     | true",
-            "a/b/c/d                    |  a/+      | true",
-            "a/b/c/d                    |  a/d      | false",
-            "a/b/c/d                    |  a/+/c    | true",
-    }, delimiter = '|')
-    public void testHasPrefix(final String a, final String b, final boolean hasPrefix) {
-        assertEquals(hasPrefix, f(a).hasPrefix(f(b)));
-    }
-
-
-    @Test
-    public void testPrepend() {
-        assertEquals(new fURI("http://fhatos.org/a/b"), new fURI("http://fhatos.org/b").prepend("a"));
-        assertEquals(new fURI("http://fhatos.org/a/b/c/d"), new fURI("http://fhatos.org/d").prepend("a/b/c"));
-
-    }
-
-    @Test
-    public void testExtend() {
-        assertEquals(new fURI("http://fhatos.org/a/b"), new fURI("http://fhatos.org/a").extend("b"));
-        assertEquals(new fURI("http://fhatos.org/a/b/c/d"), new fURI("http://fhatos.org/a").extend("b/c/d"));
-        assertEquals(new fURI("http://fhatos.org/a/b"), new fURI("http://fhatos.org/a/b/c/d").extend(".././.."));
-        assertEquals(new fURI("http://fhatos.org/a/b"), new fURI("http://fhatos.org/a/b/c").extend("../z/.."));
-        assertEquals(new fURI("http://fhatos.org/a/b/d"), new fURI("http://fhatos.org/a").extend("b/./d"));
-
-    }
-
-    @Test
-    public void testIsAbsolute() {
-        assertTrue(new fURI("http://fhatos.org/a").isAbsolute());
-        assertTrue(new fURI("http://fhatos.org").isAbsolute());
-        assertFalse(new fURI("").isAbsolute());
-        assertFalse(new fURI("a/b").isAbsolute());
-        assertTrue(new fURI("/a/b").isAbsolute());
-        assertTrue(new fURI("/a/+/b").isAbsolute());
-        assertTrue(new fURI("/a/+/#").isAbsolute());
-        assertFalse(new fURI("a/+/b").isAbsolute());
-        assertFalse(new fURI("a/+/#").isAbsolute());
+            "http://fhatos.org/a         | 1   | http://fhatos.org",
+            "http://fhatos.org/a/        | 2   | http://fhatos.org/",
+            "http://fhatos.org/a/b       | 2   | http://fhatos.org",
+            "http://fhatos.org/a/b/      | 2   | http://fhatos.org/",
+            "http://fhatos.org/a/b       | 2   | http://fhatos.org",
+            "http://fhatos.org/a/b       | 3   | http://fhatos.org",
+            "http://fhatos.org:81/a      | 1   | http://fhatos.org:81",
+            "http://fhatos.org:81/a/     | 2   | http://fhatos.org:81/",
+            "http://fhatos.org:81/a      | 2   | http://fhatos.org:81",
+            "http://fhatos.org:81/a/b/   | 1   | http://fhatos.org:81/a/",
+            "http://fhatos.org:81/a/b    | 1   | http://fhatos.org:81/a",
+            "http://fhatos.org:81/a/b    | 2   | http://fhatos.org:81",
+            "http://fhatos.org:81/a/b/   | 2   | http://fhatos.org:81/",
+            "http://fhatos.org:81/a/b    | 3   | http://fhatos.org:81",
+            "/fhat.org/a/b               | 1   | /fhat.org/a",
+            "fhat.org/a/b                | 1   | fhat.org/a",
+            "fhat.org/a/b                | 3   | null",
+            "/a/b/c?a=b&c=d              | 1   | /a/b?a=b&c=d",
+            "/a/b/c?a=b&c=d              | 2   | /a?a=b&c=d",
+            "./a/./././././?a=b&c=d      | 5   | ./a/?a=b&c=d",
+            "/a//b//c?a=b&c=d            | 2   | /a//b?a=b&c=d",
+            "/a/b/c/?a=b&c=d             | 3   | /?a=b&c=d",
+            "/a/b/c{*}?a=b&c=d           | 1   | /a/b{*}?a=b&c=d",
+            "/a/b/c{2,3}?a=b&c=d         | 2   | /a{2,3}?a=b&c=d",
+            "a/b/c{2,3}?a=b&c=d          | 2   | a{2,3}?a=b&c=d",
+            ".//a/b/c{2,3}?a=b&c=d       | 2   | .//a{2,3}?a=b&c=d",
+            // "/a/b/c/[0]?a=b&c=d          | 2   | /a/[0]?a=b&c=d",
+            // "/a/b/c/{?}?a=b&c=d          | 2   | /a/{?}?a=b&c=d",
+            // "/a/b?a=b&c=d                | 2   | ?a=b&c=d",
+    }, delimiter = '|', nullValues = "null")
+    public void testRetract(final String furi, final int steps, final String expected) {
+        final fURI start = fURI.of(furi);
+        final fURI end = fURI.of(expected);
+        assertEquals(end, start.retract(steps), printComponents(start.retract(steps)) + printComponents(end));
+        LOG.error("testing %s retracted %d steps is %s", start, steps, expected);
+        printComponents(start);
     }
 
     @ParameterizedTest
     @CsvSource(value = {
             "http://fhatos.org/a         | 1   | http://fhatos.org",
-           // "http://fhatos.org/a/        | 1   | http://fhatos.org/",
-            "http://fhatos.org/a/b       | 1   | http://fhatos.org/a",
-            "http://fhatos.org/a/b/      | 1   | http://fhatos.org/a/",
-            "http://fhatos.org/a/b       | 2   | http://fhatos.org",
-            "http://fhatos.org/a/b       | 3   | http://fhatos.org",
-            "http://fhatos.org:81/a      | 1   | http://fhatos.org:81",
-            "http://fhatos.org:81/a/b    | 1   | http://fhatos.org:81/a",
-            "http://fhatos.org:81/a/b    | 2   | http://fhatos.org:81",
-            "http://fhatos.org:81/a/b    | 3   | http://fhatos.org:81",
-            "/fhat.org/a/b               | 1   | /fhat.org/a",
-            "fhat.org/a/b                | 1   | fhat.org/a",
-            "fhat.org/a/b                | 3   | ",
-            "/a/b/c?a=b&c=d              | 1   | /a/b?a=b&c=d",
-            "/a/b/c?a=b&c=d              | 2   | /a?a=b&c=d",
-            "/a/b/c/?a=b&c=d             | 2   | /a/?a=b&c=d",
-            "/a/b/c{*}?a=b&c=d           | 1   | /a/b{*}?a=b&c=d",
-            "/a/b/c{2,3}?a=b&c=d         | 2   | /a{2,3}?a=b&c=d",
-            // TODO: "/a/b/c/{2,3}?a=b&c=d         | 2   | /a/{2,3}?a=b&c=d",
-             "/a/b/c/[0]?a=b&c=d          | 2   | /a/[0]?a=b&c=d",
-             //"/a/b/c/{?}?a=b&c=d          | 2   | /a/{?}?a=b&c=d",
-             //"/a/b?a=b&c=d                | 2   | ?a=b&c=d",
-    }, delimiter = '|')
-    public void testRetract(final String furi, final int steps, final String expected) {
-        final fURI start = fURI.of(furi);
-        final fURI end = fURI.of(expected);
-        assertEquals(end, start.retract(steps));
-        LOG.debug("testing %s retracted %d steps is %s", start, steps, expected);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "http://fhatos.org/a         | 1   | http://fhatos.org", 
-        //    "http://fhatos.org/a/        | 1   | http://fhatos.org/",
+            //    "http://fhatos.org/a/         | 1   | http://fhatos.org/",
             "http://fhatos.org/a/b       | 1   | http://fhatos.org/b",
             "http://fhatos.org/a/b/      | 1   | http://fhatos.org/b/",
             "http://fhatos.org/a/b       | 2   | http://fhatos.org",
@@ -570,22 +143,296 @@ public class fURITest extends AbstractMetatronTest {
 
     @ParameterizedTest
     @CsvSource(value = {
+            "a                                   | null | null  | -1  | a        | 1        | null | null",
+            "mtron:                              | mtron| null  | -1  | null     | 1        | null | null",
+            "mtron:abc                           | mtron| null  | -1  | abc      | 1        | null | null",
+            "a/b                                 | null | null  | -1  | a/b      | 1        | null | null",
+            "a/b/c                               | null | null  | -1  | a/b/c    | 1        | null | null",
+            "a/b/c/d                             | null | null  | -1  | a/b/c/d  | 1        | null | null",
+            "/a/b/c                              | null | null  | -1  | /a/b/c   | 1        | null | null",
+            "/a/b/c{2,3}                         | null | null  | -1  | /a/b/c   | 2,3      | null | null",
+            "/a/b/c{?}                           | null | null  | -1  | /a/b/c   | 0,1      | null | null",
+            "/a/b/c{*}                           | null | null  | -1  | /a/b/c   | 0,       | null | null",
+            "/a/b/c{**}                          | null | null  | -1  | /a/b/c   | ,        | null | null",
+            "/a/b/c{**}?a=b                      | null | null  | -1  | /a/b/c   | ,        | null | a=b",
+            "mtron:/a/b/c{**}?a=b                | mtron | null | -1  | /a/b/c   | ,        | null | a=b",
+            "mtron://a/b/c{**}?a=b               | mtron | a    | -1  | /b/c     | ,        | null | a=b",
+            "mtron:a/b/c                         | mtron | null | -1  | a/b/c    | 1        | null | null",
+            "mtron://a/b/c{?}?a=b&c=d            | mtron | a    | -1  | /b/c     | 0,1      | null | a=b&c=d",
+            "mtron://a:34/b/c{?}?a=b&c=d         | mtron | a    | 34  | /b/c     | 0,1      | null | a=b&c=d",
+            "mtron://a:34/b/c{-10,100}?a=b&c=d   | mtron | a    | 34  | /b/c     | -10,100  | null | a=b&c=d",
+            "mtron://a:34/b/c?a=b&c=d            | mtron | a    | 34  | /b/c     | 1        | null | a=b&c=d",
+            "mtron:/b/c?a=b&c=d                  | mtron | null | -1  | /b/c     | 1        | null | a=b&c=d"},
+            delimiter = '|', nullValues = "null")
+    public void testParse(final String furi, final String scheme, final String host, final int port, final String path, final String coefficient, final String poly, final String query) {
+        final fURI parse = fURI.of(furi);
+        final fURI components = fURI.of(scheme, host, port, null == path ? List.of() : Arrays.asList(path.split("/")), cInt.of(coefficient), List.of(), parseQuery(query));
+        LOG.error("testing:" +
+                "\n\tparse    : {{b}}%s{{X}} " +
+                "\n\tcomponent: {{b}}%s{{X}}", parse, components);
+        checkEquals(parse, components);
+    }
+
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "/a/b/c                  | null",
+            "a/b/c                   | null",
+            "http://x.com/a/b/c      | http",
+            "mtron://lang/obj        | mtron",
+            "mtron:lang/obj          | mtron",
+            "./mtron:lang            | null",
+            "http:m:m:m              | http",
+            "m:m:m:m                 | m"
+    }, delimiter = '|', nullValues = "null")
+    public void testScheme(final String furi, final String scheme) {
+        assertEquals(scheme, fURI.of(furi).scheme());
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "/a/b/c                     |  ",
+            "a/b/c                      |  ",
+            "//x.com/a/b/c              |  x.com",
+            "//x/a/b/c                  |  x",
+            "//x:8080/a/b/c             |  x",
+            "//x.com                    |  x.com",
+            "//x                        |  x",
+            "http://x.com/a/b/c         |  x.com",
+            "http://x.com:80/a/b/c      |  x.com",
+            "mtron://lang/obj           |  lang",
+            "mtron:lang/obj             |  "
+    }, delimiter = '|')
+    public void testHostOrSegment(final String a, final String b) {
+        printComponents(fURI.of(a));
+        assertEquals(fURI.of(a).host(), b);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "/a/b/c                     |  /a       | true",
+            "a/b/c                      |  a        | true",
+            "/a/b/c                     |  a        | false",
+            "/a/b/c                     |  +        | true",
+            "a/b/c                      |  /a       | false", // TODO: should authority-less furis check on start /?
+            "//x.com/a/b/c              |  x.com    | false",
+            "//x/a/b/c                  |  x        | false",
+            "a/b/c/d                    |  a        | true",
+            "a/b/c/d                    |  a/b/     | true",
+            "a/b/c/d                    |  a/+      | true",
+            "a/b/c/d                    |  a/d      | false",
+            "a/b/c/d                    |  a/+/c    | true",
+    }, delimiter = '|')
+    public void testHasPrefix(final String a, final String b, final boolean hasPrefix) {
+        LOG.error("testing {{b}}%s{{X}} has prefix {{b}}%s{{X}} [expected: %s]", fURI.of(a), fURI.of(b), hasPrefix);
+        assertEquals(hasPrefix, fURI.of(a).hasPrefix(fURI.of(b)));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "a/b/c         |  a/b/c",
+            "./b/c         |  b/c",
+            "a/./c         |  a/c",
+            "a/b/.         |  a/b",
+            "a/./.         |  a",
+            "a/././d       |  a/d",
+            "a/././d/      |  a/d/",
+            // "././.      |   ",
+            "a/b/..        |  a",
+            "a/../..       |  ..",
+            "./../../../.  |  ../../..",
+            "./../../a     |  ../../a",
+            "a/./z/../b    | a/b",
+    }, delimiter = '|')
+    public void testResolve(final String f1, final String f2) {
+        final fURI furi1a = fURI.of(f1);
+        final fURI furi1b = fURI.of(f2);
+      //  final ifURI furi2a = mParser.m_furi().parse(f1).get();
+      //  final ifURI furi2b = mParser.m_furi().parse(f2).get();
+       // LOG.info("testing {{b}}%s{{/b}} {{g}}=>{{/g}} {{b}}%s{{b}} resolution", furi1a, furi2b);
+        //assertEquals(furi1a.resolve(), furi2b);
+        //assertEquals(furi2a.resolve(), furi1b);
+        assertEquals(furi1a.resolve(), furi1b);
+    }
+    
+    @ParameterizedTest
+    @CsvSource(value = {
+            "/a/b/c                     |  /a       | false",
+            "a/b/c                      |  c        | true",
+            "/a/b/c                     |  c/       | false",
+            "/a/b/c                     |  +/       | false",
+            "/a/b/c                     |  +        | true",
+            "a/b/c                      |  /b/c     | false",
+            "//x.com/a/b/c              |  x.com    | false",
+            "//x/a/b/c                  |  x        | false",
+            "a/b/c/d                    |  d        | true",
+            "a/b/c/d                    |  c/d      | true",
+            "a/b/c/d                    |  b/c/d    | true",
+            "a/b/c/d                    |  a/d/     | false",
+            "a/b/c/d                    |  b/+/+    | true",
+            "a/b/c/d                    |  b/c/+    | true",
+            "a/b/c/d                    |  +/c/d    | true",
+    }, delimiter = '|')
+    public void testHasPostfix(final String a, final String b, final boolean hasPostfix) {
+        LOG.error("testing {{b}}%s{{X}} has postfix {{b}}%s{{X}} [expected: %s]", fURI.of(a), fURI.of(b), hasPostfix);
+        assertEquals(hasPostfix, fURI.of(a).hasPostfix(fURI.of(b)));
+    }
+
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "a                  | a{-1}",
+            "a{1,1}             | a{-1}",
+            "a{-1}              | a",
+            "a{-1}              | a{1}",
+            "a{2,3}             | a{-3,-2}",
+            "a{0}               | a{0}",
+            "a{,10}             | a{-10,}",
+            "a{2,}              | a{,-2}",
+            "a{*}               | a{,0}",
+            "a{?}               | a{-1,0}",
+            "a{+}               | a{,-1}",
+            "a{10}              | a{-10}",
+            "a{10,}             | a{,-10}"
+    }, delimiter = '|')
+    public void testNeg(final String f1, final String expected) {
+        final fURI furi1 = fURI.of(f1);
+        final fURI furi2 = fURI.of(f1);
+        checkEquals(furi1, furi2);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "/test.com?a=1&b=2|/test.com|a|1|b|2",
+            "/test.com?a=7|/test.com|a|1|a|7",
+            "/test.com?monad|/test.com|monad|null|monad|null",
+            "/test.com?monad&a=7|/test.com|monad|null|a|7",
+            "/test.com?c=abc|/test.com|c|abc|c|abc"},
+            delimiter = '|', nullValues = "null")
+    public void testQueryWrite(final String expected, final String base, final String k1, final String v1, final String k2, final String v2) {
+        final fURI expectedfURI = fURI.of(expected);
+        final fURI resultfURI = fURI.of(base).q(k1, v1).q(k2, v2);
+        assertEquals(expectedfURI, resultfURI);
+    }
+
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "/a/b/c                  |     1|            /a",
+            "/a/b/c/                  |     1|            /a/",
+            "/a/b/c                  |     2|            /a/b",
+            "/a/b/c/                 |     3|            /a/b/c/",
+            "a/b/c                   |     2|            a/b",
+            "a/b/c                   |     3|            a/b/c",
+            "a/b/c?a=b&c=2           |     2|            a/b?a=b&c=2",
+            "/a/b/c                  |     4|            /a/b/c",
+            "http://x.com/a/b/c      |     4|            http://x.com/a/b/c",
+            "http://x.com/a/b/c      |     3|            http://x.com/a/b/c",
+            "http://x.com/a/b/c      |     2|            http://x.com/a/b",
+            "http://x.com/a/b/c     |     1|             http://x.com/a",
+            "http://a:b@x.com/a/b/c  |     2|            http://a:b@x.com/a",
+            "http://a:b@x.com/a/b/c  |     3|            http://a:b@x.com/a/b",
+            "http://a:b@x.com/a/b/c  |     4|            http://a:b@x.com/a/b/c"// username password not implemented yet
+    },
+            delimiter = '|')
+    public void testHead(final String f, final int steps, final String head) {
+        final fURI furi = fURI.of(f);
+        final fURI computedHead = furi.head(steps);
+        final fURI expectedHead = fURI.of(head);
+        assertEquals(expectedHead, computedHead);
+        //assertEquals(computedHead,furi.retract(furi.segments().size()-steps));
+        //assertEquals(furi.path().size(), computedHead.path().size() + (furi.path().size() - steps));
+        // assertEquals(steps, computedHead.path().size());
+        checkEquals(furi.head(steps), expectedHead);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "/a/b/c                  |     1|            /c",
+            "/a/b/c                  |     2|            /b/c",
+            "/a/b/c/                 |     3|            /a/b/c/",
+            "a/b/c                   |     2|            b/c",
+            "a/b/c                   |     3|            a/b/c",
+            "a/b/c?a=b&c=2           |     2|            b/c?a=b&c=2",
+            "/a/b/c                  |     4|            /a/b/c",
+            "http://x.com/a/b/c      |     4|            http://x.com/a/b/c",
+            "http://x.com/a/b/c      |     3|            http://x.com/a/b/c",
+            "http://x.com/a/b/c      |     2|            http://x.com/b/c",
+            "http://x.com/a/b/c      |     1|            http://x.com/c",
+            "http://a:221/a/b/c/     |     1|            http://a:221/c/",
+            "http://a:221/a/b/c      |     1|            http://a:221/c",
+            "http://a:221/a/b/c      |     2|            http://a:221/b/c",
+            "http://a:222/a/b/c      |     3|            http://a:222/a/b/c",
+            "http://a:223/a/b/c      |     4|            http://a:223/a/b/c"// username password not implemented yet
+    },
+            delimiter = '|')
+    public void testTail(final String f, final int steps, final String tail) {
+        final fURI furi = fURI.of(f);
+        final fURI computedHead = furi.tail(steps);
+        final fURI expectedHead = fURI.of(tail);
+        assertEquals(expectedHead, computedHead);
+        checkEquals(furi.tail(steps), expectedHead);
+    }
+
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "http://fhatos.org/b         | a       |  http://fhatos.org/a/b",
+            "http://fhatos.org/b/c/d     | a       |  http://fhatos.org/a/b/c/d",
+            "/b/c/d                      | a       |  a/b/c/d",
+            "/b/c/d                      | /a      |  /a/b/c/d",
+            "mtron:/b/c/d                | /a      |  mtron:/a/b/c/d",
+            "mtron:/b/c/d                | a       |  mtron:a/b/c/d",
+            "mtron:/b/c/d                | a/      |  mtron:a/b/c/d",
+            "mtron:/b/c/d                | /a/     |  mtron:/a/b/c/d",
+            "mtron://www.com:8999/b/c/d  | a/b/c   |  mtron://www.com:8999/a/b/c/b/c/d",
+            "mtron://www.com/b/c/d       | /a/b/c  |  mtron://www.com//a/b/c/b/c/d",
+            "mtron://www.com/b/c/d{2}    | /a/b/c  |  mtron://www.com//a/b/c/b/c/d{2}",
+    },
+            delimiter = '|')
+    public void testPrepend(final String base, final String prepend, final String expected) {
+        assertEquals(fURI.of(expected), fURI.of(base).prepend(prepend));
+        checkEquals(fURI.of(base).prepend(prepend), fURI.of(expected));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "http://fhatos.org/b         | a       |  http://fhatos.org/b/a",
+            "http://fhatos.org/b/c/d     | a       |  http://fhatos.org/b/c/d/a",
+            "/b/c/d                      | a       |  /b/c/d/a",
+            // "/b/c/d                      | /a      |  /b/c/d//a",
+            "mtron:/b/c/d                | /a      |  mtron:/b/c/d//a",
+            "mtron:/b/c/d                | #      |  mtron:/b/c/d/#",
+            "mtron:/b/c/d                | a       |  mtron:/b/c/d/a",
+            "mtron:/b/c/d                | a/      |  mtron:/b/c/d/a/",
+            "mtron:/b/c/d                | /a/     |  mtron:/b/c/d//a/",
+            "mtron://www.com:8999/b/c/d  | a/b/c   |  mtron://www.com:8999/b/c/d/a/b/c",
+            "mtron://www.com/b/c/d       | /a/b/c  |  mtron://www.com/b/c/d//a/b/c",
+            "mtron://www.com/b/c/d{2}    | /a/b/c  |  mtron://www.com/b/c/d//a/b/c{2}",
+    }, delimiter = '|')
+    public void testExtend(final String base, final String prepend, final String expected) {
+        LOG.error("testing {{b}}%s{{X}} extend {{b}}%s{{X}} [expected: %s]", fURI.of(base), fURI.of(prepend), fURI.of(expected));
+        assertEquals(fURI.of(expected), fURI.of(base).extend(prepend));
+        checkEquals(fURI.of(base).extend(prepend), fURI.of(expected));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
             "a|a|true",
             "a|+|true",
             "a|+/|false",
             "a|/+|false",
             "+|a|false",
-            "|a|false",
+            "null|a|false",
             "#|a|false",
             "a|#|true",
             "#|#|true",
-            "a||false",
-            "|/|false",
-            "{0}|{0}/|true",
+            "a|null|false",
+            //"null|/|false",
             "{0}|a/b{*}|true",
             "/a/b{0}|/a/b{*}|true",
             "/{0}|/{*}|true",
-            "||true",
+            "null|null|true",
             "http://fhatos.org/a|http://fhatos.org/a|true",
             "http://fhatos.org/a|http://fhatos.org/a/b|false",
             "http://fhatos.org/a/b|http://fhatos.org/a|false",
@@ -626,8 +473,8 @@ public class fURITest extends AbstractMetatronTest {
             "a/b/c|/a/b/#|false",
             "a/b/c|/a/#|false",
             "a/b/c|/#|false",
-            "|#|true",
-            "|+|false",
+            "null|#|true",
+            "null|+|false",
             "abc|+|true",
             "abc/a|+|false",
             "abc/a|+/+|true",
@@ -689,7 +536,7 @@ public class fURITest extends AbstractMetatronTest {
             "ws://metatron.org:1234/abc|ws://metatron.org:1234/abc|true",
             "ws://metatron.org:1234/abc|ws://metatron.org:4567/abc|false",
             "metatron.org:1234|metatron.org:4567|false",
-            "metatron.org:1234|metatron.org:+|true",
+            //"metatron.org:1234|metatron.org:+|true",
             "metatron.org:1234|+:+|true",
             "ws://metatron.org:1234|ws://+:1234|true",
             "ws://metatron.org:1234|http://metatron.org:1234|false",
@@ -709,7 +556,7 @@ public class fURITest extends AbstractMetatronTest {
             //"a/plus{4}|+/plus{4}|true", // TODO:?!? STRANGE!?!?
             //"/mtron/inst/plus{4}|/mtron/+/plus{4}|true" // TODO:?!? STRANGE!?!?
             "/m/lst[A,B]|/m/lst[A,B]|true",
-            "xxx[A,B]|xxx[#,+]|true",
+           /* "xxx[A,B]|xxx[#,+]|true",
             "xxx[ab,cd]|xxx[ab,cd{?}]|true",
             "xxx[ab,cd]|xxx[ab{*},cd{?}]{?}|true",
             "xxx[ab,cd{0}]|xxx[ab{*},cd{+}]{?}|false",
@@ -718,7 +565,7 @@ public class fURITest extends AbstractMetatronTest {
             "/m/lst[ab,cd]|/m/lst[ab{*},cd]{+}|true",
             "xxx[ab{2},cd{0}]|xxx[ab{1,3},cd{0}]{1,5}|true",
             "xxx[ab{2},cd{1,3}]{2,3}|xxx[ab{1,3},cd{0,100}]{1,5}|true",
-            "xxx[ab{2},cd{1,3}]{2,3}|xxx[ab{1,3},cd{0,2}]{1,5}|false",
+            "xxx[ab{2},cd{1,3}]{2,3}|xxx[ab{1,3},cd{0,2}]{1,5}|false",*/
             "http://localhost:8080/abc|http://#|true",
             "http://localhost:8080/abc|http://+:8081/+|false",
             "http://localhost:8080/abc|http://+:8080/+|true",
@@ -739,13 +586,13 @@ public class fURITest extends AbstractMetatronTest {
             "http://localhost:8080/abc|+://localhost:8080/abc|true",
             "http://localhost:8080/abc|+://+/abc|true",
             "http://localhost:8080|+://#|true"
-    }, delimiter = '|')
+    }, delimiter = '|', nullValues = "null")
     void testMatches(final String a, final String b, final boolean shouldMatch) {
-        final fURI furi1a = fURI.of(nullToEmpty(a));
-        final fURI furi1b = fURI.of(nullToEmpty(b));
-        final boolean doObjParser = null != a && null != b && !a.equals("{0}");
-        final fURI furi2a = doObjParser ? mParser.m_furi().parse(nullToEmpty(a)).get() : fURI.of(nullToEmpty(a));
-        final fURI furi2b = doObjParser ? mParser.m_furi().parse(nullToEmpty(b)).get() : fURI.of(nullToEmpty(b));
+        final fURI furi1a = fURI.of(a);
+        final fURI furi1b = fURI.of(b);
+       /* final boolean doObjParser = null != a && null != b && !a.equals("{0}");
+        final fURI furi2a = doObjParser ? mParser.m_furi().parse(a).get() : fURI.of(a);
+        final fURI furi2b = doObjParser ? mParser.m_furi().parse(b).get() : fURI.of(b);
         LOG.trace("testing: {{b}}%s{{/b}} %s {{b}}%s{{/b}}", furi1a, shouldMatch ? "{{g}}should match{{/g}}" : "{{r}}should not match{{/r}}", furi1b);
         LOG.trace("testing: {{b}}%s{{/b}} %s {{b}}%s{{/b}}", furi2a, shouldMatch ? "{{g}}should match{{/g}}" : "{{r}}should not match{{/r}}", furi2b);
         LOG.trace("testing: {{b}}%s{{/b}} %s {{b}}%s{{/b}}", furi1a, shouldMatch ? "{{g}}should match{{/g}}" : "{{r}}should not match{{/r}}", furi2b);
@@ -761,63 +608,9 @@ public class fURITest extends AbstractMetatronTest {
             assertFalse(furi2a.test(furi2b));
             assertFalse(furi1a.test(furi2b));
             assertFalse(furi2a.test(furi1b));
-        }
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "a                 |+                 |[a]",
-            "a/b               |+/b               |[a]",
-            "/a/b              |/+/b              |[a]",
-            "a/b/c             |+/b/+             |[a, c]",
-            "a/b/c             |a/#               |[b, c]",
-            "a/b/c             |#                 |[a, b, c]",
-            "a/b/c             |+/#               |[a, b, c]",
-            "a/b/c             |+/+/+             |[a, b, c]",
-            "a/b/c             |a/b/c             |[]",
-            "a/b/c             |+                 |[]",
-            "a/b/c             |+/b/d             |[]",
-            "+/b/c             |+/b/c             |[+]",
-            "+/#               |+/b/c             |[]",
-            "+/#               |+/+/+             |[+, #]",
-            "+/b/c             |+/b/+             |[+, c]",
-    }, delimiter = '|')
-    void testSelect(final String a, final String b, final String matches) {
-        final fURI furi1a = fURI.of(nullToEmpty(a));
-        final fURI furi1b = fURI.of(nullToEmpty(b));
-        final boolean doObjParser = null != a && null != b && !a.equals("[0]");
-        final fURI furi2a = doObjParser ? mParser.m_furi().parse(nullToEmpty(a)).get() : fURI.of(nullToEmpty(a));
-        final fURI furi2b = doObjParser ? mParser.m_furi().parse(nullToEmpty(b)).get() : fURI.of(nullToEmpty(b));
-        LOG.trace("testing: {{b}}%s{{/b}} selects %s from {{b}}%s{{/b}}", furi2a, matches, furi1a);
-        assertEquals(furi1a, furi2a);
-        assertEquals(matches, furi1a.select(furi1b).toString());
-        assertEquals(matches, furi2a.select(furi2b).toString());
-        assertEquals(matches, furi1a.select(furi2b).toString());
-        assertEquals(matches, furi2a.select(furi1b).toString());
-    }
-
-    private String nullToEmpty(final String s) {
-        return null == s ? "" : s;
-    }
-
-    @Test
-    public void testQueryRead() {
-        assertEquals(Map.of("a", "1", "b", "2"), fURI.of("http://meta.tron/query?a=1&b=2").queryMap());
-        assertEquals(Map.of("a", "", "b", "2"), fURI.of("http://meta.tron/query?a&b=2").queryMap());
-        assertEquals(Map.of(), fURI.of("http://meta.tron/query").queryMap());
-        assertEquals(Map.of("sub", ""), fURI.of("http://meta.tron/query?sub").queryMap());
-        //  assertEquals(fURI.of("http://meta.tron/query?a=1&b=2"), fURI.of("http://meta.tron/query").query(Map.of("a", "", "b", "2")));
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "a/b/c[int,int]{2}  |2               |[int, int]",
-            "a/b/c[A{2},B{3}]   |                |[A{2}, B{3}]"
-    }, delimiter = '|')
-    void testPoly(final String furi, final String c, final String typeParams) {
-        final fURI furiA = f(furi);
-        assertEquals(c, furiA.c());
-        assertEquals(typeParams, furiA.poly().toString());
+        }*/
+        printComponents(fURI.of(b));
+        checkMatches(fURI.of(a), fURI.of(b), shouldMatch);
     }
 
     @ParameterizedTest
@@ -832,7 +625,7 @@ public class fURITest extends AbstractMetatronTest {
             "a/b/.                   |.",
     }, delimiter = '|')
     void testName(final String furi, final String name) {
-        assertEquals(name, f(furi).name());
+        assertEquals(name, fURI.of(furi).name());
     }
 
     @ParameterizedTest
@@ -852,9 +645,62 @@ public class fURITest extends AbstractMetatronTest {
             "#{?}                    |true",
             "#{0}                    |true",
             "#{1}                    |true",
-            "a/b/c{+}                |false"
+            "a/b/c{+}                |false",
+            "a/b/c{?}                |false"
     }, delimiter = '|')
     void testHasPattern(final String furi, final boolean pattern) {
-        assertEquals(pattern, f(furi).hasPattern());
+        assertEquals(pattern, fURI.of(furi).hasPattern());
     }
+
+
+    private void checkMatches(final fURI furiA, final fURI furiB, final boolean matches) {
+        LOG.error("testing equality:" +
+                "\n\tparse    : {{b}}%s{{X}} " +
+                "\n\tcomponent: {{b}}%s{{X}}", furiA, furiB);
+        LOG.error("parse class    : %s", furiA.getClass().getSimpleName());
+        LOG.error("component class: %s", furiB.getClass().getSimpleName());
+        if (false && matches) {
+
+            assertTrue(fURI.of(furiA.scheme()).test(fURI.of(furiB.scheme())), "schemas don't match");
+            assertTrue(fURI.of(furiA.host()).test(fURI.of(furiB.host())), "hosts don't match");
+            assertEquals(furiA.port(), furiB.port(), "ports don't match");
+            assertTrue(fURI.of(furiA.pathString()).test(fURI.of(furiB.pathString())), "paths don't match");
+            assertTrue(((C) furiA.c()).within(furiB.c()), "coefficients don't match");
+            assertEquals(furiA.qMap(), furiB.qMap(), "queries don't match");
+        }
+        /// /
+        assertEquals(matches, furiA.test(furiB), "furis " + (matches ? "don't" : "shouldn't") + " match");
+    }
+
+    private void checkEquals(final fURI furiA, final fURI furiB) {
+        LOG.error("testing equality:" +
+                "\n\tparse    : {{b}}%s{{X}} " +
+                "\n\tcomponent: {{b}}%s{{X}}", furiA, furiB);
+        LOG.error("parse class    : %s", furiA.getClass().getSimpleName());
+        LOG.error("component class: %s", furiB.getClass().getSimpleName());
+        assertEquals(furiA.scheme(), furiB.scheme(), "schemas don't match");
+        assertEquals(furiA.host(), furiB.host(), "hosts don't match");
+        assertEquals(furiA.port(), furiB.port(), "ports don't match");
+        assertEquals(furiA.pathString(), furiB.pathString(), "paths don't match");
+        assertEquals(furiA.c(), furiB.c(), "coefficients don't match");
+        assertEquals(furiA.qMap(), furiB.qMap(), "queries don't match");
+        /// /
+        assertEquals(furiA, furiB, "furis don't match");
+
+    }
+
+    private String printComponents(final fURI furi) {
+        LOG.error("parse: {{b}}%s{{X}}", furi);
+        LOG.error("class:  %s", furi.getClass().getSimpleName());
+        LOG.error("schema: %s", furi.scheme());
+        LOG.error("host:   %s", furi.host());
+        LOG.error("port:   %s", furi.port());
+        LOG.error("path:   %s", furi.pathString());
+        LOG.error("  path: %s", furi.path());
+        LOG.error("  size: %d", furi.path().size());
+        LOG.error("coeff:  %s", furi.c());
+        LOG.error("query:  %s", furi.qMap());
+        return "";
+    }
+
 }

@@ -178,7 +178,7 @@ public class machInstSet extends AbstractInstSet {
         final Set<Inst> insts = new LinkedHashSet<>();
         insts.addAll(Router.RouterType.insts());
         insts.addAll(List.of(
-                instC(LIFT_INST_TID.dom(ALL).rng(MACH_MONAD_TID).query(MONAD, "^"), lst(T(ALL.maybe())), (lhs, inst) -> {
+                instC(LIFT_INST_TID.dom(ALL).rng(MACH_MONAD_TID).q(MONAD, "^"), lst(T(ALL.maybe())), (lhs, inst) -> {
                     final Monad monad = lhs.asMonad();
                     if (!inst.arg(0).isNoObj())
                         return inst.arg(0).apply(monad);
@@ -230,7 +230,7 @@ public class machInstSet extends AbstractInstSet {
                             return objs(Arrays.stream(Objects.requireNonNull(file.listFiles()))
                                     //.peek(ff -> LOG.info("reading file %s", f(f(ff.getName()).name())))
                                     .map(ff -> makeFile(ff.toPath()))
-                                    .map(ff -> uri(space.rewrite(ff.uriValue().qLess(), true), ff.uriValue().isBranch() ? DIR_TID : FILE_TID)));
+                                    .map(ff -> uri(space.rewrite(ff.uriValue().noQ(), true), ff.uriValue().isBranch() ? DIR_TID : FILE_TID)));
                         }
                     }
                     return noobj();

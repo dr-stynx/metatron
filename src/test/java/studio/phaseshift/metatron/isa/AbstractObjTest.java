@@ -19,6 +19,7 @@
 package studio.phaseshift.metatron.isa;
 
 import studio.phaseshift.metatron.AbstractMetatronTest;
+import studio.phaseshift.metatron.furi.c.cInt;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.isa.m.parser.mParser;
 import studio.phaseshift.metatron.isa.m.type.Obj;
@@ -39,7 +40,7 @@ public abstract class AbstractObjTest extends AbstractMetatronTest {
         final fURI removeF = f(remove);
         final Obj retrievedF = mParser.m_obj().parse(retrieved).get();
         final Obj remainingF = mParser.m_obj().parse(remaining).get();
-        assertEquals(Tuple.Pair.with(retrievedF, remainingF), currentF.take(removeF.cV()));
+        assertEquals(Tuple.Pair.with(retrievedF, remainingF), currentF.take((cInt)removeF.c()));
         Router.global().at(uri("primary"), uri("/m"));
     }
 }

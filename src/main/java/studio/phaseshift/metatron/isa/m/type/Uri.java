@@ -65,13 +65,13 @@ public interface Uri extends Mono, Ring.O<Uri> {
         else if (k.equals(f(PORT)))
             return jnt(this.uriValue().port());
         else if (k.equals(f(PATH)))
-            return lst(this.uriValue().segments().stream().map(MUri::uri).map(Obj::<Obj>as).toList());
+            return lst(this.uriValue().path().stream().map(MUri::uri).map(Obj::<Obj>as).toList());
         else if (k.equals(f(C)))
             return rec(
-                    MIN, null == this.uriValue().cV().min() ? noobj() : jnt(this.uriValue().cV().min()),
-                    MAX, null == this.uriValue().cV().max() ? noobj() : jnt(this.uriValue().cV().max()));
+                    MIN, null == this.uriValue().c().min() ? noobj() : jnt((Long)this.uriValue().c().min()),
+                    MAX, null == this.uriValue().c().max() ? noobj() : jnt((Long)this.uriValue().c().max()));
         else if (k.equals(f(Q)))
-            return rec(this.uriValue().queryMap().entrySet().stream().map(kv -> rel(uri(kv.getKey()), uri(kv.getValue()))));
+            return rec(this.uriValue().qMap().entrySet().stream().map(kv -> rel(uri(kv.getKey()), uri(kv.getValue()))));
         else
             throw MTronException.of("unknown uri component: %s", k);
     }
@@ -97,7 +97,7 @@ public interface Uri extends Mono, Ring.O<Uri> {
 
     @Override
     default Uri mult(final Uri rhs) {
-        return this.jvm(this.uriValue().mult(rhs.uriValue()));
+        return this;//this.jvm(this.uriValue().mult(rhs.uriValue()));
     }
 
 
@@ -108,12 +108,12 @@ public interface Uri extends Mono, Ring.O<Uri> {
 
     @Override
     default Uri plus(final Uri rhs) {
-        return this.jvm(this.uriValue().plus(rhs.uriValue()));
+        return this;// this.jvm(this.uriValue().plus(rhs.uriValue()));
     }
 
     @Override
     default Uri neg() {
-        return this.jvm(this.uriValue().neg());
+        return this;// this.jvm(this.uriValue().neg());
     }
 
     @Override
@@ -139,11 +139,11 @@ public interface Uri extends Mono, Ring.O<Uri> {
                                 SCHEME, lhsUri.scheme() == null ? noobj() : uri(lhsUri.scheme()),
                                 HOST, lhsUri.host() == null ? noobj() : uri(lhsUri.host()),
                                 PORT, lhsUri.port() == -1 ? noobj() : jnt(lhsUri.port()),
-                                PATH, lhsUri.path().isEmpty() ? noobj() : lst(Stream.concat(Stream.concat((lhsUri.isAbsolute() && !lhsUri.hasAuthority()) ? Stream.of(uri()) : Stream.empty(), lhsUri.segments().stream().map(MUri::uri)), lhsUri.isBranch() ? Stream.of(uri()) : Stream.empty())),
-                                C, rec(MIN, null == lhsUri.cV().min() ? noobj() : jnt(lhsUri.cV().min()), MAX, null == lhsUri.cV().max() ? noobj() : jnt(lhsUri.cV().max())),
-                                Q, lhsUri.queryMap().isEmpty() ? noobj() : rec(lhsUri.queryMap().entrySet().stream().map(kv -> rel(uri(kv.getKey()), uri(kv.getValue())))));
+                                PATH, lhsUri.path().isEmpty() ? noobj() : lst(Stream.concat(Stream.concat((lhsUri.isAbsolute() && !lhsUri.hasHost()) ? Stream.of(uri()) : Stream.empty(), lhsUri.path().stream().map(MUri::uri)), lhsUri.isBranch() ? Stream.of(uri()) : Stream.empty())),
+                                C, rec(MIN, null == lhsUri.c().min() ? noobj() : jnt((Long)lhsUri.c().min()), MAX, null == lhsUri.c().max() ? noobj() : jnt((Long)lhsUri.c().max())),
+                                Q, lhsUri.qMap().isEmpty() ? noobj() : rec(lhsUri.qMap().entrySet().stream().map(kv -> rel(uri(kv.getKey()), uri(kv.getValue())))));
                     }),
-                    instC(REVERSE_INST_TID.dom(URI_TID).rng(URI_TID), lst(), (lhs, inst) -> lhs.jvm(lhs.uriValue().segments(lhs.asUri().uriValue().segments().reversed()))),
+                    instC(REVERSE_INST_TID.dom(URI_TID).rng(URI_TID), lst(), (lhs, inst) -> lhs.jvm(lhs.uriValue().path(lhs.asUri().uriValue().path().reversed()))),
                     docWrap(instC(HAS_INST_TID.dom(URI_TID).rng(URI_TID.maybe()), lst(T(STR_TID)), (lhs, inst) -> REGEX_CACHE.compute(inst.arg(0).strValue(), (k, v) -> null == v ? Pattern.compile(k) : v).matcher(lhs.uriValue().toString()).find() ? lhs : noobj()),
                             "a uri to check", "whether the domain matches arg regex", Map.of(jnt(0), "the regex for matching"), "check whether the lhs str matches the regex arg"),
                     docWrap(instC(HAS_INST_TID.dom(URI_TID).rng(URI_TID.maybe()), lst(T(URI_TID)), (lhs, inst) -> REGEX_CACHE.compute(inst.arg(0).uriValue().toString(), (k, v) -> null == v ? Pattern.compile(k) : v).matcher(lhs.uriValue().toString()).find() ? lhs : noobj()),
@@ -153,17 +153,17 @@ public interface Uri extends Mono, Ring.O<Uri> {
                     instC(RSHIFT_INST_TID.dom(URI_TID).rng(ALL.maybeSome()), lst(T(ALL.some())), (lhs, inst) ->
                             objs(inst.arg(0).stream().map(u -> {
                                 if (u.isInt()) {
-                                    return lhs.uriValue().pathLength() > u.intValue().intValue() ? uri(lhs.uriValue().segments().get(u.intValue().intValue())) : noobj();
+                                    return lhs.uriValue().pathLength() > u.intValue().intValue() ? uri(lhs.uriValue().path().get(u.intValue().intValue())) : noobj();
                                 } else {
                                     final String component = u.uriValue().toString();
                                     final Object result = switch (component) {
                                         case SCHEME -> lhs.uriValue().scheme();
                                         case HOST -> lhs.uriValue().host();
                                         case PORT -> lhs.uriValue().port();
-                                        case AUTHORITY -> lhs.uriValue().authority();
+                                        case AUTHORITY -> lhs.uriValue().host() + ":" + lhs.uriValue().port();
                                         case PATH -> lhs.uriValue().path();
-                                        case C -> lst(jnt(lhs.uriValue().cV().min()), jnt(lhs.uriValue().cV().max()));
-                                        case Q -> lhs.uriValue().queryMap().entrySet().stream()
+                                        case C -> lst(jnt((Long)lhs.uriValue().c().min()), jnt((Long)lhs.uriValue().c().max()));
+                                        case Q -> lhs.uriValue().qMap().entrySet().stream()
                                                 .map(kv -> rel(MObjFactory.single().toObjFromString(kv.getKey()), MObjFactory.single().toObjFromString(kv.getValue())))
                                                 .collect(new CommonUtil.RecCollector());
                                         default -> noobj();
@@ -181,12 +181,12 @@ public interface Uri extends Mono, Ring.O<Uri> {
                     instC(PROD_INST_TID.dom(URI_TID.maybeSome()).rng(URI_TID), lst(), (lhs, inst) -> lhs.stream().reduce(inst.seed(), (a, b) -> uri(a.uriValue().mult(b.uriValue()))), uri(".")),
                   /*  instC(URI_SCHEME_TID.dom(URI_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(lhs.uriValue().scheme())),
                     instC(URI_HOST_TID.dom(URI_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(lhs.uriValue().host())),*/
-                    instC(PATH_TID.dom(URI_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(lhs.uriValue().path())),
+                    instC(PATH_TID.dom(URI_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(lhs.uriValue().pathString())),
                     /*   instC(URI_PORT_TID.dom(URI_TID).rng(INT_TID), lst(T(URI_TID)), (lhs, inst) -> jnt(lhs.uriValue().port())),*/
-                    instC(Q_INST_TID.dom(URI_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(lhs.uriValue().queryValue(inst.arg(0).uriValue(), fURI.class))),
-                    instC(Q_INST_TID.dom(URI_TID).rng(REC_TID), lst(), (lhs, inst) -> rec(lhs.uriValue().queryMap().entrySet().stream().map(kv -> rel(uri(kv.getKey()), uri(kv.getValue()))))),
-                    instC(Q_INST_TID.dom(URI_TID).rng(URI_TID), lst(T(REC_TID)), (lhs, inst) -> lhs.jvm(lhs.uriValue().queryMap(inst.arg(0).recValue().entrySet().stream().collect(Collectors.toMap(kv -> kv.getKey().uriValue().toString(), kv -> kv.getValue().uriValue().toString(), (a, b) -> b, LinkedHashMap::new))))),
-                    instC(URI_C_TID.dom(URI_TID).rng(LST_TID), lst(T(URI_TID)), (lhs, inst) -> lst(jnt(lhs.uriValue().cV().min()), jnt(lhs.uriValue().cV().max()))),
+                    instC(Q_INST_TID.dom(URI_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(lhs.uriValue().q(inst.arg(0).uriValue().toString(), fURI.class))),
+                    instC(Q_INST_TID.dom(URI_TID).rng(REC_TID), lst(), (lhs, inst) -> rec(lhs.uriValue().qMap().entrySet().stream().map(kv -> rel(uri(kv.getKey()), uri(kv.getValue()))))),
+                    instC(Q_INST_TID.dom(URI_TID).rng(URI_TID), lst(T(REC_TID)), (lhs, inst) -> lhs.jvm(lhs.uriValue().q((Map<String,String>)inst.arg(0).asRec().elements().collect(Collectors.toMap(kv -> kv.first().toString(), kv -> kv.second().toString(), (a, b) -> b, LinkedHashMap::new))))),
+                    instC(URI_C_TID.dom(URI_TID).rng(LST_TID), lst(T(URI_TID)), (lhs, inst) -> lst(jnt((Long)lhs.uriValue().c().min()), jnt((Long)lhs.uriValue().c().max()))),
                     instC(POW_INST_TID.dom(URI_TID).rng(URI_TID), lst(T(INT_TID)), (lhs, inst) -> {
                         final int pow = inst.arg(0).intValue().intValue();
                         if (0 == pow) return lhs.jvm(f(""));
@@ -214,15 +214,15 @@ public interface Uri extends Mono, Ring.O<Uri> {
 
     class Helper {
         public static boolean whereUri(final Uri lhs, final fURI filter) {
-            if (filter.segments().size() < lhs.uriValue().segments().size() && !filter.hasPattern('#'))
+            if (filter.path().size() < lhs.uriValue().path().size() && !filter.hasPattern('#'))
                 return false;
-            for (int i = 0; i < filter.segments().size(); i++) {
-                final String segment = filter.segments().get(i);
+            for (int i = 0; i < filter.path().size(); i++) {
+                final String segment = filter.path().get(i);
                 if (segment.equals("#"))
                     return true;
-                if (lhs.uriValue().segments().size() <= i)
+                if (lhs.uriValue().path().size() <= i)
                     return false;
-                if (!lhs.uriValue().segments().get(i).equals(segment) && !segment.equals("+"))
+                if (!lhs.uriValue().path().get(i).equals(segment) && !segment.equals("+"))
                     return false;
             }
             return true;
@@ -231,14 +231,14 @@ public interface Uri extends Mono, Ring.O<Uri> {
         public static Uri selectUri(final Uri lhs, final fURI selection) {
             String path = "";
             boolean all_found = false;
-            for (int i = 0; i < selection.segments().size(); i++) {
-                final String segment = selection.segments().get(i);
+            for (int i = 0; i < selection.path().size(); i++) {
+                final String segment = selection.path().get(i);
                 if (segment.equals("#"))
                     all_found = true;
-                if (!all_found && lhs.uriValue().segments().size() <= i)
+                if (!all_found && lhs.uriValue().path().size() <= i)
                     return null;
-                if (all_found || lhs.uriValue().segments().get(i).equals(segment) || segment.equals("+"))
-                    path += "/" + lhs.uriValue().segments().get(i);
+                if (all_found || lhs.uriValue().path().get(i).equals(segment) || segment.equals("+"))
+                    path += "/" + lhs.uriValue().path().get(i);
                 else
                     return null;
             }

@@ -251,7 +251,8 @@ public class MObjs implements Objs {
 
     @Override
     public fURI tid() {
-        try {
+        return this.tid;
+       /* try {
             return this.jvm
                     .stream()
                     .map(Obj::tid)
@@ -262,7 +263,7 @@ public class MObjs implements Objs {
                     .stream()
                     .map(Obj::tid).reduce(fURI::commonRoot)
                     .orElse(fURI.NOOBJ);
-        }
+        }*/
     }
 
     @Override

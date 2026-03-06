@@ -150,7 +150,7 @@ public class BasicRouter extends AbstractSpace<MServer> implements Router {
         } else {
             temp = this.bigToSmallRoutes.getOrDefaultRaw(furi.basePath(), furi);
         }
-        temp = temp.c(furi.c()).queryMap(furi.queryMap());
+        temp = temp.c(furi.c()).q(furi.qMap());
         temp = temp.hasDom() ? temp.dom(this.rewrite(temp.dom(), big)) : temp;
         temp = temp.hasRng() ? temp.rng(this.rewrite(temp.rng(), big)) : temp;
         return temp.resolve();
@@ -211,7 +211,7 @@ public class BasicRouter extends AbstractSpace<MServer> implements Router {
         else if (match.basePath().test(STACK_PATTERN))
             return (S) THREAD_STACK.get();
         else if (!BOOTING)
-            throw MTronException.of("no active space supports pattern %s", match.toUri(false));
+            throw MTronException.of("no active space supports pattern %s", match);
         else
             return noobjSpace.single();
     }
@@ -222,7 +222,7 @@ public class BasicRouter extends AbstractSpace<MServer> implements Router {
             return noobj();
         // if (vid.hasAuthority())
         //   return this.server().sendRecv((a, b) -> a.authority().matches(b.remoteHost().authority()), vid, from_(vid.localize().toUri()).tryToInst());
-        final fURI readableVID = vid.cLess();
+        final fURI readableVID = vid.one();
         /// ///////////////////
         if (readableVID.isGeneric())
             return T(readableVID);
@@ -248,7 +248,7 @@ public class BasicRouter extends AbstractSpace<MServer> implements Router {
             this.server().send((a, b) -> a.authority().matches(b.remoteHost().authority()), vid, start_(obj.vid(null)).to_(vid.localize().toUri()).tryToInst());
             return obj;
         }*/
-        final fURI writableVID = vid.cLess();
+        final fURI writableVID = vid.one();
         /// ///////////////
         final Space space = this.getSpace(writableVID);
         LOG.trace("writing %s {{g}}=>{{b}} %s{{X}} in %s", obj, vid, space);

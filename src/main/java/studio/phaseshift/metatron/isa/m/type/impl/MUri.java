@@ -31,7 +31,7 @@ public class MUri extends MObj implements Uri {
     public MUri(final fURI jvm, final fURI tid, final fURI vid) {
         super(jvm.resolve(), tid, vid);
         if (jvm.isZero())
-            this.tid = this.tid.zero();
+            this.tid = fURI.of(this.tid.toString()).zero();
     }
 
     public static Uri uri(final String jvm) {

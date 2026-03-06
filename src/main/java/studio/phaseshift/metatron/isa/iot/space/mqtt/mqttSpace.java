@@ -169,7 +169,7 @@ public class mqttSpace extends AbstractSpace<Mqtt5Client> {
     @Override
     public Obj read(final fURI vid) {
         return studio.phaseshift.metatron.furi.Q.Helper.processPreRead(this.qs(), vid, vid).orElseGet(() -> {
-            final Obj result = this.cache.read(vid.qLess());
+            final Obj result = this.cache.read(vid.noQ());
             return studio.phaseshift.metatron.furi.Q.Helper.processPostRead(this.qs(), vid, vid, result).orElse(result);
         });
     }
@@ -194,7 +194,7 @@ public class mqttSpace extends AbstractSpace<Mqtt5Client> {
     private void send(final fURI vid, final Obj obj) {
         try {
             final byte[] payload = obj.isNoObj() ? new byte[0] : this.serializer.outputBytes(obj).array();
-            if (vid.hasQuery(Tokens.SUB))
+            if (vid.hasQ(Tokens.SUB))
                 return;
             this.sjvm
                     .toAsync()

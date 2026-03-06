@@ -18,7 +18,7 @@
 
 package studio.phaseshift.metatron.furi.form;
 
-import studio.phaseshift.metatron.furi.ifURI;
+import studio.phaseshift.metatron.furi.fURI;
 
 import java.util.List;
 
@@ -38,10 +38,6 @@ public class SXPXXfURI extends XXPXXfURI {
     public String scheme() {
         return this.scheme;
     }
-
-    @Override
-    public ifURI scheme(final String scheme) {
-        return new SXPXXfURI(scheme, this.path);
-    }
+    
 }
 

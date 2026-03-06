@@ -74,7 +74,7 @@ public class haosSpace extends mqttSpace {
         }
 
         public static EntityType inferFrom(final fURI id) {
-            final String path = id.path();
+            final String path = id.pathString();
             if (path.startsWith("sensor")) return SENSOR;
             else if (path.startsWith("switch")) return SWITCH;
             else if (path.startsWith("button")) return BUTTON;

@@ -56,7 +56,7 @@ public class MqttPubSubQ extends PubSubQ {
         @Override
         public Optional<Obj> preWrite(final fURI source, final fURI vid, final Obj obj) {
             LOG.trace("evaluating {{y}}prewrite{{/y}}: %s => %s", obj, vid);
-            if (vid.hasQuery(SUB)) {
+            if (vid.hasQ(SUB)) {
                 if (obj.isNoObj()) {
                     space.sjvm().toAsync()
                             .unsubscribeWith()

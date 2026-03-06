@@ -71,7 +71,7 @@ public abstract class AbstractSpaceTest extends AbstractMetatronTest {
     @BeforeEach
     protected void setup() {
         if (!Router.global().hasSpaceFor(this.baseURI))
-            this.spaceStorage = memSpace.of(rec(uri(PATTERN), uri(this.baseURI.retract().extend("#"))), f("/sys/space").extend(this.baseURI.retractPattern().name()));
+            this.spaceStorage = memSpace.of(rec(uri(PATTERN), uri(this.baseURI.retract(1).extend("#"))), f("/sys/space").extend(this.baseURI.retractPattern().name()));
         this.space = this.spaceSupplier.get();
         if (null == this.space)
             Assertions.fail("space supplier yielded a null space");

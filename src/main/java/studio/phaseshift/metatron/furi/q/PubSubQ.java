@@ -128,7 +128,7 @@ public class PubSubQ extends BaseQ {
 
         @Override
         public Optional<Obj> preRead(final fURI source, final fURI vid) {
-            if (vid.hasQuery(SUB)) {
+            if (vid.hasQ(SUB)) {
                 LOG.trace("evaluating {{y}}preread{{/y}}: %s", vid);
                 return Optional.of(subscriptions.elements().map(Rel::second).map(Obj::<Subscription>as).filter(s -> vid.basePath().bimatches(s.target())).map(Obj::<Obj>as).reduce(Obj::append).orElse(noobj()));
             }
@@ -164,7 +164,7 @@ public class PubSubQ extends BaseQ {
         @Override
         public Optional<Obj> postWrite(final fURI source, final fURI vid, final Obj obj, final Obj obj2) {
             LOG.debug("evaluating {{y}}postwrite{{/y}}: %s => %s", obj, vid);
-            if (vid.hasQuery(SUB)) {
+            if (vid.hasQ(SUB)) {
                 if (obj.isNoObj()) {
                     subscriptions.jvm().remove(vid.basePath().toUri());
                 } else if (obj.tid().basePath().equals(SUBSCRIPTION_TID)) {

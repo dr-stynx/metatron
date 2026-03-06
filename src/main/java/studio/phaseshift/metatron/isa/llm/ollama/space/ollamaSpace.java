@@ -86,7 +86,7 @@ public class ollamaSpace extends AbstractSpace<OllamaModels> {
                                 uri(THINK), bool(m.get1().getCapabilities().contains(THINKING)),
                                 uri(SKILL), lst(m.get1().getCapabilities().stream().map(MUri::uri)),
                                 uri(SIZE), jnt(m.get0().getSize(), MATH_BYTE_TID, fnull)), OLLAMA_OLLM_TID, fnull)).forEach(m -> {
-                    this.write(this.pattern.retract().extend(m.at(NAME).uriValue()), m);
+                    this.write(this.pattern.retract(1).extend(m.at(NAME).uriValue()), m);
                 });
     }
 

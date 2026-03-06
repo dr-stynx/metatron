@@ -20,7 +20,7 @@ package studio.phaseshift.metatron.furi.form;
 
 import studio.phaseshift.metatron.furi.C;
 import studio.phaseshift.metatron.furi.c.cInt;
-import studio.phaseshift.metatron.furi.ifURI;
+import studio.phaseshift.metatron.furi.fURI;
 
 import java.util.List;
 
@@ -38,11 +38,6 @@ public class XXPCXfURI extends XXPXXfURI {
 
     @Override
     public cInt c() {
-        return this.coefficient;
-    }
-
-    @Override
-    public ifURI c(final C<?, ?> coefficient) {
-        return new XXPCXfURI(this.path, coefficient);
+        return null==this.coefficient ? cInt.ONE() : this.coefficient;
     }
 }

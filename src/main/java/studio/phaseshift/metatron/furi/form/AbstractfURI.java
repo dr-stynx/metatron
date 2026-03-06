@@ -18,10 +18,9 @@
 
 package studio.phaseshift.metatron.furi.form;
 
-import studio.phaseshift.metatron.Tokens;
 import studio.phaseshift.metatron.furi.C;
 import studio.phaseshift.metatron.furi.c.cInt;
-import studio.phaseshift.metatron.furi.ifURI;
+import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.util.MTronException;
 
 import java.util.*;
@@ -30,10 +29,10 @@ import java.util.stream.Collectors;
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class AbstractfURI implements ifURI {
+public abstract class AbstractfURI implements fURI {
 
     @Override
-    public ifURI resolve() {
+    public fURI resolve() {
         final List<String> newSegments = new ArrayList<>();
         for (final String seg : this.path()) {
             if (seg.equals("."))
@@ -45,25 +44,175 @@ public abstract class AbstractfURI implements ifURI {
         }
         return this.path(newSegments);
     }
-    
+
     @Override
-    public ifURI scheme(final String scheme) {
-        return ifURI.of(scheme, this.host(), this.port(), this.path(), this.c(), List.of(), this.qMap());
+    public boolean hasDom(final fURI dom) {
+        return this.dom().test(dom);
+    }
+
+    @Override
+    public boolean hasRng(final fURI rng) {
+        return this.rng().test(rng);
+    }
+
+    @Override
+    public boolean hasDom() {
+        return this.hasQ("dom");
+    }
+
+    @Override
+    public boolean hasRng() {
+        return this.hasQ("rng");
+    }
+
+    @Override
+    public boolean isGeneric() {
+        if (this.path().isEmpty())
+            return false;
+        if (this.pathLength() == 1 && (this.path().getFirst().equals("#") || this.path().getFirst().equals("+")))
+            return false;
+        boolean hasCapitalGeneric = false;
+        for (final String seg : this.c("1").path()) { // TODO: this is necessary because {} is appended to final segment (needs to be fixed ASAP!).
+            if (!seg.isEmpty() && seg.chars().allMatch(Character::isUpperCase))
+                hasCapitalGeneric = true;
+            if (seg.chars().anyMatch(c -> c != '#' && c != '+' && !Character.isAlphabetic(c) || Character.isLowerCase(c)))
+                return false;
+        }
+        return hasCapitalGeneric;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return !this.hasScheme() && !this.hasHost() && this.path().isEmpty() && this.qMap().isEmpty();
+    }
+
+    @Override
+    public boolean hasQ() {
+        return !this.qMap().isEmpty();
+    }
+
+    @Override
+    public fURI noQ() {
+        return fURI.of(this.scheme(), this.host(), this.port(), this.path(), this.c(), List.of(), Map.of());
+    }
+
+    @Override
+    public boolean hasQ(final String key) {
+        return key.equals("+") || key.equals("#") || this.qMap().containsKey(key);
+    }
+
+    @Override
+    public fURI zero() {
+        return NOOBJ.c(cInt.ZERO());
+    }
+
+    @Override
+    public fURI one() {
+        return this.c(cInt.ONE());
+    }
+
+    @Override
+    public fURI maybe() {
+        return this.c(cInt.MAYBE());
+    }
+
+    @Override
+    public fURI maybeMaybe() {
+        return this.c("??");
+    }
+
+    @Override
+    public fURI maybeSome() {
+        return this.c(cInt.MAYBESOME());
+    }
+
+    @Override
+    public fURI some() {
+        return this.c(cInt.SOME());
+    }
+
+
+    public fURI removePrefix(final fURI prefix) {
+        final String newPath = this.toString();
+        final String pre = prefix.toString();
+        //return new fURI(newPath.startsWith(prefix.toString()) ? newPath.substring(prefix.send ? prefix.toString().length() +1 : prefix.toString().length()) : newPath);
+        if (!newPath.startsWith(pre))
+            return this;
+        final fURI newURI = fURI.of(newPath.substring(pre.length() + (newPath.charAt(pre.length()) == '/' ? 1 : 0)));
+        //   newURI.sstart = !prefix.send;
+        return newURI;
+    }
+
+    @Override
+    public fURI clone() {
+        return this;
+    }
+
+    @Override
+    public fURI asRelative() {
+        if (!this.path().isEmpty() && this.path().getFirst().isEmpty())
+            return fURI.of(this.scheme(), this.host(), this.port(), this.path().subList(1, this.path().size()), this.c(), List.of(), this.qMap());
+        return this;
+    }
+
+    @Override
+    public int compareTo(final fURI furi) {
+        if (null == furi) return -1;
+        if (this.equals(furi)) return 0;
+        if (Objects.equals(this.host(), "#"))
+            return 1;
+        if (!Objects.equals(this.host(), furi.host()) && !Objects.equals(this.host(), "+"))
+            return -1;
+        for (int i = 0; i < this.path().size(); i++) {
+            final String segment = this.path().get(i);
+            if (segment.equals("#"))
+                return 1;
+            if (furi.pathLength() <= i)
+                return -1;
+            if (!segment.equals("+") && !segment.equals(furi.path().get(i)))
+                return -1;
+        }
+        return (this.path().size() > furi.pathLength() || furi.pathLength() == this.path().size() && this.hasPattern()) ? 1 : -1;
+    }
+
+    @Override
+    public fURI asNode() {
+        if (this.pathLength() > 0 && this.path().getLast().isEmpty()) {
+            final List<String> newPath = new ArrayList<>(this.path());
+            newPath.removeLast();
+            return fURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
+        }
+        return this;
+    }
+
+    @Override
+    public fURI asBranch() {
+        if (this.pathLength() > 0 && !this.path().getLast().isEmpty()) {
+            final List<String> newPath = new ArrayList<>(this.path());
+            newPath.addLast("");
+            return fURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
+        }
+        return this;
+    }
+
+    @Override
+    public fURI scheme(final String scheme) {
+        return fURI.of(scheme, this.host(), this.port(), this.path(), this.c(), List.of(), this.qMap());
     }
 
     @Override
     public String scheme() {
-        return null;
+        return "";
     }
 
     @Override
-    public ifURI host(final String host) {
-        return ifURI.of(this.scheme(), host, this.port(), this.path(), this.c(), List.of(), this.qMap());
+    public fURI host(final String host) {
+        return fURI.of(this.scheme(), host, this.port(), this.path(), this.c(), List.of(), this.qMap());
     }
 
     @Override
     public String host() {
-        return null;
+        return "";
     }
 
 
@@ -73,8 +222,8 @@ public abstract class AbstractfURI implements ifURI {
     }
 
     @Override
-    public ifURI port(final int port) {
-        return ifURI.of(this.scheme(), this.host(), port, this.path(), this.c(), List.of(), this.qMap());
+    public fURI port(final int port) {
+        return fURI.of(this.scheme(), this.host(), port, this.path(), this.c(), List.of(), this.qMap());
     }
 
 
@@ -89,33 +238,42 @@ public abstract class AbstractfURI implements ifURI {
     }
 
     @Override
-    public ifURI path(final List<String> path) {
-        return ifURI.of(this.scheme(), this.host(), this.port(), path, this.c(), List.of(), this.qMap());
+    public fURI path(final List<String> path) {
+        return fURI.of(this.scheme(), this.host(), this.port(), path, this.c(), List.of(), this.qMap());
     }
 
     @Override
-    public ifURI path(final String path) {
-        return ifURI.of(this.scheme(), this.host(), this.port(), List.of(path.split("/")), this.c(), List.of(), this.qMap());
+    public fURI path(final String path) {
+        return fURI.of(this.scheme(), this.host(), this.port(), List.of(path.split("/")), this.c(), List.of(), this.qMap());
     }
 
     @Override
-    public ifURI c(final C<?, ?> coefficient) {
-        return ifURI.of(this.scheme(), this.host(), this.port(), this.path(), coefficient, List.of(), this.qMap());
+    public fURI c(final C<?, ?> coefficient) {
+        return fURI.of(this.scheme(), this.host(), this.port(), this.path(), null == coefficient ? cInt.ONE() : coefficient, List.of(), this.qMap());
     }
 
     @Override
-    public ifURI q(final Map<String, String> query) {
-        return ifURI.of(this.scheme(), this.host(), this.port(), this.path(), this.c(), List.of(), query);
+    public fURI c(final String coefficient) {
+        return fURI.of(this.scheme(), this.host(), this.port(), this.path(), null == coefficient ? cInt.ONE() : cInt.of(coefficient), List.of(), this.qMap());
     }
 
     @Override
-    public ifURI dom(final ifURI dom) {
-        return this;
+    public fURI q(final Map<String, String> query) {
+        return fURI.of(this.scheme(), this.host(), this.port(), this.path(), this.c(), List.of(), null == query ? Map.of() : query);
     }
 
     @Override
-    public ifURI rng(final ifURI rng) {
-        return this;
+    public fURI dom(final fURI dom) {
+        final Map<String, String> map = new HashMap<>(this.qMap());
+        map.put("dom", dom.toString());
+        return fURI.of(this.scheme(), this.host(), this.port(), this.path(), this.c(), List.of(), map);
+    }
+
+    @Override
+    public fURI rng(final fURI rng) {
+        final Map<String, String> map = new HashMap<>(this.qMap());
+        map.put("rng", rng.toString());
+        return fURI.of(this.scheme(), this.host(), this.port(), this.path(), this.c(), List.of(), map);
     }
 
     @Override
@@ -138,18 +296,38 @@ public abstract class AbstractfURI implements ifURI {
     }
 
     @Override
+    public boolean hasPattern(final char patternCharacter) {
+        final String pattern = Character.toString(patternCharacter);
+        if (Objects.equals(this.scheme(), pattern))
+            return true;
+        if (Objects.equals(this.host(), pattern))
+            return true;
+        for (String segment : this.path()) {
+            if (Objects.equals(segment, pattern))
+                return true;
+        }
+        return this.qMap().entrySet().stream().anyMatch(kv -> {
+            if (Objects.equals(kv.getValue(), pattern))
+                return true;
+            if (Objects.equals(kv.getKey(), pattern))
+                return true;
+            return false;
+        });
+    }
+
+    @Override
     public List<String> poly() {
         return List.of();
     }
 
 
     @Override
-    public ifURI basePath() {
-        return ifURI.of(this.scheme(), this.host(), this.port(), this.path(), cInt.ONE(), List.of(), Map.of());
+    public fURI basePath() {
+        return fURI.of(this.scheme(), this.host(), this.port(), this.path(), cInt.ONE(), List.of(), Map.of());
     }
 
     @Override
-    public boolean test(final ifURI lhs) {
+    public boolean test(final fURI lhs) {
         final C c = this.c();
         final C d = lhs.c();
         //if (c.isZero() && d.isZero())
@@ -179,11 +357,11 @@ public abstract class AbstractfURI implements ifURI {
         }*/
         if (lhs.toString().equals("#"))
             return true;
-        if (Objects.equals(lhs.scheme(), "#"))
+        if (lhs.hasScheme() && Objects.equals(lhs.scheme(), "#"))
             return true;
         if (!Objects.equals(this.scheme(), lhs.scheme()) && !Objects.equals(lhs.scheme(), "+"))
             return false;
-        if (Objects.equals(lhs.host(), "#"))
+        if (lhs.hasHost() && Objects.equals(lhs.host(), "#"))
             return true;
         if (!Objects.equals(this.host(), lhs.host()) && !Objects.equals(lhs.host(), "+"))
             return false;
@@ -214,7 +392,7 @@ public abstract class AbstractfURI implements ifURI {
     }
 
     @Override
-    public ifURI prepend(final String segment) {
+    public fURI prepend(final String segment) {
         if (segment.isEmpty() && this.path().getFirst().isEmpty())
             return this;
         final List<String> newPath = new ArrayList<>();
@@ -225,33 +403,44 @@ public abstract class AbstractfURI implements ifURI {
         //   if (segment.endsWith("/"))
         //  newPath.add("");
         newPath.addAll(this.path().getFirst().isEmpty() ? this.path().subList(1, this.path().size()) : this.path());
-        return ifURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
+        return fURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
     }
 
     @Override
-    public ifURI extend(final String segment) {
-        if (segment.isEmpty() && this.path().getLast().isEmpty())
+    public fURI extend(final fURI segment) {
+        return this.extend(segment.toString());
+    }
+
+    @Override
+    public fURI extend(final String segment) {
+        if (segment.isEmpty() && !this.path().isEmpty() && this.path().getLast().isEmpty())
             return this;
         final List<String> newPath = new ArrayList<>(this.path());
         final List<String> prefix = Arrays.asList(segment.split("/"));
-        if (this.path().getLast().isEmpty())
+        if (!this.path().isEmpty() && this.path().getLast().isEmpty())
             newPath.removeLast();
         if (this.path().isEmpty() && segment.startsWith("/"))
             newPath.add("");
         newPath.addAll(prefix);
         if (segment.endsWith("/"))
             newPath.add("");
-        return ifURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
+        return fURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
     }
 
     @Override
-    public boolean hasPrefix(String prefix) {
-        final List<String> prefixSegments = Arrays.asList(prefix.split("/"));
+    public boolean hasPrefix(final fURI prefix) {
+        if (prefix.hasScheme() && (!this.hasScheme() || !this.scheme().equals(prefix.scheme())))
+            return false;
+        if (prefix.hasAuthority() && (!this.hasAuthority() || !this.authority().test(prefix.authority())))
+            return false;
+        final List<String> prefixSegments = prefix.path();
         if (prefixSegments.size() > this.path().size())
             return false;
         for (int i = 0; i < prefixSegments.size(); i++) {
             final String prefixSegment = prefixSegments.get(i);
-            if (prefixSegment.equals("#") || prefixSegment.equals("+"))
+            if (prefixSegment.equals("#"))
+                return true;
+            if (prefixSegment.isEmpty() || prefixSegment.equals("+"))
                 continue;
             final String pathSegment = this.path().get(i);
             if (!Objects.equals(prefixSegment, pathSegment))
@@ -261,30 +450,16 @@ public abstract class AbstractfURI implements ifURI {
     }
 
     @Override
-    public boolean hasPostfix(String postfix) {
-        final List<String> postfixSegments = new ArrayList<>();
-        Collections.addAll(postfixSegments, postfix.split("/"));
-        if (postfix.endsWith("/"))
-            postfixSegments.add("");
-        if (postfixSegments.size() > this.path().size())
-            return false;
-        for (int i = 0; i < postfixSegments.size(); i++) {
-            final String postfixSegment = postfixSegments.get(i);
-            if (postfixSegment.equals("#") || postfixSegment.equals("+"))
-                continue;
-            final String pathSegment = this.path().get(this.path().size() - postfixSegments.size() + i);
-            if (!Objects.equals(postfixSegment, pathSegment))
-                return false;
-        }
-        return true;
+    public boolean hasPostfix(fURI postfix) {
+        return this.toString().endsWith(postfix.toString());
     }
 
     @Override
-    public ifURI pretract(final String segment) {
+    public fURI pretract(final String segment) {
         if (segment.isEmpty() && this.path().getFirst().isEmpty())
-            return ifURI.of(this.scheme(), this.host(), this.port(), this.path().subList(1, this.path().size()), this.c(), List.of(), this.qMap());
-        if (this.hasPrefix(segment))
-            return ifURI.of(this.scheme(), this.host(), this.port(), this.path().subList(segment.split("/").length, this.path().size()), this.c(), List.of(), this.qMap());
+            return fURI.of(this.scheme(), this.host(), this.port(), this.path().subList(1, this.path().size()), this.c(), List.of(), this.qMap());
+        if (this.hasPrefix(fURI.of(segment)))
+            return fURI.of(this.scheme(), this.host(), this.port(), this.path().subList(segment.split("/").length, this.path().size()), this.c(), List.of(), this.qMap());
         return this;
     }
 
@@ -293,11 +468,11 @@ public abstract class AbstractfURI implements ifURI {
     }
 
     @Override
-    public ifURI pretract(final int steps) {
+    public fURI pretract(final int steps) {
         if (steps == 0)
             return this;
         if (steps >= this.pathLength())
-            return ifURI.of(this.scheme(), this.host(), this.port(), List.of(), this.c(), List.of(), this.qMap());
+            return fURI.of(this.scheme(), this.host(), this.port(), List.of(), this.c(), List.of(), this.qMap());
         boolean hasBlank = this.hasBlankCap(true);
         List<String> newPath = new ArrayList<>(this.path());
         if (hasBlank) newPath.removeFirst();
@@ -308,16 +483,16 @@ public abstract class AbstractfURI implements ifURI {
         if (newPath.stream().allMatch(String::isEmpty)) {
             newPath.clear();
         }
-        return ifURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
+        return fURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
     }
 
 
     @Override
-    public ifURI retract(int steps) {
+    public fURI retract(int steps) {
         if (steps == 0)
             return this;
         if (steps >= this.pathLength())
-            return ifURI.of(this.scheme(), this.host(), this.port(), List.of(), this.c(), List.of(), this.qMap());
+            return fURI.of(this.scheme(), this.host(), this.port(), List.of(), this.c(), List.of(), this.qMap());
         boolean hasBlank = this.hasBlankCap(false);
         List<String> newPath = new ArrayList<>(this.path());
         if (hasBlank) newPath.removeLast();
@@ -328,45 +503,65 @@ public abstract class AbstractfURI implements ifURI {
         if (newPath.stream().allMatch(String::isEmpty)) {
             newPath.clear();
         }
-        return ifURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
+        return fURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
     }
 
     @Override
-    public ifURI retractPattern() {
+    public fURI retractPattern() {
         final List<String> newPath = new ArrayList<>(this.path());
-        while (newPath.getLast().equals("#") || newPath.getLast().equals("+")) {
+        while (!newPath.isEmpty() && (newPath.getLast().equals("#") || newPath.getLast().equals("+"))) {
             newPath.removeLast();
         }
-        return ifURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
+        return fURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
     }
 
     @Override
-    public ifURI retract(final String segment) {
+    public fURI retract(final String segment) {
 
 
         //   if (segment.isEmpty() && this.path().getLast().isEmpty())
         //    return ifURI.of(this.scheme(), this.host(), this.port(), this.path().subList(0, this.path().size() - 1), this.c(), List.of(), this.qMap());
-        if (this.hasPrefix(segment))
-            return ifURI.of(this.scheme(), this.host(), this.port(), this.path().subList(0, this.path().size() - segment.split("/").length), this.c(), List.of(), this.qMap());
+        if (this.hasPrefix(fURI.of(segment)))
+            return fURI.of(this.scheme(), this.host(), this.port(), this.path().subList(0, this.path().size() - segment.split("/").length), this.c(), List.of(), this.qMap());
         return this;
     }
 
 
     @Override
-    public C<?, ?> c() {
+    public C c() {
         return cInt.ONE();
     }
 
+    @Override
+    public fURI mult(final fURI rhs) {
+        final List<String> segments = new ArrayList<>(this.path());
+        segments.addAll(rhs.path());
+        return fURI.of(this.scheme(), this.host(), this.port(), segments, this.c().mult(rhs.c()), List.of(), Map.of());
+    }
 
     @Override
-    public ifURI dom() {
-        return null;
+    public fURI plus(final fURI rhs) {
+        final List<String> segments = new ArrayList<>(this.path());
+        segments.addAll(rhs.path());
+        return fURI.of(this.scheme(), this.host(), this.port(), segments, this.c().plus(rhs.c()), List.of(), Map.of());
     }
 
 
     @Override
-    public ifURI rng() {
-        return null;
+    public fURI dom() {
+        final String d = this.q("dom");
+        if (null == d)
+            return ALL;
+        return fURI.of(d);
+    }
+
+
+    @Override
+    public fURI rng() {
+        final String r = this.q("rng");
+        if (null == r)
+            return ALL;
+        return fURI.of(r);
     }
 
 
@@ -381,31 +576,38 @@ public abstract class AbstractfURI implements ifURI {
     }
 
     @Override
-    public ifURI q(final String key, final Object value) {
+    public fURI q(final String key, final Object value) {
         final Map<String, String> newQ = new HashMap<>(this.qMap());
         newQ.put(key, null == value ? "" : value.toString());
-        return ifURI.of(this.scheme(), this.host(), this.port(), this.path(), this.c(), List.of(), newQ);
+        return fURI.of(this.scheme(), this.host(), this.port(), this.path(), this.c(), List.of(), newQ);
     }
 
     @Override
     public <T> T qValue(final String key, final Class<T> valueClass) {
+        final String value = this.q(key);
+        if (null == value)
+            return null;
         if (String.class.isAssignableFrom(valueClass))
-            return (T) this.qMap().get(key);
+            return (T) value;
+        else if (fURI.class.isAssignableFrom(valueClass))
+            return (T) fURI.of(value);
         else if (Integer.class.isAssignableFrom(valueClass))
-            return (T) Integer.valueOf(this.qMap().get(key));
+            return (T) Integer.valueOf(value);
         else if (Long.class.isAssignableFrom(valueClass))
-            return (T) Long.valueOf(this.qMap().get(key));
+            return (T) Long.valueOf(value);
         else if (Double.class.isAssignableFrom(valueClass))
-            return (T) Double.valueOf(this.qMap().get(key));
+            return (T) Double.valueOf(value);
         else if (Boolean.class.isAssignableFrom(valueClass))
-            return (T) Boolean.valueOf(this.qMap().get(key));
+            return (T) Boolean.valueOf(value);
         else
-            throw MTronException.of("no known conversion of %s to %s", this.qMap().get(key), valueClass);
+            throw MTronException.of("no known conversion of %s to %s", value, valueClass);
     }
 
 
     @Override
     public String q(final String key) {
+        if (null == key)
+            return null;
         return this.qMap().get(key);
     }
 
@@ -426,40 +628,46 @@ public abstract class AbstractfURI implements ifURI {
 
 
     @Override
-    public ifURI head(final int steps) {
+    public fURI head(final int steps) {
         if (steps == 0)
-            return ifURI.of(this.scheme(), this.host(), this.port(), List.of(), this.c(), List.of(), this.qMap());
+            return fURI.of(this.scheme(), this.host(), this.port(), List.of(), this.c(), List.of(), this.qMap());
         if (steps >= this.pathLength())
             return this;
         boolean hasBlankRight = this.hasBlankCap(false);
         boolean hasBlankLeft = this.hasBlankCap(true);
-        final List<String> newPath =  new ArrayList<>(this.path().subList(0,steps + (hasBlankLeft ? 1 : 0)));
-        if(hasBlankRight && !newPath.isEmpty() && !newPath.getLast().isEmpty())
+        final List<String> newPath = new ArrayList<>(this.path().subList(0, steps + (hasBlankLeft ? 1 : 0)));
+        if (hasBlankRight && !newPath.isEmpty() && !newPath.getLast().isEmpty())
             newPath.addLast("");
-        return ifURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
-       // return ifURI.of(this.scheme(), this.host(), this.port(), this.path().subList(0, steps + (hasBlank ? 1 : 0)), this.c(), List.of(), this.qMap());
+        return fURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
+        // return ifURI.of(this.scheme(), this.host(), this.port(), this.path().subList(0, steps + (hasBlank ? 1 : 0)), this.c(), List.of(), this.qMap());
     }
 
     @Override
-    public ifURI tail(final int steps) {
+    public fURI tail(final int steps) {
         if (steps == 0)
-            return ifURI.of(this.scheme(), this.host(), this.port(), List.of(), this.c(), List.of(), this.qMap());
+            return fURI.of(this.scheme(), this.host(), this.port(), List.of(), this.c(), List.of(), this.qMap());
         if (steps >= this.pathLength())
             return this;
         boolean hasBlankRight = this.hasBlankCap(false);
         boolean hasBlankLeft = this.hasBlankCap(true);
-        final List<String> newPath =  new ArrayList<>(this.path().subList(((this.path().size()-steps) - (hasBlankRight ? 1 : 0)),this.path().size()));
-        if(hasBlankLeft && !newPath.isEmpty() && !newPath.getFirst().isEmpty())
+        final List<String> newPath = new ArrayList<>(this.path().subList(((this.path().size() - steps) - (hasBlankRight ? 1 : 0)), this.path().size()));
+        if (hasBlankLeft && !newPath.isEmpty() && !newPath.getFirst().isEmpty())
             newPath.addFirst("");
-        return ifURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
+        return fURI.of(this.scheme(), this.host(), this.port(), newPath, this.c(), List.of(), this.qMap());
     }
+
+    public int hashCode() {
+        return Objects.hash(this.scheme(), this.host(), this.port(), this.path(), this.c(), this.qMap());
+        //return this.toString().hashCode();
+    }
+
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        if (null != scheme())
+        if (!scheme().isEmpty())
             sb.append(scheme()).append(":");
-        if (null != host()) {
+        if (!host().isEmpty()) {
             sb.append("//");
             sb.append(host());
             if (-1 != port())
@@ -475,7 +683,7 @@ public abstract class AbstractfURI implements ifURI {
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof ifURI that))
+        if (!(other instanceof fURI that))
             return false;
         return Objects.equals(this.scheme(), that.scheme())
                 && Objects.equals(this.host(), that.host())

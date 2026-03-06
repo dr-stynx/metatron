@@ -106,7 +106,7 @@ public interface Router extends Space {
         int count = (int) ((double) vidObj.length / 2.0d);
         final Obj[] result = new Obj[count];
         for (int i = 0; i < vidObj.length; i = i + 2) {
-            result[--count] = this.write(fURI.of(vidObj[i]), (Obj) vidObj[i + 1]);
+            result[--count] = this.write(fURI.of(vidObj[i].toString()), (Obj) vidObj[i + 1]);
         }
         return result;
     }
