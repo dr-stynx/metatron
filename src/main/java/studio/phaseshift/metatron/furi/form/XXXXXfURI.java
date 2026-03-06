@@ -18,34 +18,11 @@
 
 package studio.phaseshift.metatron.furi.form;
 
-import studio.phaseshift.metatron.furi.C;
-import studio.phaseshift.metatron.furi.ifURI;
-
-import java.util.*;
-
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class XXPXXfURI extends AbstractfURI {
+public class XXXXXfURI extends AbstractfURI {
 
-    final List<String> path;
+    public static final XXXXXfURI INSTANCE = new XXXXXfURI();
 
-    public XXPXXfURI(final List<String> path) {
-        this.path = path;
-    }
-
-    @Override
-    public List<String> path() {
-        return this.path;
-    }
-
-    @Override
-    public ifURI dom(final ifURI dom) {
-        return null; // TODO
-    }
-
-    @Override
-    public ifURI rng(final ifURI rng) {
-        return null; // TODO    
-    }
 }
