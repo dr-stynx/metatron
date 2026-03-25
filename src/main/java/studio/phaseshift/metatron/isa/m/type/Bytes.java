@@ -40,7 +40,7 @@ import static studio.phaseshift.metatron.isa.m.type.impl.MType.T;
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface Bytes extends Mono, PlusMonoid.O<Bytes> {
+public interface Bytes extends Mono {
 
     Type BYTES_TYPE = Type.Builder.build().tid(BYTES_TID).vid(BYTES_TID).create();
 
@@ -67,19 +67,7 @@ public interface Bytes extends Mono, PlusMonoid.O<Bytes> {
         return (Bytes) Mono.super.c(c);
     }
 
-    @Override
-    default Bytes zero() {
-        return bytes(ByteBuffer.wrap(new byte[0]));
-    }
 
-    @Override
-    default Bytes plus(final Bytes rhs) {
-        final ByteBuffer buffer = ByteBuffer.allocate(this.jvm().remaining() + rhs.jvm().remaining());
-        buffer.put(this.jvm().duplicate());
-        buffer.put(rhs.jvm().duplicate());
-        buffer.flip();
-        return this.jvm(buffer);
-    }
 
     default String toHexString() {
         return "0x" + HexFormat.of().formatHex(this.jvm().array());
@@ -108,9 +96,16 @@ public interface Bytes extends Mono, PlusMonoid.O<Bytes> {
                     instC(AS_INST_TID.dom(BYTES_TID).rng(STR_TID), lst(T(STR_TID)), (lhs, inst) -> str(new String(lhs.bytesValue().array(), StandardCharsets.UTF_8), inst.arg(0).tid(), lhs.vid())),
                     //instC(LSHIFT_INST_TID.dom(BYTES_TID).rng(BYTES_TID), lst(isa_(T(BYTES_TID)).else_(jnt(1)).tryToInst()), (lhs, inst) -> lhs.jvm(ByteBuffer.wrap(Arrays.copyOfRange(lhs.bytesValue().array(), inst.arg(0).intValue().intValue(), lhs.bytesValue().array().length)))),
                     //instC(RSHIFT_INST_TID.dom(BYTES_TID).rng(BYTES_TID), lst(isa_(T(BYTES_TID)).else_(jnt(1)).tryToInst()), (lhs, inst) -> lhs.jvm(ByteBuffer.wrap(Arrays.copyOf(lhs.bytesValue().array(), lhs.bytesValue().array().length - inst.arg(0).intValue().intValue())))),
-                    instC(ZERO_INST_TID.dom(BYTES_TID).rng(BYTES_TID), lst(), (lhs, inst) -> lhs.asBytes().zero()),
-                    instC(PLUS_INST_TID.dom(BYTES_TID).rng(BYTES_TID), lst(T(BYTES_TID)), (lhs, inst) -> lhs.<Bytes>as().plus(inst.arg(0).as())),
-                    instC(WITHIN_INST_TID.dom(BYTES_TID).rng(B), lst(T(B)), (lhs, inst) -> IntStream.range(0, lhs.bytesValue().array().length).map(i -> lhs.bytesValue().array()[i]).boxed().map(b -> inst.arg(0).apply(bytes(ByteBuffer.wrap(new byte[]{(byte) b.intValue()})))).map(o -> (PlusMonoid.O) o).reduce((a, b) -> (PlusMonoid.O) a.plus(b)).map(Obj::<Obj>as).orElse(noobj()))));
+                    instC(ZERO_INST_TID.dom(BYTES_TID).rng(BYTES_TID), lst(), (lhs, inst) -> bytes(ByteBuffer.wrap(new byte[0]))),
+                    instC(ONE_INST_TID.dom(BYTES_TID).rng(BYTES_TID), lst(), (lhs, inst) -> bytes(ByteBuffer.wrap(new byte[0]))),
+                    instC(PLUS_INST_TID.dom(BYTES_TID).rng(BYTES_TID), lst(T(BYTES_TID)), (lhs, inst) -> {
+                        final ByteBuffer buffer = ByteBuffer.allocate(lhs.bytesValue().remaining() + inst.arg(0).asBytes().bytesValue().remaining());
+                        buffer.put(lhs.bytesValue().duplicate());
+                        buffer.put(inst.arg(0).asBytes().bytesValue().duplicate());
+                        buffer.flip();
+                        return lhs.jvm(buffer);
+                    }),
+                    instC(WITHIN_INST_TID.dom(BYTES_TID).rng(B), lst(T(B)), (lhs, inst) -> IntStream.range(0, lhs.bytesValue().array().length).map(i -> lhs.bytesValue().array()[i]).boxed().map(b -> inst.arg(0).apply(bytes(ByteBuffer.wrap(new byte[]{(byte) b.intValue()})))).reduce((a, b) -> Algebras.plus(a, b)).orElse(noobj()))));
 
                     /*instC(SPLIT_INST_TID.dom(BYTES_TID).rng(LST_TID), lst(T(BYTES_TID)), (lhs, inst) -> {
                         final byte[] array = lhs.bytesValue().array();

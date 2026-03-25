@@ -24,6 +24,7 @@ import studio.phaseshift.metatron.isa.AbstractSpace;
 import studio.phaseshift.metatron.isa.Space;
 import studio.phaseshift.metatron.isa.m.mInstSet;
 import studio.phaseshift.metatron.isa.m.parser.mParser;
+import studio.phaseshift.metatron.isa.m.type.Algebras;
 import studio.phaseshift.metatron.isa.m.type.Obj;
 import studio.phaseshift.metatron.isa.m.type.Rec;
 import studio.phaseshift.metatron.isa.m.type.Type;
@@ -64,7 +65,7 @@ public class memSpace extends AbstractSpace<Map<fURI, Obj>> {
 
     public static final fURI MEM_SPACE_TID = M_ISA_TID.extend("space/mem");
 
-    protected static final Rec MEM_SPACE_CONFIG = SPACE_CONFIG.plus(rec(uri(PERSIST).maybe().asUri(), FILE_TYPE));
+    protected static final Rec MEM_SPACE_CONFIG = rec(uri(PERSIST).maybe().asUri(), FILE_TYPE); //(Rec) Algebras.plus(SPACE_CONFIG, rec(uri(PERSIST).maybe().asUri(), FILE_TYPE));
 
     public static final Type MEM_SPACE_TYPE = Type.Builder.build()
             .tid(SPACE_TID)

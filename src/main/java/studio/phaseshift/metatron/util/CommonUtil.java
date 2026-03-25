@@ -242,7 +242,12 @@ public final class CommonUtil {
 
         @Override
         public BiConsumer<Map<Obj, Obj>, Rel> accumulator() {
-            return (a, b) -> a.compute(b.jvm().get0(), (k, v) -> b.isNoObj() ? v : (null == v ? b.jvm().get1() : v.append(b.jvm().get1())));
+            return (a, b) -> a.compute(b.jvm().get0(), (k, v) -> {
+                if (b.isNoObj()) return v;
+                if (null == v) return b.jvm().get1();
+                // Use Algebras.plus() which handles instruction algebra internally
+                return studio.phaseshift.metatron.isa.m.type.Algebras.plus(v, b.jvm().get1());
+            });
         }
 
         @Override

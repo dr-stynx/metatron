@@ -28,6 +28,7 @@ import java.util.*;
 import static studio.phaseshift.metatron.furi.fURI.Singleton.f;
 import static studio.phaseshift.metatron.furi.q.DocQ.Doc.docWrap;
 import static studio.phaseshift.metatron.isa.m.mInstSet.*;
+import static studio.phaseshift.metatron.isa.m.type.Algebras.*;
 import static studio.phaseshift.metatron.isa.m.type.Bool.BOOL_TYPE;
 import static studio.phaseshift.metatron.isa.m.type.Bytes.BYTES_TYPE;
 import static studio.phaseshift.metatron.isa.m.type.impl.MBool.bool;
@@ -44,7 +45,7 @@ import static studio.phaseshift.metatron.isa.m.type.impl.MUri.uri;
 /**
  *
  */
-public interface Int extends Mono, Ring.O<Int> {
+public interface Int extends Mono {
 
     
     Type INT_TYPE = Type.Builder.build().tid(INT_TID).vid(INT_TID).create();
@@ -74,30 +75,7 @@ public interface Int extends Mono, Ring.O<Int> {
         return (Int) Mono.super.c(c);
     }
 
-    @Override
-    default Int zero() {
-        return ZERO;
-    }
 
-    @Override
-    default Int one() {
-        return ONE;
-    }
-
-    @Override
-    default Int plus(final Int rhs) {
-        return this.jvm((this.intValue() * this.c().max()) + (rhs.intValue() * rhs.c().max())).c(cInt.ONE());
-    }
-
-    @Override
-    default Int mult(final Int rhs) {
-        return this.jvm((this.intValue() * this.c().max()) * (rhs.intValue() * rhs.c().max())).c(cInt.ONE());
-    }
-
-    @Override
-    default Int neg() {
-        return this.jvm(-1 * this.intValue());
-    }
 
     Int self(final Long jvm, final fURI tid, final fURI vid);
     
@@ -110,9 +88,9 @@ public interface Int extends Mono, Ring.O<Int> {
                     instC(AS_INST_TID.dom(INT_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> real(lhs.intValue().doubleValue(), inst.arg(0).tid(), lhs.vid())),
                     instC(AS_INST_TID.dom(INT_TID).rng(STR_TID), lst(T(STR_TID)), (lhs, inst) -> str(lhs.intValue().toString(), inst.arg(0).tid(), lhs.vid())),
                     instC(AS_INST_TID.dom(INT_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(f(lhs.intValue().toString()), inst.arg(0).tid(), lhs.vid())),
-                    instC(ZERO_INST_TID.dom(INT_TID).rng(INT_TID), lst(), (lhs, _) -> lhs.asInt().zero()),
-                    instC(ONE_INST_TID.dom(INT_TID).rng(INT_TID), lst(), (lhs, _) -> lhs.asInt().one()),
-                    instC(NEG_INST_TID.dom(INT_TID).rng(INT_TID), lst(), (lhs, _) -> lhs.asInt().neg()),
+                    instC(ZERO_INST_TID.dom(INT_TID).rng(INT_TID), lst(), (lhs, _) -> ZERO),
+                    instC(ONE_INST_TID.dom(INT_TID).rng(INT_TID), lst(), (lhs, _) -> ONE),
+                    instC(NEG_INST_TID.dom(INT_TID).rng(INT_TID), lst(), (lhs, _) -> lhs.jvm(-1 * lhs.intValue())),
                     docWrap(instC(MULT_INST_TID.dom(INT_TID).rng(INT_TID), lst(T(INT_TID)), (lhs, inst) -> lhs.jvm(lhs.intValue() * inst.arg(0).intValue())), "the lhs int", "the result of the multiplication", Map.of(INT_TYPE, "the int to multiply the lhs by"), "multiply the lhs int by the argument int"),
                     docWrap(instC(MINUS_INST_TID.dom(INT_TID).rng(INT_TID), lst(T(INT_TID)), (lhs, inst) -> lhs.jvm(lhs.intValue() - inst.arg(0).intValue())), "the lhs int", "the result of the subtraction", Map.of(INT_TYPE, "the int to subtract from the lhs"), "subtract the argument int from the lhs int"),
                     docWrap(instC(PLUS_INST_TID.dom(INT_TID).rng(INT_TID), lst(INT_TYPE), (lhs, inst) -> lhs.jvm(lhs.intValue() + inst.arg(0).intValue())), "the lhs int", "the result of the addition", Map.of(INT_TYPE, "the int to add to the lhs"), "add the argument int to the lhs int"),
@@ -121,8 +99,8 @@ public interface Int extends Mono, Ring.O<Int> {
                     docWrap(instC(GTE_INST_TID.dom(INT_TID).rng(BOOL_TID), lst(T(INT_TID)), (lhs, inst) -> bool(Inst.Helper.alignLHSType(lhs, inst.arg(0)).filter(l -> l.intValue() >= inst.arg(0).intValue()).isPresent())), "the lhs int", "whether the lhs is greater than or equal to the rhs", Map.of(INT_TYPE, "the int to compare against the lhs"), "check whether the lhs int is greater than or equal to the argument int"),
                     docWrap(instC(LT_INST_TID.dom(INT_TID).rng(BOOL_TID), lst(T(INT_TID)), (lhs, inst) -> bool(Inst.Helper.alignLHSType(lhs, inst.arg(0)).filter(l -> l.intValue() < inst.arg(0).intValue()).isPresent())), "the lhs int", "whether the lhs is less than the rhs", Map.of(INT_TYPE, "the int to compare against the lhs"), "check whether the lhs int is less than the argument int"),
                     docWrap(instC(LTE_INST_TID.dom(INT_TID).rng(BOOL_TID), lst(T(INT_TID)), (lhs, inst) -> bool(Inst.Helper.alignLHSType(lhs, inst.arg(0)).filter(l -> l.intValue() <= inst.arg(0).intValue()).isPresent())), "the lhs int", "whether the lhs is less than or equal to the rhs", Map.of(INT_TYPE, "the int to compare against the lhs"), "check whether the lhs int is less than or equal to the argument int"),
-                    instC(SUM_INST_TID.dom(INT_TID.maybeSome()).rng(INT_TID), lst(), (lhs, inst) -> inst.seed().jvm(lhs.stream().reduce(inst.seed(), (a, b) -> ((Int) a).plus((Int) b)).intValue()), jnt(0)),
-                    instC(PROD_INST_TID.dom(INT_TID.maybeSome()).rng(INT_TID), lst(), (lhs, inst) -> inst.seed().jvm(lhs.stream().reduce(inst.seed(), (a, b) -> jnt(a.intValue() * (b.intValue() * b.c().max()))).intValue()/* * inst.c().max()*/), jnt(1)),
+                    instC(SUM_INST_TID.dom(INT_TID.maybeSome()).rng(INT_TID), lst(), (lhs, inst) -> lhs.stream().reduce(zero(lhs), Algebras::plus)),
+                    instC(PROD_INST_TID.dom(INT_TID.maybeSome()).rng(INT_TID), lst(), (lhs, inst) -> lhs.stream().reduce(one(lhs), (a, b) -> Algebras.mult(Algebras.mult(a,b), jnt(b.c().max())))),
                     instC(POW_INST_TID.dom(INT_TID).rng(INT_TID), lst(T(INT_TID)), (lhs, inst) -> jnt((long) Math.pow(lhs.intValue(), inst.arg(0).intValue()))),
                     instC(MOD_INST_TID.dom(INT_TID).rng(INT_TID), lst(INT_TYPE), (lhs,inst) -> jnt(lhs.intValue() % inst.arg(0).intValue())),
                     instC(ORDER_INST_TID.dom(INT_TID.maybeSome()).rng(LST_TID), lst(), (lhs, inst) -> lst(lhs.stream().sorted(Comparator.comparing(a -> a.asInt().intValue()))))

@@ -1,12 +1,12 @@
 /*
  * Metatron: A Distributed Computing Language and Virtual Machine
  *  Copyright (C) 2025- PhaseShift Studio, LLC
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -31,8 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static studio.phaseshift.metatron.isa.m.mInstSet.ID_INST_TID;
-import static studio.phaseshift.metatron.isa.m.mInstSet.INST_TID;
+import static studio.phaseshift.metatron.isa.m.mInstSet.*;
 import static studio.phaseshift.metatron.isa.m.type.NoObj.noobj;
 import static studio.phaseshift.metatron.isa.m.type.impl.MInst.instB;
 import static studio.phaseshift.metatron.isa.m.type.impl.MInst.instC;
@@ -62,7 +61,7 @@ public class mFluent<F extends Fluent<F>> extends MCode implements Fluent<F>, Co
     // ========================================
 
     public F start_(final Obj obj) {
-        return this.addInst(instB(mInstSet.START_INST_TID, lst(obj)));
+        return this.addInst(instB(mInstSet.START_INST_TID.dom(NOOBJ_TID.zero()).rng(obj.tid()), lst(obj)));
     }
 
     public F block_(final Obj obj) {
@@ -75,6 +74,10 @@ public class mFluent<F extends Fluent<F>> extends MCode implements Fluent<F>, Co
 
     public F else_(final Obj obj) {
         return this.addInst(instB(mInstSet.ELSE_INST_TID, lst(obj)));
+    }
+
+    public F neg_() {
+        return this.addInst(instB(mInstSet.NEG_INST_TID, lst()));
     }
 
     public F apply_(final Obj obj) {
@@ -108,7 +111,7 @@ public class mFluent<F extends Fluent<F>> extends MCode implements Fluent<F>, Co
     public F one_() {
         return this.addInst(instB(mInstSet.ONE_INST_TID, lst()));
     }
-    
+
     public F thread_(final Obj obj) {
         return this.addInst(instB(mInstSet.THREAD_INST_TID, lst(obj)));
     }
@@ -181,6 +184,10 @@ public class mFluent<F extends Fluent<F>> extends MCode implements Fluent<F>, Co
         return this.addInst(instB(mInstSet.PLUS_INST_TID, lst(obj)));
     }
 
+    public F plus(final Obj obj) {
+        return this.plus_(obj);
+    }
+
     public F mplus_(final Obj obj) {
         return this.addInst(instB(mInstSet.MPLUS_INST_TID, lst(obj)));
     }
@@ -191,6 +198,10 @@ public class mFluent<F extends Fluent<F>> extends MCode implements Fluent<F>, Co
 
     public F mult_(final Obj obj) {
         return this.addInst(instB(mInstSet.MULT_INST_TID, lst(obj)));
+    }
+
+    public F mult(final Obj obj) {
+        return this.mult_(obj);
     }
 
     public F pow_(final Obj obj) {
@@ -461,6 +472,11 @@ public class mFluent<F extends Fluent<F>> extends MCode implements Fluent<F>, Co
             return new mFluent<F>().else_(obj);
         }
 
+        public static <F extends mFluent<F>> F neg_() {
+            return new mFluent<F>().neg_();
+        }
+
+
         public static <F extends mFluent<F>> F apply_(final Obj obj) {
             return new mFluent<F>().apply_(obj);
         }
@@ -492,7 +508,7 @@ public class mFluent<F extends Fluent<F>> extends MCode implements Fluent<F>, Co
         public static <F extends mFluent<F>> F one_() {
             return new mFluent<F>().one_();
         }
-        
+
         // ========================================
         // Logical Operators
         // ========================================

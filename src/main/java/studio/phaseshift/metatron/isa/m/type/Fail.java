@@ -18,7 +18,6 @@
 
 package studio.phaseshift.metatron.isa.m.type;
 
-import studio.phaseshift.metatron.algebra.PlusMonoid;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.util.MTronException;
 import studio.phaseshift.metatron.util.Tuple;
@@ -39,7 +38,7 @@ import static studio.phaseshift.metatron.isa.m.type.impl.MUri.uri;
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface Fail extends Obj, PlusMonoid<Fail> {
+public interface Fail extends Obj {
     
     Type FAIL_TYPE = Type.Builder.build().tid(FAIL_TID).vid(FAIL_TID).create();
 
@@ -49,7 +48,7 @@ public interface Fail extends Obj, PlusMonoid<Fail> {
     @Override
     Tuple.Pair<Throwable, Fail> jvm();
 
-    Fail plus(final Fail rhs);
+
 
     default Fail jvm(final Fail value) {
         return this.clone(value, this.tid(), this.vid());

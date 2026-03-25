@@ -47,7 +47,7 @@ import static studio.phaseshift.metatron.isa.m.type.impl.MType.T;
 import static studio.phaseshift.metatron.isa.m.type.impl.MUri.uri;
 import static studio.phaseshift.metatron.util.Tuple.Pair;
 
-public interface Rel extends Poly<Rel, Tuple.Pair<Obj, Obj>>, MultMonoid.O<Rel>, PlusMonoid.O<Rel> {
+public interface Rel extends Poly<Rel, Tuple.Pair<Obj, Obj>> {
 
     Type REL_TYPE = Type.Builder.build().tid(REL_TID).vid(REL_TID).create();
 
@@ -159,103 +159,7 @@ public interface Rel extends Poly<Rel, Tuple.Pair<Obj, Obj>>, MultMonoid.O<Rel>,
     // RING OPERATIONS
     ///////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Multiplicative identity: the identity relation id()
-     * For any relation r, r.mult(one()) = r and one().mult(r) = r
-     */
-    @Override
-    default Rel one() {
-        return rel(instA(ID_INST_TID.dom(A).rng(A)), instA(ID_INST_TID.dom(A).rng(A)));
-    }
 
-    /**
-     * Check if this relation is the multiplicative identity.
-     * A relation is one if it's the identity relation id()=>id()
-     */
-    @Override
-    default boolean isOne() {
-        // Check if both domain and range are id() instructions
-        // Use path() to get base TID without query parameters (dom/rng qualifiers)
-        return this.jvm().get0().isObjInst() &&
-                this.jvm().get1().isObjInst() &&
-                this.jvm().get0().asInst().tid().path().equals(ID_INST_TID.path()) &&
-                this.jvm().get1().asInst().tid().path().equals(ID_INST_TID.path());
-    }
-
-    /**
-     * Additive identity: the zero relation (noobj=>noobj)
-     * For any relation r, r.plus(zero()) = r
-     */
-    @Override
-    default Rel zero() {
-        return rel(noobj(), noobj());
-    }
-
-    /**
-     * Check if this relation is the additive identity.
-     * A relation is zero if both domain and range are noobj
-     */
-    @Override
-    default boolean isZero() {
-        return this.jvm().get0().isNoObj() && this.jvm().get1().isNoObj();
-    }
-
-    /**
-     * Relation multiplication: composition of relations.
-     * (a=>b).mult(b=>c) = (a=>c) when the range of first matches domain of second.
-     * If they don't compose, returns noobj relation.
-     */
-    @Override
-    default Rel mult(final Rel rhs) {
-        // Handle identity cases first
-        if (this.isOne()) return rhs;
-        if (rhs.isOne()) return this;
-        if (this.isZero() || rhs.isZero()) return this.zero();
-
-        // Relation composition: (a=>b) × (b=>c) = (a=>c)
-        // The range of this must match (or be compatible with) the domain of rhs
-        if (this.jvm().get1().test(rhs.jvm().get0())) {
-            // Compose: take domain from this, range from rhs
-            // Use jvm().get0() and jvm().get1() directly to avoid autoResolve
-            return rel(this.jvm().get0(), rhs.jvm().get1());
-        } else {
-            // Non-composable relations return zero
-            return this.zero();
-        }
-    }
-
-    /**
-     * Additive inverse: swap domain and range.
-     * -(a=>b) = (b=>a)
-     * This makes relations form an additive group where negation is relation reversal.
-     */
-    // @Override
-    default Rel neg() {
-        return rel(this.second(), this.first());
-    }
-
-    /**
-     * Addition: combine relations into an Objs collection.
-     * (a=>b).plus(c=>d) = {(a=>b), (c=>d)}
-     * Special case: zero + a = a (additive identity)
-     */
-    @Override
-    default Rel plus(final Rel rhs) {
-        // Handle additive identity: 0 + a = a and a + 0 = a
-        if (this.isZero()) return rhs;
-        if (rhs.isZero()) return this;
-        // create objs collection from both relations
-        return this;// objs(this, rhs);
-    }
-
-    /**
-     * Subtraction: r1.minus(r2) = r1.plus(r2.neg())
-     * Inherited from Ring interface.
-     */
-   /* @Override
-    default Rel minus(final Rel r) {
-        return Ring.O.super.minus(r);
-    }*/
 
     public static final class RelType {
 
@@ -278,41 +182,51 @@ public interface Rel extends Poly<Rel, Tuple.Pair<Obj, Obj>>, MultMonoid.O<Rel>,
                             // Distributive addition: a + {b, c} = {a+b, a+c}
                             return objs(inst.arg(0).stream().map(Obj::<Rel>as).map(rhs -> {
                                 // Handle identity directly to avoid recursion
-                                if (lhs.asRel().isZero()) return rhs;
-                                if (rhs.isZero()) return lhs.asRel();
+                                if (Algebras.isZero(lhs.asRel())) return rhs;
+                                if (Algebras.isZero(rhs)) return lhs.asRel();
                                 return (Rel) objs(lhs, rhs);
                             }));
                         } else {
                             // Direct addition of two relations
-                            if (lhs.asRel().isZero()) return inst.arg(0);
-                            if (inst.arg(0).asRel().isZero()) return lhs.asRel();
+                            if (Algebras.isZero(lhs.asRel())) return inst.arg(0);
+                            if (Algebras.isZero(inst.arg(0).asRel())) return lhs.asRel();
                             return objs(lhs.asRel(), inst.arg(0).asRel());
                         }
                     }),
                     instC(MULT_INST_TID.dom(REL_TID).rng(REL_TID.maybeSome()), lst(T(REL_TID.maybeSome())), (lhs, inst) -> {
-                        if (lhs.asRel().isZero())
+                        if (Algebras.isZero(lhs.asRel()))
                             return lhs.asRel().c(cInt.ZERO());
                         if (inst.arg(0).isObjs()) {
                             return objs(inst.arg(0).stream().map(Obj::<Rel>as).map(rhs -> {
-                                if (rhs.isZero())
+                                if (Algebras.isZero(rhs))
                                     return rhs.c(cInt.ZERO());
-                                if (lhs.asRel().isOne())
+                                if (Algebras.isOne(lhs.asRel()))
                                     return rhs;
-                                else if (rhs.isOne())
+                                else if (Algebras.isOne(rhs))
                                     return lhs;
-                                return lhs.asRel().mult(rhs);
+                                // Relation composition: (a=>b) × (b=>c) = (a=>c)
+                                if (lhs.asRel().jvm().get1().test(rhs.jvm().get0())) {
+                                    return rel(lhs.asRel().jvm().get0(), rhs.jvm().get1());
+                                } else {
+                                    return rel(noobj(), noobj());
+                                }
                             }));
                         } else {
-                            if (lhs.asRel().isOne())
+                            if (Algebras.isOne(lhs.asRel()))
                                 return inst.arg(0);
-                            else if (inst.arg(0).asRel().isOne())
+                            else if (Algebras.isOne(inst.arg(0).asRel()))
                                 return lhs;
-                            return lhs.asRel().mult(inst.arg(0).asRel());
+                            // Relation composition: (a=>b) × (b=>c) = (a=>c)
+                            if (lhs.asRel().jvm().get1().test(inst.arg(0).asRel().jvm().get0())) {
+                                return rel(lhs.asRel().jvm().get0(), inst.arg(0).asRel().jvm().get1());
+                            } else {
+                                return rel(noobj(), noobj());
+                            }
                         }
                     }),
-                    instC(NEG_INST_TID.dom(REL_TID).rng(REL_TID), lst(), (lhs, inst) -> lhs.asRel().neg()),
-                    instC(ONE_INST_TID.dom(REL_TID).rng(REL_TID), lst(), (lhs, inst) -> lhs.asRel().one()),
-                    instC(ZERO_INST_TID.dom(REL_TID).rng(REL_TID), lst(), (lhs, inst) -> lhs.asRel().zero())
+                    instC(NEG_INST_TID.dom(REL_TID).rng(REL_TID), lst(), (lhs, inst) -> rel(lhs.asRel().second(), lhs.asRel().first())),
+                    instC(ONE_INST_TID.dom(REL_TID).rng(REL_TID), lst(), (lhs, inst) -> rel(instA(ID_INST_TID.dom(A).rng(A)), instA(ID_INST_TID.dom(A).rng(A)))),
+                    instC(ZERO_INST_TID.dom(REL_TID).rng(REL_TID), lst(), (lhs, inst) -> rel(noobj(), noobj()))
             ));
 
 

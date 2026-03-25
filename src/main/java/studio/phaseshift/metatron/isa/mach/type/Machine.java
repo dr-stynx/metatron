@@ -39,7 +39,7 @@ import static studio.phaseshift.metatron.isa.mach.machInstSet.MACH_MONAD_TID;
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface Machine extends Call, Ring<Call> {
+public interface Machine extends Call {
 
     Type MACH_MACHINE_TYPE = Type.Builder.build()
             .tid(REC_TID)
@@ -90,7 +90,6 @@ public interface Machine extends Call, Ring<Call> {
 
     Consumer<Obj> onHalt();
 
-    @Override
     default Machine plus(final Call other) {
         // two machines executing in parallel
         final boolean otherMachine = other instanceof Machine;
@@ -102,7 +101,6 @@ public interface Machine extends Call, Ring<Call> {
         return null;
     }
 
-    @Override
     default Machine mult(final Call other) {
        /* return this.clone(Tuple.Quartet.with(this.value().get0().mult(other.value().get0()),
                 this.value().get1().append(other.value().get1()),

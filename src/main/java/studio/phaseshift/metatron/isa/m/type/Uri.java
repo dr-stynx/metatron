@@ -25,6 +25,8 @@ import studio.phaseshift.metatron.isa.m.type.impl.MUri;
 import studio.phaseshift.metatron.util.CommonUtil;
 import studio.phaseshift.metatron.util.MTronException;
 
+import static studio.phaseshift.metatron.isa.m.type.Algebras.*;
+
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,7 +49,7 @@ import static studio.phaseshift.metatron.isa.m.type.impl.MStr.str;
 import static studio.phaseshift.metatron.isa.m.type.impl.MType.T;
 import static studio.phaseshift.metatron.isa.m.type.impl.MUri.uri;
 
-public interface Uri extends Mono, Ring.O<Uri> {
+public interface Uri extends Mono {
 
     Type URI_TYPE = Type.Builder.build().tid(URI_TID).vid(URI_TID).create();
 
@@ -91,31 +93,7 @@ public interface Uri extends Mono, Ring.O<Uri> {
         return this.clone(this.jvm(), this.tid(), vid);
     }
 
-    @Override
-    default Uri one() {
-        return this.jvm().one().toUri();
-    }
 
-    @Override
-    default Uri mult(final Uri rhs) {
-        return this.jvm(this.uriValue().mult(rhs.uriValue()));
-    }
-
-
-    @Override
-    default Uri zero() {
-        return this.jvm().zero().toUri();
-    }
-
-    @Override
-    default Uri plus(final Uri rhs) {
-        return this.jvm(this.uriValue().plus(rhs.uriValue()));
-    }
-
-    @Override
-    default Uri neg() {
-        return this.jvm(this.uriValue().neg());
-    }
 
     @Override
     default boolean test(final Obj obj) {
@@ -176,10 +154,10 @@ public interface Uri extends Mono, Ring.O<Uri> {
                                 }
                             }))),
                     //  instC(LSHIFT_INST_TID.dom(URI_TID).rng(URI_TID), lst(isa_(T(INT_TID)).else_(jnt(1))), (lhs, inst) -> lhs.jvm(lhs.uriValue().pretract(inst.arg(0).intValue().intValue()))),
-                    instC(PLUS_INST_TID.dom(URI_TID).rng(URI_TID.maybe()), lst(T(URI_TID.maybe())), (lhs, inst) -> lhs.jvm(lhs.uriValue().plus(inst.arg(0).uriValue()))),
                     instC(MULT_INST_TID.dom(URI_TID).rng(URI_TID.maybe()), lst(T(URI_TID.maybe())), (lhs, inst) -> lhs.jvm(lhs.uriValue().mult(inst.arg(0).uriValue()))),
-                    instC(SUM_INST_TID.dom(URI_TID.maybeSome()).rng(URI_TID), lst(), (lhs, inst) -> inst.seed().jvm(lhs.stream().reduce(inst.seed(), (a, b) -> ((Uri) a).plus((Uri) b)).uriValue()), uri(NOOBJ)),
-                    instC(PROD_INST_TID.dom(URI_TID.maybeSome()).rng(URI_TID), lst(), (lhs, inst) -> lhs.stream().reduce(inst.seed(), (a, b) -> uri(a.uriValue().mult(b.uriValue()))), uri(".")),
+                    instC(ZERO_INST_TID.dom(URI_TID).rng(URI_TID), lst(), (lhs, inst) -> uri(NOOBJ)),
+                    instC(ONE_INST_TID.dom(URI_TID).rng(URI_TID), lst(), (lhs, inst) -> uri(".")),
+                    instC(PROD_INST_TID.dom(URI_TID.maybeSome()).rng(URI_TID), lst(), (lhs, inst) -> lhs.stream().reduce(one(lhs), (a, b) -> a.jvm(a.uriValue().mult(b.uriValue())))),
                   /*  instC(URI_SCHEME_TID.dom(URI_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(lhs.uriValue().scheme())),
                     instC(URI_HOST_TID.dom(URI_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(lhs.uriValue().host())),*/
                     instC(PATH_TID.dom(URI_TID).rng(URI_TID), lst(T(URI_TID)), (lhs, inst) -> uri(lhs.uriValue().pathString())),

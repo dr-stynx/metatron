@@ -103,7 +103,6 @@ public interface Q extends Rec {
             return this;
         }
 
-        @Override
         default Rec plus(final Rec objs) {
             return this;
         }
@@ -148,7 +147,6 @@ public interface Q extends Rec {
             return this;
         }
 
-        @Override
         default Rec plus(final Rec objs) {
             return this;
         }

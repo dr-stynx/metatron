@@ -81,12 +81,10 @@ public class MFail extends MObj implements Fail {
         return super.jvm();
     }
 
-    @Override
     public Fail plus(final Fail rhs) {
         return fail(this.jvm().get0(), rhs);
     }
 
-    @Override
     public Fail zero() {
         return fail(FastNoSuchElementException.instance(), null);
     }

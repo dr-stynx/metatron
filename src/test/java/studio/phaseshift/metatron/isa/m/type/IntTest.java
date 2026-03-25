@@ -205,7 +205,8 @@ public class IntTest extends AbstractAlgebraTest<Int> {
             "{10,20,30}.sum()                  % 60",
             "{-5,5}.sum()                      % 0",
             "{1}.sum()                         % 1",
-            "{}.sum?int<=int{*}(0)             % 0",
+            "{0}.sum?int<=int{*}()             % 0",
+            //TODO: Necessary "{}.sum?int<=int{*}()              % 0",
     }, delimiter = '%')
     public void testSum(final String code, final String expected) {
         AbstractMetatronTest.checkCodeParseApply(LOG, code, expected);

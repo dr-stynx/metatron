@@ -18,7 +18,6 @@
 
 package studio.phaseshift.metatron.isa.m.type;
 
-import studio.phaseshift.metatron.algebra.Ring;
 import studio.phaseshift.metatron.furi.c.cInt;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.isa.m.type.impl.MCode;
@@ -33,7 +32,7 @@ import static studio.phaseshift.metatron.isa.m.parser.mFluent.StartLess.split_;
 import static studio.phaseshift.metatron.isa.m.type.impl.MLst.lst;
 import static studio.phaseshift.metatron.isa.m.type.impl.MObjs.objs;
 
-public interface Call extends Obj, Ring<Call> {
+public interface Call extends Obj {
 
     default boolean hasDomOrRng() {
         return this.hasDom() || this.hasRng();
@@ -103,57 +102,12 @@ public interface Call extends Obj, Ring<Call> {
     }
 
     @Override
-    default Call neg() {
-        return this.c(cInt::neg).as();
-    }
-
-    @Override
-    default Obj append(final Obj obj) {
-        return obj.isCall() && !obj.tid().basePath().equals(AUTO_FROM_INST_TID) ? this.plus((Call) obj) : objs(List.of(this, obj));
-    }
-
-    @Override
-    default Call one() {
-        return MInst.instB(ID_INST_TID, lst());
-    }
-
-    @Override
-    default boolean isOne() {
-        return this.tryToInst().equals(this.one());
-    }
-
-    @Override
-    default boolean isZero() {
-        return this.isNoObj();
-    }
-
-    @Override
     default Call c(final Function<cInt, cInt> func) {
         return (Call) Obj.super.c(func);
     }
 
     @Override
-    default Call plus(final Call rhs) {
-        if (rhs.isZero()) return this;
-        if (this.isZero()) return rhs;
-        if (this.clessEquals(rhs))
-            return this.c(c -> c.plus(rhs.c()));
-        return split_(objs(this.tryToInst(), rhs.tryToInst())).tryToInst();
-    }
-
-    @Override
-    default Call mult(final Call rhs) {
-        if (rhs.isZero() || this.isZero())
-            return NoObj.noobj();
-        if (rhs.isOne()) return this;
-        if (this.isOne()) return rhs;
-        final List<Inst> insts = new ArrayList<>(this.insts());
-        insts.addAll(rhs.tryToInst().insts());
-        return MCode.of(insts).tryToInst().c(c -> this.c().mult(rhs.c()));
-    }
-
-    @Override
-    default Call zero() {
-        return NoObj.noobj();
+    default Obj append(final Obj obj) {
+        return obj.isCall() && !obj.tid().basePath().equals(AUTO_FROM_INST_TID) ? objs(List.of(this, obj)) : objs(List.of(this, obj));
     }
 }

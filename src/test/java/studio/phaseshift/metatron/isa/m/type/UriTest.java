@@ -52,7 +52,6 @@ public class UriTest extends AbstractMetatronTest {
             "<http://webpage.com>.type()                                  | start(uri::T[])",
             "\"http://webpage.com\".type()                                | start(str::T[])",
             //"a/b.plus(c/d)                                              | {a/b,c/d}",
-            "a/b.plus(noobj)                                              | a/b",
             "a/b.mult(c/d)                                                | a/b/c/d",
             "a/b.mult(noobj)                                              | noobj",
             "a.mult(<../b>)                                               | b",

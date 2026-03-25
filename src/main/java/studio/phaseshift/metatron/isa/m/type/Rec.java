@@ -35,10 +35,12 @@ import static studio.phaseshift.metatron.Tokens.*;
 import static studio.phaseshift.metatron.Tokens.C;
 import static studio.phaseshift.metatron.furi.fURI.Singleton.ALL;
 import static studio.phaseshift.metatron.isa.m.mInstSet.*;
+import static studio.phaseshift.metatron.isa.m.type.Algebras.*;
 import static studio.phaseshift.metatron.isa.m.type.NoObj.noobj;
 import static studio.phaseshift.metatron.isa.m.type.Poly.Helper.selectRecRecursion;
 import static studio.phaseshift.metatron.isa.m.type.Rel.REL_TYPE;
 import static studio.phaseshift.metatron.isa.m.type.Uri.URI_TYPE;
+import static studio.phaseshift.metatron.isa.m.type.impl.MInst.instB;
 import static studio.phaseshift.metatron.isa.m.type.impl.MInst.instC;
 import static studio.phaseshift.metatron.isa.m.type.impl.MLst.lst;
 import static studio.phaseshift.metatron.isa.m.type.impl.MObjs.objs;
@@ -48,7 +50,7 @@ import static studio.phaseshift.metatron.isa.m.type.impl.MType.T;
 import static studio.phaseshift.metatron.isa.m.type.impl.MUri.uri;
 import static studio.phaseshift.metatron.util.CommonUtil.immutableMap;
 
-public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
+public interface Rec extends Poly<Rec, Map<Obj, Obj>> {
 
     Type REC_TYPE = Type.Builder.build().tid(REC_TID).vid(REC_TID).create();
     Rec EMPTY_REC = rec(immutableMap());
@@ -58,10 +60,7 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
         return this.jvm().entrySet().stream().map(kv -> rel(kv.getKey(), kv.getValue()).c(this.c()).as());
     }
 
-    @Override
-    default Rec zero() {
-        return rec();
-    }
+
 
     @Override
     Rec clone(final Object jvm, final fURI tid, final fURI vid);
@@ -169,14 +168,7 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
         }
     }
 
-    @Override
-    default Rec plus(final Rec rhs) {
-        final Map<Obj, Obj> newMap = new LinkedHashMap<>(this.recValue());
-        rhs.elements().forEach(o -> newMap.compute(o.jvm().get0(), (k, v) -> null == v ? o.jvm().get1() :
-                v.isPlusMonoid() && o.isPlusMonoid() ? (Obj) v.<PlusMonoid.O>as().plus(o.jvm().get1().<PlusMonoid.O>as()) :
-                        v.append(o.jvm().get1())));
-        return this.jvm(newMap);
-    }
+
 
    /* default Obj apply(final Obj lhs) {
         if (lhs.isRec())
@@ -232,7 +224,8 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
                         //  furi = furi.qMap(lhsRec.at(Q).asRec().elements().map(e -> Tuple.Pair.with(e.first().toCleanString(), e.second().toCleanString())).map(p -> Tuple.Pair.<String, String>with(p.get0(), p.get1())).collect(Collectors.toMap(Tuple.Pair::get0, Tuple.Pair::get1)));
                         return uri(furi);
                     }),
-                    instC(ZERO_INST_TID.dom(REC_TID).rng(REC_TID), lst(), (lhs, inst) -> lhs.asRec().zero()),
+                    instC(ZERO_INST_TID.dom(REC_TID).rng(REC_TID), lst(), (lhs, inst) -> rec()),
+                    instC(ONE_INST_TID.dom(REC_TID).rng(REC_TID), lst(), (lhs, inst) -> rec()),
                     instC(REVERSE_INST_TID.dom(REC_TID).rng(REC_TID), lst(), (lhs, inst) -> new ArrayList<Rel>(lhs.asRec().elements().toList()).reversed().stream().collect(new CommonUtil.RecCollector(lhs.tid(), lhs.vid()))),
                     instC(HAS_INST_TID.dom(REC_TID).rng(REC_TID.maybe()), lst(T(ALL), T(ALL)), (lhs, inst) -> {
                         final Obj result = inst.arg(1).apply(lhs.asRec().at(inst.arg(0)));
@@ -249,7 +242,15 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
                     instC(RNG_INST_TID.dom(REC_TID).rng(ALL_STAR), lst(), (lhs, inst) -> objs(lhs.asRec().elements().map(Rel::second))),
                     instC(RSHIFT_INST_TID.dom(REC_TID).rng(ALL_STAR), lst(T(ALL.maybeSome())), (lhs, inst) -> objs(inst.arg(0).orElse((Obj) uri("+")).stream().map(k -> lhs.asRec().at(k)))),
                     // instC(LSHIFT_INST_TID.dom(REC_TID).rng(ALL_STAR), lst(), (lhs, inst) -> lhs.parent()),
-                    instC(PLUS_INST_TID.dom(REC_TID).rng(REC_TID), lst(T(REC_TID.maybeMaybe())), (lhs, inst) -> lhs.jvm(lhs.asRec().plus(inst.arg(0).asRec()).recValue())),
+                    instC(PLUS_INST_TID.dom(REC_TID).rng(REC_TID), lst(T(REC_TID.maybeMaybe())), (lhs, inst) -> {
+                        final Map<Obj, Obj> newMap = new LinkedHashMap<>(lhs.asRec().recValue());
+                        inst.arg(0).asRec().elements().forEach(o -> newMap.compute(o.jvm().get0(), (k, v) -> {
+                            if (null == v) return o.jvm().get1();
+                            // Use Algebras.plus() which handles instruction algebra internally
+                            return Algebras.plus(v, o.jvm().get1());
+                        }));
+                        return lhs.jvm(newMap);
+                    }),
                     instC(MPLUS_INST_TID.dom(REC_TID).rng(REC_TID), lst(T(REC_TID)), (lhs, inst) -> inst.arg(0).<Rec>as().elements().map(Obj::<Obj>as).reduce(lhs.<Rec>as(), (a, b) -> a.<Rec>as().at(((Rel) b).first(), ((Rel) b).second(), MUTABLE))),
                     instC(SELECT_INST_TID.dom(REC_TID).rng(REC_TID.maybe()), lst(T(REC_TID)), (lhs, inst) -> selectRecRecursion(lhs.asRec(), inst.arg(0).asRec())),
                     instC(SELECT_INST_TID.dom(REC_TID).rng(ALL.maybe()), lst(T(URI_TID)), (lhs, inst) -> lhs.asRec().at(inst.arg(0))),
@@ -258,7 +259,7 @@ public interface Rec extends Poly<Rec, Map<Obj, Obj>>, PlusMonoid.O<Rec> {
                     instC(UPDATE_INST_TID.dom(REC_TID).rng(REC_TID.maybe()), lst(REC_TYPE), (lhs, inst) -> Poly.Helper.updateRecRecursion(lhs.asRec(), inst.arg(0).asRec(), MUTABLE)),// inst.arg(0).asRec().elements().map(r -> lhs.asRec().at(r.first(), r.second(), MUTABLE)).filter(o -> false).findFirst().orElse(lhs.as())),
                     instC(UPDATE_INST_TID.dom(REC_TID).rng(REC_TID.maybe()), lst(REL_TYPE), (lhs, inst) -> Poly.Helper.updateRecRecursion(lhs.asRec(), rec(inst.arg(0).asRel().jvm().get0(), inst.arg(1).asRel().jvm().get1()), MUTABLE)),// inst.arg(0).asRec().elements().map(r -> lhs.asRec().at(r.first(), r.second(), MUTABLE)).filter(o -> false).findFirst().orElse(lhs.as())),
                     instC(WITHIN_INST_TID.dom(REC_TID).rng(REC_TID), lst(T(ALL_STAR)), (lhs, inst) -> rec(lhs.elements().map(r -> inst.arg(0).apply(r).<Rel>as()))),
-                    instC(SUM_INST_TID.dom(REC_TID.maybeSome()).rng(REC_TID), lst(), (lhs, inst) -> lhs.stream().map(Obj::asRec).reduce(rec(), Rec::plus))
+                    instC(SUM_INST_TID.dom(REC_TID.maybeSome()).rng(REC_TID), lst(T(REC_TID.maybe())), (lhs, inst) -> lhs.stream().reduce(inst.arg(0).orElse(zero(lhs)), (a, b) -> Algebras.plus(a, b)))
             ));
 
 

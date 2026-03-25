@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static studio.phaseshift.metatron.furi.fURI.Singleton.ALL;
 import static studio.phaseshift.metatron.isa.m.mInstSet.*;
+import static studio.phaseshift.metatron.isa.m.type.Algebras.*;
 import static studio.phaseshift.metatron.isa.m.type.impl.MBool.bool;
 import static studio.phaseshift.metatron.isa.m.type.impl.MInst.instC;
 import static studio.phaseshift.metatron.isa.m.type.impl.MInt.jnt;
@@ -39,7 +40,7 @@ import static studio.phaseshift.metatron.isa.m.type.impl.MReal.real;
 import static studio.phaseshift.metatron.isa.m.type.impl.MStr.str;
 import static studio.phaseshift.metatron.isa.m.type.impl.MType.T;
 
-public interface Real extends Mono, Ring.O<Real>, MultGroup.O<Real> {
+public interface Real extends Mono {
 
     Real ZERO = real(0.0d);
     Real ONE = real(1.0d);
@@ -70,40 +71,7 @@ public interface Real extends Mono, Ring.O<Real>, MultGroup.O<Real> {
         return (Real) Mono.super.c(c);
     }
 
-    @Override
-    default Real zero() {
-        return ZERO;
-    }
 
-    @Override
-    default Real one() {
-        return ONE;
-    }
-
-    @Override
-    default Real inv() {
-        return this.jvm(1.0d / this.realValue());
-    }
-
-    @Override
-    default Real div(final Real rhs) {
-        return this.jvm(this.realValue() / rhs.realValue());
-    }
-
-    @Override
-    default Real plus(final Real rhs) {
-        return this.jvm((this.realValue() * this.c().max()) + (rhs.realValue() * rhs.c().max())).c(cInt.ONE());
-    }
-
-    @Override
-    default Real mult(final Real rhs) {
-        return this.jvm((this.realValue() * this.c().max()) * (rhs.realValue() * rhs.c().max())).c(cInt.ONE());
-    }
-
-    @Override
-    default Real neg() {
-        return this.jvm(-1.0d * this.realValue());
-    }
 
     final class TypeObj {
 
@@ -117,16 +85,16 @@ public interface Real extends Mono, Ring.O<Real>, MultGroup.O<Real> {
                     instC(GTE_INST_TID.dom(REAL_TID).rng(BOOL_TID), lst(T(REAL_TID)), (lhs, inst) -> bool(Inst.Helper.alignLHSType(lhs, inst.arg(0)).filter(l -> l.realValue() >= inst.arg(0).realValue()).isPresent())),
                     instC(LT_INST_TID.dom(REAL_TID).rng(BOOL_TID), lst(T(REAL_TID)), (lhs, inst) -> bool(Inst.Helper.alignLHSType(lhs, inst.arg(0)).filter(l -> l.realValue() < inst.arg(0).realValue()).isPresent())),
                     instC(LTE_INST_TID.dom(REAL_TID).rng(BOOL_TID), lst(T(REAL_TID)), (lhs, inst) -> bool(Inst.Helper.alignLHSType(lhs, inst.arg(0)).filter(l -> l.realValue() <= inst.arg(0).realValue()).isPresent())),
-                    instC(NEG_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(), (lhs, inst) -> lhs.asReal().neg()),
-                    instC(PLUS_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> lhs.asReal().plus(Inst.Helper.alignRHSType(lhs,inst.arg(0)).asReal())),
-                    instC(MULT_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> lhs.asReal().mult(Inst.Helper.alignRHSType(lhs,inst.arg(0)).asReal())),
-                    instC(DIV_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> lhs.asReal().div(Inst.Helper.alignRHSType(lhs,inst.arg(0)).asReal())),
-                    instC(ZERO_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(), (lhs, inst) -> lhs.asReal().zero()),
-                    instC(ONE_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(), (lhs, inst) -> lhs.asReal().one()),
-                    instC(INV_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(), (lhs, inst) -> lhs.asReal().inv()),
-                    instC(MINUS_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> lhs.asReal().minus(Inst.Helper.alignRHSType(lhs,inst.arg(0)).asReal())),
-                    instC(SUM_INST_TID.dom(REAL_TID.maybeSome()).rng(REAL_TID), lst(), (lhs, inst) -> inst.seed().jvm(lhs.stream().reduce(inst.seed(), (a, b) -> ((Real) a).plus((Real) b)).realValue()), real(0.0)),
-                    instC(PROD_INST_TID.dom(REAL_TID.maybeSome()).rng(REAL_TID), lst(), (lhs, inst) -> lhs.stream().reduce(inst.seed(), (a, b) -> real(a.realValue() * (b.realValue() * b.c().max()))), real(1.0)),
+                    instC(NEG_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(), (lhs, inst) -> lhs.jvm(-1.0d * lhs.realValue())),
+                    instC(PLUS_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> lhs.jvm((lhs.realValue() * lhs.c().max()) + (Inst.Helper.alignRHSType(lhs,inst.arg(0)).realValue() * Inst.Helper.alignRHSType(lhs,inst.arg(0)).c().max())).c(cInt.ONE())),
+                    instC(MULT_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> lhs.jvm((lhs.realValue() * lhs.c().max()) * (Inst.Helper.alignRHSType(lhs,inst.arg(0)).realValue() * Inst.Helper.alignRHSType(lhs,inst.arg(0)).c().max())).c(cInt.ONE())),
+                    instC(DIV_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> lhs.jvm(lhs.realValue() / Inst.Helper.alignRHSType(lhs,inst.arg(0)).realValue())),
+                    instC(ZERO_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(), (lhs, inst) -> ZERO),
+                    instC(ONE_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(), (lhs, inst) -> ONE),
+                    instC(INV_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(), (lhs, inst) -> lhs.jvm(1.0d / lhs.realValue())),
+                    instC(MINUS_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> Algebras.plus(lhs, Algebras.neg(Inst.Helper.alignRHSType(lhs,inst.arg(0))))),
+                    instC(SUM_INST_TID.dom(REAL_TID.maybeSome()).rng(REAL_TID), lst(), (lhs, inst) -> lhs.stream().reduce(Algebras.zero(lhs), Algebras::plus)),
+                    instC(PROD_INST_TID.dom(REAL_TID.maybeSome()).rng(REAL_TID), lst(), (lhs, inst) -> lhs.stream().reduce(Algebras.one(lhs), (a, b) -> Algebras.mult(Algebras.mult(a, b), real((double)b.c().max())))),
                     instC(POW_INST_TID.dom(REAL_TID).rng(REAL_TID), lst(T(REAL_TID)), (lhs, inst) -> real(Math.pow(lhs.realValue(), inst.arg(0).realValue()))),
                     instC(MATH_INST_TID.dom(ALL.maybe()).rng(REAL_TID), lst(T(STR_TID)), (lhs, inst) -> {
                         final String equation = inst.arg(0).strValue();

@@ -22,6 +22,7 @@ import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.isa.AbstractSpace;
 import studio.phaseshift.metatron.isa.Space;
 import studio.phaseshift.metatron.isa.m.mInstSet;
+import studio.phaseshift.metatron.isa.m.type.Algebras;
 import studio.phaseshift.metatron.isa.m.type.Obj;
 import studio.phaseshift.metatron.isa.m.type.Rec;
 import studio.phaseshift.metatron.isa.m.type.Type;
@@ -58,10 +59,12 @@ public class metaSpace extends AbstractSpace<MServer> {
     protected final List<fURI> peers = new ArrayList<>();
     protected final int selfIndex;
 
-    protected static final Rec META_SPACE_CONFIG = SPACE_CONFIG.plus(
+    protected static final Rec META_SPACE_CONFIG =  rec(uri(HOST), URI_TYPE,
+            uri(ROUTE), rec(URI_TYPE, URI_TYPE),
+            uri(PEERS), lst(URI_TYPE.<Type>maybeSome())); /*(Rec) Algebras.plus(SPACE_CONFIG,
             rec(uri(HOST), URI_TYPE,
                     uri(ROUTE), rec(URI_TYPE, URI_TYPE),
-                    uri(PEERS), lst(URI_TYPE.<Type>maybeSome())));
+                    uri(PEERS), lst(URI_TYPE.<Type>maybeSome())));*/
 
     public static final Type META_SPACE_TYPE = Type.Builder.build()
             .tid(SPACE_TID)

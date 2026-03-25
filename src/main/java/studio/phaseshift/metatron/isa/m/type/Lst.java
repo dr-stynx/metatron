@@ -18,7 +18,6 @@
 
 package studio.phaseshift.metatron.isa.m.type;
 
-import studio.phaseshift.metatron.algebra.PlusMonoid;
 import studio.phaseshift.metatron.furi.c.cInt;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.util.CommonUtil;
@@ -36,6 +35,7 @@ import java.util.stream.Stream;
 
 import static studio.phaseshift.metatron.furi.fURI.Singleton;
 import static studio.phaseshift.metatron.furi.fURI.Singleton.ALL;
+import static studio.phaseshift.metatron.isa.m.type.Algebras.*;
 import static studio.phaseshift.metatron.isa.m.mInstSet.*;
 import static studio.phaseshift.metatron.isa.m.type.Int.INT_TYPE;
 import static studio.phaseshift.metatron.isa.m.type.NoObj.noobj;
@@ -44,13 +44,14 @@ import static studio.phaseshift.metatron.isa.m.type.Uri.URI_TYPE;
 import static studio.phaseshift.metatron.isa.m.type.impl.MInst.instC;
 import static studio.phaseshift.metatron.isa.m.type.impl.MInt.jnt;
 import static studio.phaseshift.metatron.isa.m.type.impl.MLst.lst;
+import static studio.phaseshift.metatron.isa.m.type.impl.MLst.lst0;
 import static studio.phaseshift.metatron.isa.m.type.impl.MObjs.objs;
 import static studio.phaseshift.metatron.isa.m.type.impl.MRel.rel;
 import static studio.phaseshift.metatron.isa.m.type.impl.MStr.str;
 import static studio.phaseshift.metatron.isa.m.type.impl.MType.T;
 import static studio.phaseshift.metatron.isa.m.type.impl.MUri.uri;
 
-public interface Lst extends Poly<Lst, List<Obj>>, PlusMonoid.O<Lst> {
+public interface Lst extends Poly<Lst, List<Obj>> {
 
     public static final Type LST_TYPE = Type.Builder.build()
             .tid(LST_TID)
@@ -180,18 +181,7 @@ public interface Lst extends Poly<Lst, List<Obj>>, PlusMonoid.O<Lst> {
         return (Lst) Poly.super.c(f);
     }
 
-    @Override
-    default Lst plus(final Lst rhs) {
-        final List<Obj> list = new ArrayList<>();
-        this.elements().map(e -> e.c(c -> c.mult(this.c()))).forEach(list::add);
-        rhs.elements().map(e -> e.c(c -> c.mult(rhs.c()))).forEach(list::add);
-        return this.<Lst>jvm(list).c(cInt::one);
-    }
 
-    @Override
-    default Lst zero() {
-        return lst(List.of());
-    }
 
     @Override
     default boolean test(final Obj rhs) {
@@ -226,14 +216,15 @@ public interface Lst extends Poly<Lst, List<Obj>>, PlusMonoid.O<Lst> {
                     instC(MULT_INST_TID.dom(LST_TID).rng(LST_TID), lst(T(LST_TID)), (lhs, inst) -> lhs.jvm(lhs.elements().flatMap(a -> inst.arg(0).elements().map(b -> rel(a, b))).toList())),
                     instC(RSHIFT_INST_TID.dom(LST_TID).rng(ALL_STAR), lst(T(ALL.maybeSome())), (lhs, inst) -> objs(inst.arg(0).orElse((Obj) uri(Singleton.WILD_ONE.toString())).stream().map(k -> lhs.asLst().at(k)))),
                     // instC(LSHIFT_INST_TID.dom(LST_TID).rng(ALL_STAR), lst(isa_(INT_TYPE).else_(jnt(1))), (lhs, inst) -> lhs.parent()),
-                    instC(ZERO_INST_TID.dom(LST_TID).rng(LST_TID), lst(), (lhs, inst) -> lhs.asLst().zero()),
+                    instC(ZERO_INST_TID.dom(LST_TID).rng(LST_TID), lst(), (lhs, inst) -> lst0()),
+                    instC(ONE_INST_TID.dom(LST_TID).rng(LST_TID), lst(), (lhs, inst) -> lst0()),
                     instC(SPLIT_INST_TID.dom(ALL).rng(LST_TID), lst(T(LST_TID)), (lhs, inst) -> lst(inst.arg(0).elements().map(e -> e.apply(lhs)).toList())),
                     instC(MERGE_INST_TID.dom(LST_TID).rng(ALL_STAR), lst(), (lhs, inst) -> objs(lhs.elements())),
                     instC(MERGE_INST_TID.dom(LST_TID).rng(ALL_STAR), lst(URI_TYPE), (lhs, inst) -> uri(lhs.elements().map(e -> e.uriValue().toString()).reduce("", (a, b) -> a + inst.arg(0).uriValue().toString() + b).substring(1))),
                     instC(MERGE_INST_TID.dom(LST_TID).rng(ALL_STAR), lst(STR_TYPE), (lhs, inst) -> str(lhs.elements().map(Obj::strValue).reduce("", (a, b) -> a + inst.arg(0).strValue() + b).substring(1))),
                     instC(HAS_INST_TID.dom(LST_TID).rng(LST_TID.maybe()), lst(T(ALL)), (lhs, inst) -> lhs.<Lst>as().elements().anyMatch(r -> r.test(inst.arg(0))) ? lhs : noobj()),
                     instC(WITHIN_INST_TID.dom(LST_TID).rng(LST_TID), lst(T(ALL_STAR)), (lhs, inst) -> lst(inst.arg(0).apply(objs(lhs.stream().flatMap(Obj::elements))).stream().toList())),
-                    instC(SUM_INST_TID.dom(LST_TID.maybeSome()).rng(LST_TID), lst(), (lhs, inst) -> inst.seed().jvm(lhs.stream().reduce(inst.seed(), (a, b) -> ((Lst) a).plus((Lst) b)).lstValue()), lst()),
+                    instC(SUM_INST_TID.dom(LST_TID.maybeSome()).rng(LST_TID), lst(), (lhs, inst) -> lhs.stream().reduce(zero(lhs), Algebras::plus)),
                     instC(SELECT_INST_TID.dom(LST_TID).rng(LST_TID.maybe()), lst(T(LST_TID)), (lhs, inst) -> Poly.Helper.selectLstRecursion(lhs.asLst(), inst.arg(0).asLst())),
                     instC(UPDATE_INST_TID.dom(LST_TID).rng(LST_TID), lst(LST_TYPE), (lhs, inst) -> inst.arg(0).elements().reduce(lhs, (a, b) -> a.asLst().add(b, MUTABLE))),
                     instC(POW_INST_TID.dom(LST_TID).rng(LST_TID), lst(INT_TYPE), (lhs, inst) -> {

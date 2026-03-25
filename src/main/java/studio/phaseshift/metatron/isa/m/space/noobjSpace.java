@@ -148,7 +148,6 @@ public final class noobjSpace implements Space, InstSet {
         return this;
     }
 
-    @Override
     public Rec plus(final Rec objs) {
         return this;
     }

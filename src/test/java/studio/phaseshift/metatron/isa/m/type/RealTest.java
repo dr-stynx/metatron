@@ -58,6 +58,10 @@ public class RealTest extends AbstractAlgebraTest<Real> {
             "10.5.plus(5.5)                            % 16.0",
             "10.0.mult(2.5)                            % 25.0",
             "10.0.minus(3.5)                           % 6.5",
+            "10.0.plus(-3.5)                           % 6.5",
+            "10.0.plus(3.5.mult(-1.0))                 % 6.5",
+            "10.0.plus(3.5.mult(one().neg()))          % 6.5",
+            "10.0.plus(3.5.neg())                      % 6.5",
             "0.0.plus(0.0)                             % 0.0",
             "1.0.mult(0.0)                             % 0.0",
             "-5.5.plus(10.5)                           % 5.0",
@@ -107,7 +111,7 @@ public class RealTest extends AbstractAlgebraTest<Real> {
 
     @ParameterizedTest
     @CsvSource(value = {
-            "{1.1,2.2,3.3}.sum()                 % 6.6",
+            "{1.1,2.2,3.3}>-.sum?real{*}<=real{*}()                 % 6.6",
             "{10.5,20.5,30.0}.sum()              % 61.0",
             "{-5.5,5.5}.sum()                    % 0.0",
             "{1.5}.sum()                         % 1.5",

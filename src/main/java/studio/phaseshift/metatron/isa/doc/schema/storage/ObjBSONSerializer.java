@@ -29,6 +29,8 @@ import studio.phaseshift.metatron.isa.mach.io.type.AbstractObjSerializer;
 import studio.phaseshift.metatron.util.CommonUtil;
 import studio.phaseshift.metatron.util.MTronException;
 
+import static studio.phaseshift.metatron.isa.m.type.Algebras.*;
+
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.Function;
@@ -246,7 +248,7 @@ public class ObjBSONSerializer extends AbstractObjSerializer<BsonValue> {
 
     @Override
     public BsonBinary writeBytes(final Bytes bytes) {
-        return new BsonBinary(bytes(new byte[]{BYTES_MAGIC_NUMBER}).plus(bytes).jvm().array());
+        return new BsonBinary(((Bytes) plus(bytes(new byte[]{BYTES_MAGIC_NUMBER}), bytes)).jvm().array());
     }
 
     @Override
@@ -261,7 +263,7 @@ public class ObjBSONSerializer extends AbstractObjSerializer<BsonValue> {
 
     @Override
     public BsonBinary writeFail(final Fail fail) {
-        return new BsonBinary(bytes(new byte[]{FAIL_MAGIC_NUMBER}).plus(bytes(fail.toString().getBytes())).jvm().array());
+        return new BsonBinary(((Bytes) plus(bytes(new byte[]{FAIL_MAGIC_NUMBER}), bytes(fail.toString().getBytes()))).jvm().array());
     }
 
     @Override
@@ -281,7 +283,7 @@ public class ObjBSONSerializer extends AbstractObjSerializer<BsonValue> {
 
     @Override
     public BsonBinary writeUri(final Uri uri) {
-        return new BsonBinary(bytes(new byte[]{URI_MAGIC_NUMBER}).plus(bytes(uri.uriValue().toString().getBytes())).jvm().array());
+        return new BsonBinary(((Bytes) plus(bytes(new byte[]{URI_MAGIC_NUMBER}), bytes(uri.uriValue().toString().getBytes()))).jvm().array());
     }
 
     @Override

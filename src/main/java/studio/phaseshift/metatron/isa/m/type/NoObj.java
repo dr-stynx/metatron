@@ -159,12 +159,10 @@ public final class NoObj implements Obj, Inst {
         return f.of(o -> NoObj.noobj());
     }
 
-    @Override
     public Call plus(final Call rhs) { // a no-op branch
         return rhs;
     }
 
-    @Override
     public Call mult(final Call rhs) { // a no-op sink
         return this;
     }

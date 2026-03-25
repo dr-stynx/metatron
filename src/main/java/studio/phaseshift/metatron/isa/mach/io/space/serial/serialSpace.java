@@ -25,6 +25,7 @@ import org.jline.utils.AttributedString;
 import studio.phaseshift.metatron.Tokens;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.isa.AbstractSpace;
+import studio.phaseshift.metatron.isa.m.type.Algebras;
 import studio.phaseshift.metatron.isa.m.type.Obj;
 import studio.phaseshift.metatron.isa.m.type.Rec;
 import studio.phaseshift.metatron.isa.m.type.Str;
@@ -70,7 +71,7 @@ public class serialSpace extends AbstractSpace<SerialPort[]> {
             .vid(SERIAL_SPACE_TID)
             .constructor(
                     instC(INST_TID.dom(ALL.maybe()).rng(SERIAL_SPACE_TID),
-                            lst(isa_(SPACE_CONFIG.plus(rec(uri(Tokens.ROUTE), REC_TYPE))).tryToInst()),
+                            lst(isa_(Algebras.plus(SPACE_CONFIG, rec(uri(Tokens.ROUTE), REC_TYPE))).tryToInst()),
                             (lhs, inst) -> serialSpace.of(inst.arg(0).asRec(), inst.arg(0).vid()))).create();
 
     private final Map<String, Tuple.Pair<SerialPort, ByteArrayOutputStream>> buffers = new HashMap<>();

@@ -28,7 +28,9 @@ import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
 import org.apache.tinkerpop.gremlin.structure.util.wrapped.WrappedGraph;
 import studio.phaseshift.metatron.furi.fURI;
 import studio.phaseshift.metatron.isa.grph.tp3.space.tp3Space;
+import studio.phaseshift.metatron.isa.m.type.Algebras;
 import studio.phaseshift.metatron.isa.m.type.Obj;
+import studio.phaseshift.metatron.isa.m.type.Rec;
 import studio.phaseshift.metatron.isa.m.type.Uri;
 import studio.phaseshift.metatron.isa.m.type.impl.MObjFactory;
 import studio.phaseshift.metatron.isa.mach.type.Router;
@@ -95,7 +97,7 @@ public class mGraph implements Graph, WrappedGraph<tp3Space> {
         final fURI pattern = f(configuration.getProperty(PATTERN).toString());
         final Obj s = Router.global().read(spacevid);
         if (s.isNoObj()) {
-            this.space = tp3Space.of(rec(configurationToMap(configuration)).plus(rec(uri(PATTERN), uri(pattern))), spacevid);
+            this.space = tp3Space.of((Rec) Algebras.plus(rec(configurationToMap(configuration)), rec(uri(PATTERN), uri(pattern))), spacevid);
         } else if (s instanceof tp3Space) {
             this.space = (tp3Space) s;
         } else {
