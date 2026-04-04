@@ -19,7 +19,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>metatron instruction sets</title>
+    <title>instsets - metatron Instruction Set</title>
     <!-- METADATA -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -224,135 +224,84 @@ bin/metatron</code></pre>
     </div>
 </nav>
 <main class="container my-4 flex-grow-1">
+        <div class="instset-doc">
+            
         <div class="container-xxl py-4">
-            <div class="text-center mb-5">
-                <h1 class="text-primary glow-text">metatron</h1>
-                <p class="subtitle text-light">instruction set documentation</p>
-            </div>
-
-            <div class="row g-3">
+            <div class="text-center mb-4">
+                <h1 class="text-primary glow-text">
+                    <span class="text-light">/</span>instsets
+                </h1>
+                <p style="line-height:0.1rem;" class="subtitle text-light">instruction set reference</p>
                 
-                <div class="col-md-6 col-lg-4">
-                    <a href="m.html" class="text-decoration-none">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title code text-primary">/m</h5>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <span class="badge bg-primary">25 types</span>
-                                    <span class="badge bg-success">228 instructions</span>
-                                    <span class="badge bg-info text-dark">4 spaces</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
+            </div>
+        </div>
+            
+        <div class="container-xxl mb-4">
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <button class="btn btn-outline-secondary" disabled>Types <span class="badge bg-dark">0</span></button>
+                <button class="btn btn-outline-secondary" disabled>Insts <span class="badge bg-dark">0</span></button>
+                <button class="btn btn-outline-secondary" disabled>Rewrites <span class="badge bg-dark">0</span></button>
+                <a href="#spaces" class="btn btn-outline-primary">Spaces <span class="badge bg-secondary">1</span></a>
+                <button class="btn btn-outline-secondary" disabled>Consts <span class="badge bg-dark">0</span></button>
+            </div>
+        </div>
+            
+            
+        <div class="container-xxl mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-primary">Index</h5>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <a href="m_doc.html" class="text-decoration-none">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title code text-primary">/m/doc</h5>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <span class="badge bg-primary">3 types</span>
-                                    <span class="badge bg-success">0 instructions</span>
-                                    <span class="badge bg-info text-dark">1 spaces</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <a href="m_grph.html" class="text-decoration-none">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title code text-primary">/m/grph</h5>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <span class="badge bg-primary">3 types</span>
-                                    <span class="badge bg-success">14 instructions</span>
-                                    <span class="badge bg-info text-dark">1 spaces</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <a href="m_llm.html" class="text-decoration-none">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title code text-primary">/m/llm</h5>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <span class="badge bg-primary">1 types</span>
-                                    <span class="badge bg-success">1 instructions</span>
-                                    <span class="badge bg-info text-dark">1 spaces</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <a href="m_mach.html" class="text-decoration-none">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title code text-primary">/m/mach</h5>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <span class="badge bg-primary">10 types</span>
-                                    <span class="badge bg-success">9 instructions</span>
-                                    <span class="badge bg-info text-dark">2 spaces</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <a href="m_math.html" class="text-decoration-none">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title code text-primary">/m/math</h5>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <span class="badge bg-primary">9 types</span>
-                                    <span class="badge bg-success">14 instructions</span>
-                                    <span class="badge bg-info text-dark">1 spaces</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <a href="m_tble.html" class="text-decoration-none">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title code text-primary">/m/tble</h5>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <span class="badge bg-primary">3 types</span>
-                                    <span class="badge bg-success">1 instructions</span>
-                                    <span class="badge bg-info text-dark">1 spaces</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <a href="m_web.html" class="text-decoration-none">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title code text-primary">/m/web</h5>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <span class="badge bg-primary">4 types</span>
-                                    <span class="badge bg-success">2 instructions</span>
-                                    <span class="badge bg-info text-dark">1 spaces</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
+                <div class="card-body">
+                    
+                    
+                    
+                    
+            <div class="mb-3">
+                <h6 class="text-primary mb-2">Spaces</h6>
+                <div class="index-columns">
+                    
+                <a href="#space-noobj" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-dark text-light border-secondary py-1 px-2 small">
+                    <span class="code">noobj</span>
+                    <span class="badge bg-info">S</span>
+                </a>
                 </div>
             </div>
-
-            <div class="py-3 text-center mt-5">
-                <hr class="border-secondary">
-                <small class="text-muted">
-                    metatron instset doc generator on build 0-2026-04-04 12:51:31<br>
-                    © PhaseShift Studio, LLC
-                </small>
+                    
+                </div>
             </div>
+        </div>
+            
+            
+            
+            
+        <div class="container-xxl mb-4" id="spaces">
+            <h3 class="text-primary mb-3">
+                Spaces <span class="badge bg-info">1</span>
+            </h3>
+            
+                <div class="card mb-3" id="space-noobj">
+                    <div class="card-header d-flex justify-content-between align-items-center py-2">
+                        <a href="noobj.html" class="code text-primary fw-bold text-decoration-none">noobj</a>
+                        <small class="text-muted code">noobj</small>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <pre class="mb-0"><code class="language-mtron">noobj</code></pre>
+                    </div>
+                    
+                    
+                </div>
+        </div>
+            
+            
+        <div class="container-xxl py-3 text-center">
+            <hr class="border-secondary">
+            <small class="text-muted">
+                generated by metatron instset doc generator on build 1-2026-04-04 11:04:59<br>
+                © PhaseShift Studio, LLC
+            </small>
+        </div>
         </div></main>
 <footer class="container-fluid bg-secondary fixed-bottom text-light footer wow fadeIn" data-wow-delay="0.1s">
     <div class="d-flex pt-1 mb-0">
