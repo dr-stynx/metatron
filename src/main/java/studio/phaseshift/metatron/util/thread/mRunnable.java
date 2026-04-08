@@ -16,17 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.isa.mach.type;
+package studio.phaseshift.metatron.util.thread;
 
-import studio.phaseshift.metatron.isa.m.type.Obj;
+import java.util.function.Supplier;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface Monad<OBJ extends Obj> extends Obj {
+public interface mRunnable<T> extends Runnable, Supplier<T> {
 
-    @Override
-    OBJ jvm();
+    default void run() {
+            
+    }
     
-    
+    interface mCoreRunnable<T> extends mRunnable<T> {
+
+    }
+
+    interface mVirtualRunnable<T> extends mRunnable<T> {
+
+    }
 }

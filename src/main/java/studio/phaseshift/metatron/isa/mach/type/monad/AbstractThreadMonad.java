@@ -16,17 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package studio.phaseshift.metatron.isa.mach.type;
-
-import studio.phaseshift.metatron.isa.m.type.Obj;
+package studio.phaseshift.metatron.isa.mach.type.monad;
 
 /*
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface Monad<OBJ extends Obj> extends Obj {
-
-    @Override
-    OBJ jvm();
-    
-    
+public class AbstractThreadMonad {
 }
