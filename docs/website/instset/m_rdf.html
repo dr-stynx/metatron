@@ -19,7 +19,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>llm - metatron Instruction Set</title>
+    <title>rdf - metatron Instruction Set</title>
     <!-- METADATA -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -227,7 +227,7 @@ bin/metatron</code></pre>
 <div class="container-xxl py-4">
     <div class="text-center mb-4">
         <h1 class="text-primary glow-text">
-            <span class="text-light">/m/</span>llm
+            <span class="text-light">/m/</span>rdf
         </h1>
         <p style="line-height:5rem;" class="subtitle text-light">instruction set reference</p>
     </div>
@@ -245,7 +245,7 @@ bin/metatron</code></pre>
                 aria-labelledby="flush-headingOne" data-bs-parent="#accordianInstSet">
                 <div class="accordion-body">
                     <pre><code>instset::[
- pattern=&gt; /m/llm/#,
+ pattern=&gt; /m/rdf/#,
  q      =&gt;[docq::[
        pre_read =&gt;    inst?#{*}&lt;=#{?}(uri::T),
        pre_write=&gt;    inst?#{*}&lt;=#{?}(uri::T,#::T),
@@ -253,21 +253,12 @@ bin/metatron</code></pre>
        obj      =&gt;memspace::[pattern=&gt;&lt;#&gt;],
        inst     =&gt;instset::[pattern=&gt;&lt;#&gt;]]],
  space  =&gt;[super=&gt;!*/m],
+ const  =&gt;[!*/m/mach/io/serializer/rdf],
  type   =&gt;[
-      catalog::T,
-      mcp::T,
-      tool::T,
-      memory::T,
-      user::T,
-      AI::T,
-      skill::T,
-      model::T],
- inst   =&gt;[
-      as?tool&lt;=/m/space/qproc/docq/docs(tool::T),
-      as?tool&lt;=inst(tool::T),
-      as?skill&lt;=dir(skill::T),
-      chat?A{?}&lt;=model(str::T),
-      chat?rec&lt;=model(str::T,rec::T)]]@/m/llm</code></pre>
+      triple::T,
+      quad::T,
+      rdfspace::T],
+ inst   =&gt;[sparql?rec{*}&lt;=rdfspace(str::T)]]@/m/rdf</code></pre>
                 </div>
             </div>
         </div>
@@ -276,7 +267,7 @@ bin/metatron</code></pre>
 
 <div class="container-xxl mb-4">
     <div class="d-flex justify-content-center gap-2 flex-wrap">
-        <button class="btn btn-outline-secondary" disabled>Consts <span class="badge bg-dark">0</span></button><a href="#types" class="btn btn-outline-primary">Types <span class="badge bg-secondary">7</span></a><a href="#instructions" class="btn btn-outline-primary">Insts <span class="badge bg-secondary">2</span></a><a href="#spaces" class="btn btn-outline-primary">Spaces <span class="badge bg-secondary">1</span></a><button class="btn btn-outline-secondary" disabled>Rewrites <span class="badge bg-dark">0</span></button>
+        <button class="btn btn-outline-secondary" disabled>Consts <span class="badge bg-dark">0</span></button><a href="#types" class="btn btn-outline-primary">Types <span class="badge bg-secondary">2</span></a><button class="btn btn-outline-secondary" disabled>Insts <span class="badge bg-dark">0</span></button><a href="#spaces" class="btn btn-outline-primary">Spaces <span class="badge bg-secondary">3</span></a><button class="btn btn-outline-secondary" disabled>Rewrites <span class="badge bg-dark">0</span></button>
     </div>
 </div>
 
@@ -286,232 +277,98 @@ bin/metatron</code></pre>
         <div class="card-body">
         <div class="mb-3">
             <h6 class="text-primary mb-2">Types</h6>
-            <div class="d-flex flex-wrap"><a href="#type-AI" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">AI</span><span class="badge bg-primary ms-2">T</span></a><a href="#type-mcp" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">mcp</span><span class="badge bg-primary ms-2">T</span></a><a href="#type-memory" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">memory</span><span class="badge bg-primary ms-2">T</span></a><a href="#type-model" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">model</span><span class="badge bg-primary ms-2">T</span></a><a href="#type-skill" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">skill</span><span class="badge bg-primary ms-2">T</span></a><a href="#type-tool" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">tool</span><span class="badge bg-primary ms-2">T</span></a><a href="#type-user" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">user</span><span class="badge bg-primary ms-2">T</span></a></div>
-        </div>
-        <div class="mb-3">
-            <h6 class="text-primary mb-2">Instructions</h6>
-            <div class="d-flex flex-wrap"><a href="#inst-chat" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">chat</span><span class="badge bg-success ms-2">I</span></a></div>
+            <div class="d-flex align-items-start mb-1"><div style="min-width:6rem;max-width:6rem;text-align:right;padding-right:0.6rem;flex-shrink:0;"><small class="fw-bold text-secondary" style="font-family:monospace;">space</small></div><div class="d-flex flex-wrap"><a href="#type-quad" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">quad</span><span class="badge bg-primary ms-2">T</span></a><a href="#type-triple" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">triple</span><span class="badge bg-primary ms-2">T</span></a></div></div>
         </div>
         <div class="mb-3">
             <h6 class="text-primary mb-2">Spaces</h6>
-            <div class="d-flex flex-wrap"><a href="#space-catalog" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">catalog</span><span class="badge bg-info text-dark ms-2">S</span></a></div>
+            <div class="d-flex flex-wrap"><a href="#space-quad" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">quad</span><span class="badge bg-info text-dark ms-2">S</span></a><a href="#space-rdfspace" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">rdfspace</span><span class="badge bg-info text-dark ms-2">S</span></a><a href="#space-triple" class="d-inline-flex justify-content-between align-items-center bg-dark text-light border border-secondary text-decoration-none px-2 py-1 me-1 mb-1" style="min-width:180px;font-size:0.8rem;"><span class="code">triple</span><span class="badge bg-info text-dark ms-2">S</span></a></div>
         </div></div>
     </div>
 </div>
 
 <div class="container-xxl mb-4" id="types">
-    <h3 class="text-primary mb-3">Types <span class="badge bg-primary">7</span></h3>
+    <h3 class="text-primary mb-3">Types <span class="badge bg-primary">2</span></h3>
     
-<div class="card mb-3" id="type-AI">
+<div class="card mb-3" id="type-quad">
     <div class="card-header d-flex justify-content-between align-items-center py-2">
         <span>
-            <span class="code text-primary fw-bold">AI::T</span>
-            <span class="ms-2 text-muted instset-doc-small-code">refines <span class="code instset-doc-small-code text-info">rec::T</span></span>
+            <span class="code text-primary fw-bold">quad::T</span>
+            <span class="ms-2 text-muted instset-doc-small-code">refines <a href="m_rdf_space.html#type-triple" class="instset-doc-small-code text-info code">triple::T</a></span>
         </span>
-        <small class="text-muted code">/m/llm/AI</small>
+        <small class="text-muted code">/m/rdf/space/quad</small>
     </div>
-    <div class="card-body p-2"><pre class="mb-0"><code class="language-mtron">rec::T[?[
-     {?}text      =&gt;   str::T,
-     {?}thinking  =&gt;   int::T,
-     {?}attributes=&gt;   rec::T,
-     type         =&gt;   AI]]</code></pre></div>
-    
+    <div class="card-body p-2"><pre class="mb-0"><code class="language-mtron">triple::T[?[
+        uri::T,
+        uri::T,
+        uri::T,
+        uri::T]]</code></pre></div>
+    <div class="card-body border-top py-2"><p class="mb-0 text-light">an rdf quad as a subject, predicate, object, graph</p></div>
 </div>
-<div class="card mb-3" id="type-mcp">
+<div class="card mb-3" id="type-triple">
     <div class="card-header d-flex justify-content-between align-items-center py-2">
         <span>
-            <span class="code text-primary fw-bold">mcp::T</span>
-            <span class="ms-2 text-muted instset-doc-small-code">refines <span class="code instset-doc-small-code text-info">rec::T</span></span>
+            <span class="code text-primary fw-bold">triple::T</span>
+            <span class="ms-2 text-muted instset-doc-small-code">refines <span class="code instset-doc-small-code text-info">lst::T</span></span>
         </span>
-        <small class="text-muted code">/m/llm/mcp</small>
+        <small class="text-muted code">/m/rdf/space/triple</small>
     </div>
-    <div class="card-body p-2"><pre class="mb-0"><code class="language-mtron">rec::T[?[
-     host     =&gt;   uri::T,
-     {?}tool  =&gt;{?}[uri::T=&gt;tool::T],
-     {?}status=&gt;   isa(bool::T).else(false)]][
-   inst?mcp&lt;=#{?}(rec::T)]</code></pre></div>
-    <div class="card-body border-top py-2"><p class="mb-0 text-light">a server implementing the model content protocol used by llms for the acquisition of tools and access to extenal software systems</p></div><div class="card-body py-2">
-    <small class="text-muted fw-bold">sig:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">"a mcp server specification" <span class="text-light">=&gt;</span> "creates a connection to an existing mcp server"</pre>
-    <small class="text-muted fw-bold mt-2 d-block">args:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">  {?}tool <span class="text-light">=&gt;</span> <span class="text-info">"the tools/functions available for use on the mcp server"</span>
-  host <span class="text-light">=&gt;</span> <span class="text-info">"the mcp server endpoint"</span>
-  {?}status <span class="text-light">=&gt;</span> <span class="text-info">"the current status of the mcp server"</span></pre>
-</div>
-<div class="card-body border-top py-2">
-    <small class="text-muted fw-bold">examples:</small>
-    <pre><code class="language-mtron" style="padding:0 0.75rem 0 !important">mcp::[host =&gt; &lt;http://127.0.0.1:29170/index-mcp/streamable-http&gt;]@/usr/ai/mcp/intellij [-- connection populates tool and status      --]
-mcp::[host =&gt; &lt;ws://localhost:8999&gt;]@/usr/ai/mcp/mtron                                 [-- mtron router server exposes an mcp server --]</code></pre>
-</div>
-</div>
-<div class="card mb-3" id="type-memory">
-    <div class="card-header d-flex justify-content-between align-items-center py-2">
-        <span>
-            <span class="code text-primary fw-bold">memory::T</span>
-            <span class="ms-2 text-muted instset-doc-small-code">refines <span class="code instset-doc-small-code text-info">rec::T</span></span>
-        </span>
-        <small class="text-muted code">/m/llm/memory</small>
-    </div>
-    <div class="card-body p-2"><pre class="mb-0"><code class="language-mtron">rec::T[?[
-     mem   =&gt;   lst::T,
-     {?}max=&gt;   isa(int::T).else(15)]]</code></pre></div>
-    <div class="card-body border-top py-2"><p class="mb-0 text-light">llm memory structure as a lst of past interactions</p></div>
-</div>
-<div class="card mb-3" id="type-model">
-    <div class="card-header d-flex justify-content-between align-items-center py-2">
-        <span>
-            <span class="code text-primary fw-bold">model::T</span>
-            <span class="ms-2 text-muted instset-doc-small-code">refines <span class="code instset-doc-small-code text-info">rec::T</span></span>
-        </span>
-        <small class="text-muted code">/m/llm/model</small>
-    </div>
-    <div class="card-body p-2"><pre class="mb-0"><code class="language-mtron">rec::T[?[
-     provider   =&gt;   catalog::T,
-     name       =&gt;   uri::T,
-     {?}think   =&gt;   #::T,
-     {?}note    =&gt;   lst{?}::T,
-     {?}response=&gt;{?}[
-       {?}to    =&gt;    inst::T,
-       {?}format=&gt;    #::T],
-     {?}size    =&gt;   bB::T,
-     {?}memory  =&gt;   memory::T,
-     {?}desc    =&gt;   str::T,
-     {?}skill   =&gt;   lst{?}::T,
-     {?}tool    =&gt;[split([
-    ?tool::T,
-    ?mcp::T])]]]</code></pre></div>
-    <div class="card-body border-top py-2"><p class="mb-0 text-light">an mtron interface to a large language model</p></div><div class="card-body py-2">
-    <small class="text-muted fw-bold">sig:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">"a large language model" <span class="text-light">=&gt;</span> "the model construction"</pre>
-    <small class="text-muted fw-bold mt-2 d-block">args:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">  {?}think <span class="text-light">=&gt;</span> <span class="text-info">"whether the llm should think before responding"</span>
-  {?}size <span class="text-light">=&gt;</span> <span class="text-info">"the size of the model in bytes"</span>
-  name <span class="text-light">=&gt;</span> <span class="text-info">"the model name from the host catalog"</span>
-  {?}tool <span class="text-light">=&gt;</span> <span class="text-info">"tool functions the llm can use to solve problems"</span>
-  {?}host <span class="text-light">=&gt;</span> <span class="text-info">"the llm inferencing provider endpoint"</span>
-  {?}skill <span class="text-light">=&gt;</span> <span class="text-info">"skill to extend the llm&#x27;s abilities"</span>
-  {?}memory <span class="text-light">=&gt;</span> <span class="text-info">"llm&#x27;s memory of previous interactions"</span>
-  {?}note <span class="text-light">=&gt;</span> <span class="text-info">"a lst of notes that llm will read and react to between chat submissions"</span></pre>
-</div>
-</div>
-<div class="card mb-3" id="type-skill">
-    <div class="card-header d-flex justify-content-between align-items-center py-2">
-        <span>
-            <span class="code text-primary fw-bold">skill::T</span>
-            <span class="ms-2 text-muted instset-doc-small-code">refines <span class="code instset-doc-small-code text-info">rec::T</span></span>
-        </span>
-        <small class="text-muted code">/m/llm/skill</small>
-    </div>
-    <div class="card-body p-2"><pre class="mb-0"><code class="language-mtron">rec::T[?[
-     name      =&gt;   uri::T,
-     desc      =&gt;   str::T,
-     {?}content=&gt;   str::T,
-     {?}entry  =&gt;[[
-           dir    =&gt;      uri::T,
-           content=&gt;      str::T]]]]</code></pre></div>
-    <div class="card-body border-top py-2"><p class="mb-0 text-light">a skill.md specification to augment llm with specialized abilities</p></div><div class="card-body py-2">
-    <small class="text-muted fw-bold">sig:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">"a skill.md specification" <span class="text-light">=&gt;</span> "?"</pre>
-    <small class="text-muted fw-bold mt-2 d-block">args:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">  desc <span class="text-light">=&gt;</span> <span class="text-info">"skill description"</span>
-  {?}entry <span class="text-light">=&gt;</span> <span class="text-info">"skill assets, references, and scripts"</span>
-  name <span class="text-light">=&gt;</span> <span class="text-info">"skill name"</span>
-  {?}content <span class="text-light">=&gt;</span> <span class="text-info">"skill.md document content"</span></pre>
-</div>
-<div class="card-body border-top py-2">
-    <small class="text-muted fw-bold">examples:</small>
-    <pre><code class="language-mtron" style="padding:0 0.75rem 0 !important">*&lt;local:.agent/skills&gt;.as(skill::T)   [-- see as?skill&lt;=dir() --]</code></pre>
-</div>
-</div>
-<div class="card mb-3" id="type-tool">
-    <div class="card-header d-flex justify-content-between align-items-center py-2">
-        <span>
-            <span class="code text-primary fw-bold">tool::T</span>
-            <span class="ms-2 text-muted instset-doc-small-code">refines <span class="code instset-doc-small-code text-info">rec::T</span></span>
-        </span>
-        <small class="text-muted code">/m/llm/tool</small>
-    </div>
-    <div class="card-body p-2"><pre class="mb-0"><code class="language-mtron">rec::T[?[
-     inst  =&gt;   #::T,
-     name  =&gt;   uri::T,
-     desc  =&gt;   str::T,
-     {?}arg=&gt;   #::T]]</code></pre></div>
-    <div class="card-body border-top py-2"><p class="mb-0 text-light">a tool function for the llm to use</p></div><div class="card-body py-2">
-    <small class="text-muted fw-bold">sig:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">"a tool specification" <span class="text-light">=&gt;</span> "?"</pre>
-    <small class="text-muted fw-bold mt-2 d-block">args:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">  name <span class="text-light">=&gt;</span> <span class="text-info">"tool name"</span>
-  desc <span class="text-light">=&gt;</span> <span class="text-info">"tool description"</span>
-  {?}arg <span class="text-light">=&gt;</span> <span class="text-info">"tool arguments"</span></pre>
-</div>
-<div class="card-body border-top py-2">
-    <small class="text-muted fw-bold">examples:</small>
-    <pre><code class="language-mtron" style="padding:0 0.75rem 0 !important">*eval.as(tool::T)   [-- see as?tool&lt;=inst() --]</code></pre>
-</div>
-</div>
-<div class="card mb-3" id="type-user">
-    <div class="card-header d-flex justify-content-between align-items-center py-2">
-        <span>
-            <span class="code text-primary fw-bold">user::T</span>
-            <span class="ms-2 text-muted instset-doc-small-code">refines <span class="code instset-doc-small-code text-info">rec::T</span></span>
-        </span>
-        <small class="text-muted code">/m/llm/user</small>
-    </div>
-    <div class="card-body p-2"><pre class="mb-0"><code class="language-mtron">rec::T[?[
-     contents=&gt;[text=&gt;str::T],
-     type    =&gt;   user]]</code></pre></div>
-    
-</div>
-</div>
-
-<div class="container-xxl mb-4" id="instructions">
-    <h3 class="text-primary mb-3">Instructions <span class="badge bg-success">2</span></h3>
-    
-<div class="card mb-3" id="inst-chat">
-    <div class="card-header d-flex justify-content-between align-items-center py-2
-                text-light border-bottom border-secondary">
-        <span>
-            <span class="code text-primary fw-bold">chat</span>
-            <span class="ms-1"><span class="instset-doc-small-code"><a href="#type-model" data-bs-toggle="tooltip" title="domain" class="code text-info">/m/llm/model</a></span><span class="text-muted mx-1">=&gt;</span><span class="instset-doc-small-code"><a href="#" data-bs-toggle="tooltip" title="maybe generic range" class="code text-success">A{?}</a></span></span>
-        </span>
-        <small class="text-muted code">/m/llm/inst/chat?A{?}&lt;=/m/llm/model</small>
-    </div>
-    <div class="card-body p-2"><pre class="mb-1 clickable-signature" style="font-size:0.85rem;cursor:pointer;" onclick="document.getElementById('inst-chat-doc-0-tab').click();document.getElementById('inst-chat-doc-0').scrollIntoView({behavior:'smooth',block:'center'});"><code class="language-mtron">chat?A{?}&lt;=model(str::T){&lt;j&gt;}</code></pre><pre class="mb-1 clickable-signature" style="font-size:0.85rem;cursor:pointer;" onclick="document.getElementById('inst-chat-doc-0-tab').click();document.getElementById('inst-chat-doc-0').scrollIntoView({behavior:'smooth',block:'center'});"><code class="language-mtron">chat?rec&lt;=model(str::T,rec::T){&lt;j&gt;}</code></pre></div>
-    
+    <div class="card-body p-2"><pre class="mb-0"><code class="language-mtron">lst::T[?[
+        uri::T,
+        uri::T,
+        uri::T]]</code></pre></div>
+    <div class="card-body border-top py-2"><p class="mb-0 text-light">an rdf triple as a subject, predicate, object</p></div>
 </div>
 </div>
 
 <div class="container-xxl mb-4" id="spaces">
-    <h3 class="text-primary mb-3">Spaces <span class="badge bg-info">1</span></h3>
+    <h3 class="text-primary mb-3">Spaces <span class="badge bg-info">3</span></h3>
     
-<div class="card mb-3" id="space-catalog">
+<div class="card mb-3" id="space-quad">
     <div class="card-header d-flex justify-content-between align-items-center py-2">
-        <a href="m_llm_space_catalog.html"
-           class="code text-primary fw-bold text-decoration-none">catalog</a>
-        <small class="text-muted code">/m/llm/space/catalog</small>
+        <a href="m_rdf_space_quad.html"
+           class="code text-primary fw-bold text-decoration-none">quad</a>
+        <small class="text-muted code">/m/rdf/space/quad</small>
+    </div>
+    <div class="mt-2"><pre class="mb-0"><code class="language-mtron">triple::T[?[
+        uri::T,
+        uri::T,
+        uri::T,
+        uri::T]]@/m/rdf/space/quad</code></pre></div>
+    <div class="card-body border-top py-2"><p class="mb-0 text-light">an rdf quad as a subject, predicate, object, graph</p></div>
+</div>
+<div class="card mb-3" id="space-rdfspace">
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+        <a href="m_rdf_space_rdfspace.html"
+           class="code text-primary fw-bold text-decoration-none">rdfspace</a>
+        <small class="text-muted code">/m/rdf/space/rdfspace</small>
     </div>
     <div class="mt-2"><pre class="mb-0"><code class="language-mtron">space::T[?[
-     name   =&gt;   is(or(eq(anthropic),eq(openai),eq(ollama),eq(localai))),
-     pattern=&gt;   uri::T,
-     {?}host=&gt;   uri::T,
-     route  =&gt;[uri::T=&gt;uri::T]]][
-   inst?catalog&lt;=#{?}(rec::T)]@/m/llm/space/catalog</code></pre></div>
-    <div class="card-body border-top py-2"><p class="mb-0 text-light">a space for accessing llm models</p></div><div class="card-body py-2">
-    <small class="text-muted fw-bold">sig:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">"llm model catalog specification" <span class="text-light">=&gt;</span> "creates a model catalog"</pre>
-    <small class="text-muted fw-bold mt-2 d-block">args:</small>
-    <pre class="mb-0 text-bright" style="font-family:monospace;font-size:0.8em;">  {?}host <span class="text-light">=&gt;</span> <span class="text-info">"the llm inferencing provider endpoint"</span>
-  pattern <span class="text-light">=&gt;</span> <span class="text-info">"catalog address space"</span>
-  name <span class="text-light">=&gt;</span> <span class="text-info">"the provider name (anthropic, openai, ollama, or localai)"</span>
-  route <span class="text-light">=&gt;</span> <span class="text-info">"internal space routes"</span></pre>
+     pattern      =&gt;   uri::T,
+     host         =&gt;   uri::T,
+     route        =&gt;[uri::T=&gt;uri::T],
+     {?}root      =&gt;   rec::T,
+     {?}serializer=&gt;   else(!*/m/mach/io/serializer/rdf)]][
+   inst?rdfspace&lt;=#{?}(rec::T)]@/m/rdf/space/rdfspace</code></pre></div>
+    <div class="card-body border-top py-2"><p class="mb-0 text-light">a metatron realization of an rdf quad/triple store</p></div>
 </div>
+<div class="card mb-3" id="space-triple">
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+        <a href="m_rdf_space_triple.html"
+           class="code text-primary fw-bold text-decoration-none">triple</a>
+        <small class="text-muted code">/m/rdf/space/triple</small>
+    </div>
+    <div class="mt-2"><pre class="mb-0"><code class="language-mtron">lst::T[?[
+        uri::T,
+        uri::T,
+        uri::T]]@/m/rdf/space/triple</code></pre></div>
+    <div class="card-body border-top py-2"><p class="mb-0 text-light">an rdf triple as a subject, predicate, object</p></div>
 </div>
 </div>
 
 <div class="container-xxl py-3 text-center">
     <hr class="border-secondary">
     <small class="text-muted">
-        generated by metatron instset doc generator on build 0-2026-05-02 21:06:03<br>
+        generated by metatron instset doc generator on build 0-2026-05-02 21:06:05<br>
         © PhaseShift Studio, LLC
     </small>
 </div></main>
