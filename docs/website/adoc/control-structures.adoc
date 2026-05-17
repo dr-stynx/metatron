@@ -29,10 +29,9 @@ instructions: *split* and *merge* (enabled through their respective coefficients
 
 [stem]
 ++++
-
 \begin{align*}
-\color{darkred}{\tt{split}}&\color{yellow}{?}\color{purple}{A}\color{orange}{\{*\}}\color{yellow}{\tt{<=}}\color{purple}{A} & \\
-\color{darkred}{\tt{merge}}&\color{yellow}{?}\color{purple}{A}\color{orange}{\{*\}}\color{yellow}{\tt{<=}}\color{purple}{A}\color{orange}{\{*\}} &
+\tt{split}&\tt{?}A\{*\} \Leftarrow A & \\ 
+\tt{merge}&\tt{?}A\{*\} \Leftarrow A\{*\} &
 \end{align*}
 ++++
 
@@ -48,14 +47,13 @@ is perhaps best conceptualized by Feynman's https://en.wikipedia.org/wiki/Path_i
 [stem]
 ++++
 \begin{align*}
-\color{darkred}{\tt{apply}}&\color{yellow}{?}\color{purple}{B}\color{orange}{\{\tt{*}\}}\color{yellow}{\tt{<=}}\color{purple}{A}\color{orange}{\{\tt{*}\}}
+\tt{apply}&\tt{?} B\{\tt{*}\}\Leftarrow A \{\tt{*}\}
 \end{align*}
 ++++
 
-The additive component of the mtron ring, `split/merge` (sugar'd `-<`/`>-`), is distributive over the ring's
-multiplicative monoid, `apply` (sugar'd `.`). The relationship between `split/merge` and `apply` is significant, with mtron coefficients serving as the glue which renders
-this coupling algebraically sound. A complete analysis of this algebra is discussed elsewhere. For now, when seen in isolation as a commutative group,
-the following axioms hold.
+The additive component of the mtron ring, `split/merge` (sugar'd `-<`/`>-`), is https://en.wikipedia.org/wiki/Distributive_property[distributive] over the ring's
+multiplicative https://en.wikipedia.org/wiki/Monoid[monoid], `apply` (sugar'd `.`). The relationship between `split/merge` and `apply` is significant, with mtron coefficients serving as the glue which renders
+this coupling algebraically sound (closed under the ring operators). A complete analysis of this algebra is discussed elsewhere. For now, when seen in isolation as a https://en.wikipedia.org/wiki/Abelian_group[commutative group], the following axioms hold.
 
 [stem]
 \[
@@ -105,23 +103,21 @@ applied to it -- indiscriminately. Selective discrimination is a consequence of 
 Given that a `rec` relation can not have a `noobj` domain nor range, then selective branching is achieved programmatically through *filtering*.
 That is, given `rec` relations,
 
-++++
-<!-- 🐖 
+[mtron]
+----
 [a=>1,b=>noobj,noobj=>3]
--->
-++++
+----
 
 then,
 
-++++
-<!-- 🐖 
-{1,2}                                          [-- <1>
-{1,2}.split([is(lt(2))  => plus(9), /        
-             is(gte(2)) => plus(3)])         
+[mtron]
+----
+{1,2}                                          [-- <1> --]
 {1,2}.split([is(lt(2))  => plus(9), /
-             is(gte(2)) => plus(3)]).rshift()  [-- <5> 
--->
-++++
+             is(gte(2)) => plus(3)])
+{1,2}.split([is(lt(2))  => plus(9), /
+             is(gte(2)) => plus(3)]).rshift()  [-- <2> --]
+----
 
 <1> two `int` objs in a stream.
 <2> each `int` obj is split (copied) across the branch arguments (the `rels` of the `rec` arg).
@@ -136,31 +132,29 @@ The above written once more using sugar syntax:
 
 🧱
 
-++++
-<!-- 🐖
+[mtron]
+----
 {1,2}-<[?<2=>+9,?>=2=>+3]
 {1,2}-<[?<2=>+9,?>=2=>+3]>>
--->
-++++ 
+----
 
 🧱
 
 * `-<` split.
 * `?<` is less than.
-* `>?` is greater than.
+* `?>` is greater than.
 * `>-` merge.
 |===
 
 
 Unlike `rec`, `lst` can have `noobj` elements. However, when merged into a single stream, `noobj` are discarded.
 
-++++
-<!-- 🐖
-{1,2}-<[gte(2),gt(3)]            [-- <1>
-{1,2}-<[?>=2,?>3]                [-- <2>
-{1,2}-<[?>=2,?>3]>-              [-- <3>
--->
-++++
+[mtron]
+----
+{1,2}-<[gte(2),gt(3)]            [-- <1> --]
+{1,2}-<[?>=2,?>3]                [-- <2> --]
+{1,2}-<[?>=2,?>3]>-              [-- <3> --]
+----
 
 <1> Each incoming `obj` is split across each "branch" (position) of the `lst`.
 <2> a `lst` can have `noobj` elements (empty positions).
@@ -176,45 +170,19 @@ ultimately dependent on the incoming lhs `obj`, where
 \tt{obj} \cdot \tt{gte}(\_ ) \cdot \tt{is}(\_ ) => obj\{?\} \in \{\tt{obj},\tt{noobj}\}.
 ++++
 
+In this way, the mechanics of `inst` lhs-resolution, `noobj` as the `0`-element of the `obj` ring, and it's dual usage in both `*` (filter) and `+` (clone) provide sufficient infrastructure to render branch semantics in mtron.
+
+
 [indent=0,subs="verbatim,attributes",role="primary"]
 .if/else
 =====
 
-++++
-<!-- 🐖 [NO_HEADER]
+[mtron]
+----
+[NO_HEADER]
 {1,2,3,4,5}-<[?>2 => '${_} greater than 2', /
               ?>5 => '${_} greater than 5', /
               _   => '${_} is something.']
--->
-++++
+----
 
 =====
-
-[indent=0,subs="verbatim,attributes",role="secondary"]
-.switch
-=====
-
-++++
-<!-- 🐖 [NO_HEADER]
-1.plus(10)
--->
-++++
-
-=====
-
-
-[discrete]
-=== switch behavior 
-
-
-
-[discrete]
-=== If/Then/Else 
-
-++++
-<!-- 🐖 
-{1,2,3,4,5}-<[?>2 => '${_} greater than 2', /
-              ?>5 => '${_} greater than 5', /
-              _   => '${_} is something.']>>
--->
-++++

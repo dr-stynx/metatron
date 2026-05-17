@@ -111,7 +111,6 @@ public class Console extends JRec<Console> implements Closeable, Runnable {
     private static Terminal terminal;
     private final LineReader reader;
     private final StatusLine status;
-    private final ColonMenu colonMenu = new ColonMenu(this);
     private final static ConfigurationPath configurations = new ConfigurationPath(
             Paths.get("conf"),                                     // application-wide settings
             Paths.get(System.getProperty("user.home"), ".metatron") // user-specific settings
@@ -132,16 +131,24 @@ public class Console extends JRec<Console> implements Closeable, Runnable {
     private static final long PANE_RENDER_THROTTLE_MS = 80;
     private volatile long lastPaneRenderMs = 0;
 
-    /** While true, non-active-pane rendering is deferred until the keyboard has been
+    /**
+     * While true, non-active-pane rendering is deferred until the keyboard has been
      * idle for {@link #INPUT_IDLE_THRESHOLD_MS}.  Set at the top of the REPL loop,
-     * cleared when readLine() returns. */
+     * cleared when readLine() returns.
+     */
     private volatile boolean inReadLine = false;
-    /** Timestamp of the last detected keystroke (buffer-length change). */
+    /**
+     * Timestamp of the last detected keystroke (buffer-length change).
+     */
     private volatile long lastKeyActivityMs = 0;
-    /** Snapshot of buffer length used to detect keystrokes via polling. */
+    /**
+     * Snapshot of buffer length used to detect keystrokes via polling.
+     */
     private volatile int lastBufferLength = 0;
     private volatile boolean pendingPaneFlush = false;
-    /** Milliseconds of keyboard inactivity after which non-active panes may render. */
+    /**
+     * Milliseconds of keyboard inactivity after which non-active panes may render.
+     */
     private static final long INPUT_IDLE_THRESHOLD_MS = 500;
 
     // Language mode for multi-language support
@@ -167,6 +174,7 @@ public class Console extends JRec<Console> implements Closeable, Runnable {
             .isaPredicate(rec())
             .constructor(instC(M_ISA_INST_TID.dom(ALL.maybe()).rng(CONSOLE_TID), lst(T(REC_TID)), (lhs, inst) -> {
                 final Console console = new Console(inst.arg(0).as(), inst.arg(0).vid());
+                new ColonMenu(console).attach(rec(), "help", "quit", "clear", "header", "log", "check", "top", "chat", "connect");
                 BootLoader.getExecutor().submit(console);
                 return console;
             })).create();
@@ -799,28 +807,6 @@ public class Console extends JRec<Console> implements Closeable, Runnable {
     }
 
     protected void executeMtron(final String line) {
-        /// ///////////////////////////////////////////////////
-        ////////////////// PANEL SUBSCRIPTIONS ////////////////
-        /// ///////////////////////////////////////////////////
-        if (line.trim().startsWith(":" + SUBQ)) {
-            final String strip = line.substring(5).trim();
-            final fURI subURI = strip.isEmpty() ?
-                    this.vid().extend("pane").extend(this.activePane.id() + "") :
-                    f(strip);
-            final Pane pane = this.getAllPanes()
-                    .stream()
-                    .filter(p -> p.id() == this.activePane.id())
-                    .findFirst()
-                    .orElse(null);
-            if (pane == null) {
-                LOG.error("unable to find active pane: %d", this.activePane.id());
-            } else {
-                pane.unsubscribe();
-                pane.vid(subURI);
-                pane.subscribe();
-            }
-            return;
-        }
         /// /////////////////////////////////////////////////////
         CommonUtil.splitOnNonQuotedSequence(this.prefix + line + this.postfix, ';', false).forEach(l -> {
             try {
@@ -911,124 +897,13 @@ public class Console extends JRec<Console> implements Closeable, Runnable {
                 // calls accept-line to break out of readLine so the next iteration can
                 // start fresh in the new pane).  Skip evaluation entirely.
                 if (line.isEmpty()) continue;
-                if (line.startsWith(":")) {
-                    if (this.colonMenu.has(line.substring(1))) {
-                        this.colonMenu.at(line.substring(1)).apply(noobj());
-                    } else {
-                        if (line.startsWith(":chat")) {
-                            final String chatLine = line.substring(5).trim();
-                            Rec.wrap(Router.global().read("testy"), mModel.class).chat(chatLine);
-                        } else if (line.equals(":connect")) {
-                            Router.writeToSpace("abc", block_(MInst.instLambda((lhs, inst) -> {
-                                reader.getBuffer().write(lhs.asLst().at(1).strValue());
-                                return lhs;
-                            })));
-                        } else if (line.equals(":header"))
-                            this.outputHeader(line.substring(7).trim());
-                        else if (line.equals(":quit"))
-                            break;
-                        else if (line.equals(":clear")) {
-                            Graphitty.out(terminal.output(), "{{XX}}");
-                            this.status.refresh();
-                        } else if (line.startsWith(":log")) {
-                            if (!line.substring(4).trim().isBlank()) {
-                                //LOG.none("updating log level: %s\n",  line.substring(4).trim());
-                                final String[] args = line.substring(4).trim().split(" ");
-                                LogObj.setSLF4J(args[0]);
-                                if (args.length > 1)
-                                    GraphittyLogger.setDefaultTargetPane(Integer.parseInt(args[1]));
-                            }
-                            LOG.none("log level: %s [target pane: %s]\n", LogObj.getSLF4J().toString().toLowerCase(), GraphittyLogger.getDefaultTargetPane());
-                        } else if (line.startsWith(":check")) {
-                            Arrays.stream(line.substring(6).trim().split(" ")).forEach(s -> {
-                                if (!s.trim().isEmpty()) {
-                                    if (s.startsWith("-"))
-                                        TypeCheck.disable(TypeCheck.valueOf(s.substring(1).toLowerCase()));
-                                    else
-                                        TypeCheck.enable(TypeCheck.valueOf(s.toLowerCase()));
-                                }
-                            });
-                            LOG.info("type check stages {{%s}}%s{{X}}", TypeCheck.colorLevel(), TypeCheck.getEnabled());
-                        } else if (line.startsWith(":top")) {
-                            TTop.ttop(terminal, new PrintStream(terminal.output()), System.err, new String[0]);
-                        } else if (line.startsWith(":less")) {
-                            Commands.less(terminal, terminal.input(), new PrintStream(terminal.output()), System.err, Paths.get(""), new String[0]);
-                        } else if (line.startsWith(":subs")) {
-                            final SubsWidget selector = new SubsWidget(this);
-                            selector.run();
-                            selector.close();
-                        } else if (line.startsWith(":justify")) {
-                            final boolean leftJustify = line.substring(8).trim().equalsIgnoreCase("left");
-                            ((Highlighter) this.reader.getHighlighter()).justify(leftJustify);
-                            LOG.info("%s justifying nested polys", leftJustify ? "{{y}}left{{X}}" : "{{y}}right{{X}}");
-                        } else if (line.startsWith(":state")) {
-                            this.status.setState(Level.valueOf(line.substring(6).trim().toUpperCase()));
-                        } else if (line.startsWith(":lang")) {
-                            final String langName = line.substring(5).trim().toLowerCase();
-                            try {
-                                final Language newLang = Language.valueOf(langName.toUpperCase());
-                                this.setLanguage(newLang);
-                            } catch (IllegalArgumentException e) {
-                                LOG.error("unknown language: {{r}}%s{{X}}. Available: mtron, gremlin, sql", langName);
-                            }
-                        } else if (line.startsWith(":prefix")) {
-                            this.prefix = line.substring(7).trim();
-                            if (this.prefix.startsWith("\""))
-                                this.prefix = this.prefix.substring(1);
-                            if (this.prefix.endsWith("\""))
-                                this.prefix = this.prefix.substring(0, this.prefix.length() - 1);
-                        } else if (line.startsWith(":postfix")) {
-                            this.postfix = line.substring(8).trim();
-                            if (this.postfix.startsWith("\""))
-                                this.postfix = this.postfix.substring(1);
-                            if (this.postfix.endsWith("\""))
-                                this.postfix = this.postfix.substring(0, this.postfix.length() - 1);
-                        }
-                        // ========== Split Pane Commands ==========
-                        else if (line.startsWith(":split")) {
-                            final String arg = line.substring(6).trim();
-                            try {
-                                final SplitLayout direction = arg.isEmpty()
-                                        ? SplitLayout.VERTICAL  // Default to vertical
-                                        : SplitLayout.parse(arg);
-                                this.split(direction);
-                                this.renderPanes();
-                            } catch (IllegalArgumentException e) {
-                                LOG.error(e.getMessage());
-                            }
-                        } else if (line.equals(":unsplit") || line.equals(":close")) {
-                            this.closeActivePane();
-                            if (this.splitMode) {
-                                this.renderPanes();
-                            } else {
-                                Graphitty.out(terminal.output(), "{{XX}}"); // Clear screen
-                            }
-                        } else if (line.startsWith(":focus")) {
-                            final String arg = line.substring(6).trim();
-                            if (arg.isEmpty()) {
-                                // List all panes
-                                LOG.info("panes: %s, active: {{y}}%d{{X}}",
-                                        getAllPanes().stream().map(p -> String.valueOf(p.id())).toList(),
-                                        this.activePane.id());
-                            } else {
-                                try {
-                                    final int paneId = Integer.parseInt(arg);
-                                    this.focusPane(paneId);
-                                    if (this.splitMode) this.renderPanes();
-                                } catch (NumberFormatException e) {
-                                    LOG.error("invalid pane id: {{r}}%s{{X}}", arg);
-                                }
-                            }
-                        } else if (line.equals(":panes")) {
-                            // Show all panes
-                            final List<Pane> panes = getAllPanes();
-                            LOG.info("{{y}}%d{{X}} pane(s):", panes.size());
-                            for (final Pane p : panes) {
-                                final String active = (p == this.activePane) ? " {{g}}[active]{{X}}" : "";
-                                LOG.info("  [{{y}}%d{{X}}] %s, %d lines%s",
-                                        p.id(), p.language().name, p.outputBuffer().size(), active);
-                            }
-                        }
+                if (line.startsWith(COLON)) {
+                    final String cmd = line.substring(1).trim();
+                    final int spaceIdx = cmd.indexOf(' ');
+                    final String cmdName = spaceIdx > 0 ? cmd.substring(0, spaceIdx) : cmd;
+                    final String cmdArgs = spaceIdx > 0 ? cmd.substring(spaceIdx + 1).trim() : "";
+                    if (!this.at("menu" + "/" + cmdName).isNoObj()) {
+                        this.at("menu" + "/" + cmdName).apply(cmdArgs.isEmpty() ? noobj() : str(cmdArgs));
                     }
                 } else {
                     this.status.startTimer();
@@ -1073,7 +948,7 @@ public class Console extends JRec<Console> implements Closeable, Runnable {
         System.exit(0);
     }
 
-    protected void outputHeader(final String name) {
+    public void outputHeader(final String name) {
         try {
             terminal.writer().print(CommonUtil.getHeader(HEADER_FILE, name, true));
             terminal.writer().flush();
@@ -1235,42 +1110,46 @@ public class Console extends JRec<Console> implements Closeable, Runnable {
             getKeyMap().bind((Widget) () -> {
                 try {
                     final String bufferText = this.reader.getBuffer().toString();
-                    // Check if buffer ends with '.' for instruction completion
-                    if (bufferText.trim().endsWith(".")) {
-                        final Obj parsed = ObjmtronSerializer.parse(bufferText.trim().substring(0, bufferText.trim().length() - 1));
-                        if (parsed.isCode()) {
-                            terminal.writer().write("\n");
-                            final InstSelector selector = new InstSelector(parsed.resolve(noobj()).as(), bufferText);
-                            if (selector.hasInstructions()) {
-                                // Constrain the selector to the active pane when in split mode
+                    if (bufferText.trim().startsWith(COLON)) {
+                        // add completer on : colon menu items
+                    } else {
+                        // Check if buffer ends with '.' for instruction completion
+                        if (bufferText.trim().endsWith(".")) {
+                            final Obj parsed = ObjmtronSerializer.parse(bufferText.trim().substring(0, bufferText.trim().length() - 1));
+                            if (parsed.isCode()) {
+                                terminal.writer().write("\n");
+                                final InstSelector selector = new InstSelector(parsed.resolve(noobj()).as(), bufferText);
+                                if (selector.hasInstructions()) {
+                                    // Constrain the selector to the active pane when in split mode
+                                    if (Console.this.splitMode && Console.this.activePane != null) {
+                                        final int[] pos = Console.this.calculatePanePosition(Console.this.activePane);
+                                        if (pos != null) selector.setPaneBounds(pos[0], pos[1], pos[2], pos[3]);
+                                    }
+                                    Utilities.runCursorLessWidget(selector, true);
+                                    // Restore the full pane layout after the widget closes
+                                    if (Console.this.splitMode) {
+                                        Console.this.renderPanes(false); // restore after fullscreen widget
+                                    }
+                                }
+                            }
+                        } else {
+                            // Original behavior: show explain widget for code
+                            final Obj code = ObjmtronSerializer.parse(bufferText);
+                            if (code.isCode()) {
+                                terminal.writer().write("\n");
+                                final Explain explain = new Explain(code.as());
+                                // Constrain the widget to the active pane when in split mode
                                 if (Console.this.splitMode && Console.this.activePane != null) {
                                     final int[] pos = Console.this.calculatePanePosition(Console.this.activePane);
-                                    if (pos != null) selector.setPaneBounds(pos[0], pos[1], pos[2], pos[3]);
+                                    if (pos != null) explain.setPaneBounds(pos[0], pos[1], pos[2], pos[3]);
                                 }
-                                Utilities.runCursorLessWidget(selector, true);
+                                Utilities.runCursorLessWidget(explain, true);
                                 // Restore the full pane layout after the widget closes
                                 if (Console.this.splitMode) {
                                     Console.this.renderPanes(false); // restore after fullscreen widget
                                 }
+                                redrawBuffer();
                             }
-                        }
-                    } else {
-                        // Original behavior: show explain widget for code
-                        final Obj code = ObjmtronSerializer.parse(bufferText);
-                        if (code.isCode()) {
-                            terminal.writer().write("\n");
-                            final Explain explain = new Explain(code.as());
-                            // Constrain the widget to the active pane when in split mode
-                            if (Console.this.splitMode && Console.this.activePane != null) {
-                                final int[] pos = Console.this.calculatePanePosition(Console.this.activePane);
-                                if (pos != null) explain.setPaneBounds(pos[0], pos[1], pos[2], pos[3]);
-                            }
-                            Utilities.runCursorLessWidget(explain, true);
-                            // Restore the full pane layout after the widget closes
-                            if (Console.this.splitMode) {
-                                Console.this.renderPanes(false); // restore after fullscreen widget
-                            }
-                            redrawBuffer();
                         }
                     }
                 } catch (final Exception e) {

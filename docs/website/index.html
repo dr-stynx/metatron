@@ -39,6 +39,11 @@
     color: var(--white);
 }
 
+h1, h1. h2, h2. h3, h3. h4, h4. {
+    color: var(--mred) !important;
+    scale: 1.5 !important;
+}
+
 .float-left-code {
     float: left;
     background-color: transparent;
@@ -54,9 +59,26 @@
     background-color: transparent;
 }
 
+.bg-warning {
+    background-color: #b98b00 !important
+}
+
 .btn:disabled {
     border-color: var(--bs-gray-dark);
     color: var(--bs-gray);
+}
+
+.pill-label {
+    font-size: 0.85rem;
+}
+
+.mini-label {
+    color: #6C7293 !important;
+}
+
+.micro-label {
+    color: #6C7293 !important;
+    font-size: 0.85rem;
 }
 
 main {
@@ -72,7 +94,7 @@ table .paragraph {
 }
 
 table .ulist {
-   line-height: 0.9rem;
+    line-height: 0.9rem;
 }
 
 .card {
@@ -272,37 +294,44 @@ table {
     margin-left: -10px;
     transform: scale(1.5);
 }
+
 #console_feature .flip-box-back img {
     margin-top: -20px;
     margin-left: -10px;
     transform: scale(1.75);
 }
+
 #oltp_feature .flip-box-back img {
     transform: scale(1.25);
     margin-top: -20px;
     margin-left: -30px;
 }
+
 #olrp_feature .flip-box-back img {
     transform: scale(1.15);
     margin-top: -20px;
     margin-left: -15px;
 }
+
 #iot_feature .flip-box-back img {
     transform: scale(1.50);
     margin-top: -20px;
     margin-left: -15px;
 }
+
 #mtron_feature .flip-box-back img,
 #uri_feature .flip-box-back img {
     transform: scale(2);
     margin-top: -20px;
     margin-left: -10px;
 }
+
 #llm_feature .flip-box-back img {
     transform: scale(1.6);
     margin-top: -20px;
     margin-left: -15px;
 }
+
 #web_feature .flip-box-back img {
     transform: scale(1.85);
     margin-top: -10px;
@@ -329,7 +358,7 @@ table {
     max-width: 90vw;
     max-height: 90vh;
     cursor: zoom-out;
-    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
     background-color: var(--maincolor);
 }
 
@@ -654,7 +683,7 @@ body {
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    line-height: 1.45rem;
+    line-height: 1.4rem;
     font-size: 1.2rem;
 }
 
@@ -867,6 +896,42 @@ body {
     border: 1px solid #000 !important;
 }
 
+/* ── Callout badge alignment ──────────────────────────────────── */
+
+.conum + b {
+    float: right !important;
+    width: 26px !important;
+    height: 20px !important;
+    font-size: 12px !important;
+    line-height: 20px !important;
+    text-align: center !important;
+    background: var(--mred) !important;
+    color: var(--myellow);
+    font-weight: bold;
+    border-radius: 100px;
+    transform: translateX(-5px);
+}
+
+pre.highlight {
+    position: relative !important;
+}
+
+pre.highlight > code[data-lang] {
+    display: block !important;
+    padding-right: 44px;
+}
+
+/* ── Result-line dimming / input brightness ──────────────────── */
+
+.hljs-mtron-result-line {
+    opacity: 0.65;
+}
+
+.hljs-mtron-prompt-begin,
+.hljs-mtron-prompt-end {
+    filter: brightness(1.4);
+}
+
 /* Linearize Tabs for PDF Export */
 .pdf-export-mode .primary {
     display: block !important;
@@ -1013,7 +1078,7 @@ body {
     .hljs-emphasis {
         font-style: italic !important;
     }
-    
+
     .hljs-mtron-template {
         color: var(--tertiarycolor);
     }
@@ -1224,7 +1289,7 @@ th {
     margin-bottom: 2em;
 }
 
-.hljs-mtron-doc-callout, .conum + b {
+.hljs-mtron-doc-callout {
     display: inline-block;
     color: var(--myellow);
     background: var(--mred) !important;
@@ -1246,12 +1311,6 @@ th {
 
 strong {
     color: var(--mred);
-}
-
-.conum + b {
-    transform: translateX(-5px);
-    position: static;
-    color: var(--myellow);
 }
 
 .hljs-fos-docs-if-else-then-case-do,
@@ -1312,82 +1371,6 @@ strong {
 }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
-.hidden {
-    display: none;
-}
-
-.switch {
-    border-width: 1px 1px 0 1px;
-    border-style: solid;
-    border-color: #7a2518;
-    display: inline-block;
-}
-
-.switch--item {
-    padding: 10px;
-    background-color: #ffffff;
-    color: #7a2518;
-    display: inline-block;
-    cursor: pointer;
-}
-
-.switch--item.selected {
-    background-color: #7a2519;
-    color: #ffffff;
-}
-
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
-<script type="text/javascript">
-function addBlockSwitches() {
-    $('.primary').each(function() {
-        primary = $(this);
-        createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
-        primary.children('.title').remove();
-    });
-    $('.secondary').each(function(idx, node) {
-        secondary = $(node);
-        primary = findPrimary(secondary);
-        switchItem = createSwitchItem(secondary, primary.children('.switch'));
-        switchItem.content.addClass('hidden');
-        findPrimary(secondary).append(switchItem.content);
-        secondary.remove();
-    });
-}
-
-function createBlockSwitch(primary) {
-    blockSwitch = $('<div class="switch"></div>');
-    primary.prepend(blockSwitch);
-    return blockSwitch;
-}
-
-function findPrimary(secondary) {
-    candidate = secondary.prev();
-    while (!candidate.is('.primary')) {
-        candidate = candidate.prev();
-    }
-    return candidate;
-}
-
-function createSwitchItem(block, blockSwitch) {
-    blockName = block.children('.title').text();
-    content = block.children('.content').first().append(block.next('.colist'));
-    item = $('<div class="switch--item">' + blockName + '</div>');
-    item.on('click', '', content, function(e) {
-        $(this).addClass('selected');
-        $(this).siblings().removeClass('selected');
-        e.data.siblings('.content').addClass('hidden');
-        e.data.removeClass('hidden');
-    });
-    blockSwitch.append(item);
-    return {'item': item, 'content': content};
-}
-
-$(addBlockSwitches);
-
-</script>
-
 </head>
 <body class="article">
 <div id="content" style="max-width: 100%;">
@@ -1448,6 +1431,14 @@ $(addBlockSwitches);
     <!-- <script src="data/console.txt"></script>-->
     <!-- CUSTOM CSS/JAVASCRIPT -->
     <link href="css/metatron.css" rel="stylesheet">
+    <style>
+    .hidden { display: none; }
+    .switch { border-width: 1px 1px 0 1px; border-style: solid; border-color: #7a2518; display: inline-block; border-radius: 4px 4px 0 0; }
+    .switch--item { padding: 4px 14px; font-size: 0.85rem; background-color: #ffffff; color: #7a2518; display: inline-block; cursor: pointer; }
+    .switch--item:first-child { border-radius: 3px 0 0 0; }
+    .switch--item:last-child  { border-radius: 0 3px 0 0; }
+    .switch--item.selected { background-color: #7a2519; color: #ffffff; }
+    </style>
     <script src="js/metatron.js" type="text/javascript"></script>
 </head>
 <body class="d-flex flex-column min-vh-100" spellcheck="false">
@@ -1481,6 +1472,11 @@ $(addBlockSwitches);
                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="download_dropdown">
                     <li>
                         <div class="terminal-box">
+                            <pre><code>npm i -g metatron-vm</code></pre>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="terminal-box">
                             <pre><code>docker pull docker.phaseshift.studio/metatron:0.1-SNAPSHOT</code></pre>
                         </div>
                     </li>
@@ -1510,23 +1506,23 @@ bin/metatron</code></pre>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="isa_dropdown">
                     <li><a class="code dropdown-item d-flex align-items-center" href="#"
-                           onclick="location.href='instset/m.html';"><img
+                           onclick="location.href='./instset/m.html';"><img
                             src="./images/icons/space/mtron-icon.svg" class="isa-row icon-color me-2"
                             alt="mtron"/>/m</a></li>
                     <li><a class="code dropdown-item d-flex align-items-center" href="#"
-                           onclick="location.href='instset/m_mach.html';"><img
+                           onclick="location.href='./instset/m_mach.html';"><img
                             src="./images/icons/space/mach-icon.svg" class="isa-row icon-color me-2" alt="mach"/>/m/mach</a>
                     </li>
                     <li><a class="code dropdown-item d-flex align-items-center" href="#"
-                           onclick="location.href='instset/m_tble.html';"><img
+                           onclick="location.href='./instset/m_tble.html';"><img
                             src="./images/icons/space/tble-icon.svg" class="isa-row icon-color me-2" alt="tble"/>/m/tble</a>
                     </li>
                     <li><a class="code dropdown-item d-flex align-items-center" href="#"
-                           onclick="location.href='instset/m_dcmnt.html';"><img
+                           onclick="location.href='./instset/m_dcmnt.html';"><img
                             src="./images/icons/space/dcmnt-icon.svg" class="isa-row icon-color me-2" alt="dcmnt"/>/m/dcmnt</a>
                     </li>
                     <li><a class="code dropdown-item d-flex align-items-center" href="#"
-                           onclick="location.href='instset/m_grph.html';"><img
+                           onclick="location.href='./instset/m_grph.html';"><img
                             src="./images/icons/space/grph-icon.svg" class="isa-row icon-color me-2" alt="grph"/>/m/grph</a>
                     </li>
                     <!-- TODO: Add /m/vec docs
@@ -1536,20 +1532,20 @@ bin/metatron</code></pre>
                             alt="vec"/>/m/vec</a></li>
                     -->
                     <li><a class="code dropdown-item d-flex align-items-center" href="#"
-                           onclick="location.href='instset/m_web.html';"><img
+                           onclick="location.href='./instset/m_web.html';"><img
                             src="./images/icons/space/web-icon.svg" class="isa-row icon-color me-2"
                             alt="web"/>/m/web</a></li>
                     <li><a class="code dropdown-item d-flex align-items-center" href="#"
-                           onclick="location.href='instset/m_llm.html';"><img
+                           onclick="location.href='./instset/m_llm.html';"><img
                             src="./images/icons/space/llm-icon.svg" class="isa-row icon-color me-2"
                             alt="llm"/>/m/llm</a></li>
                     <li><a class="code dropdown-item d-flex align-items-center" href="#"
-                           onclick="location.href='instset/m_iot.html';"><img
+                           onclick="location.href='./instset/m_iot.html';"><img
                             src="./images/icons/space/graphql-icon.svg" class="isa-row icon-color me-2" 
                             alt="iot"/>/m/iot</a>
                     </li>
                     <li><a class="code dropdown-item d-flex align-items-center" href="#"
-                           onclick="location.href='instset/m_math.html';"><img
+                           onclick="location.href='./instset/m_math.html';"><img
                             src="./images/icons/space/math-icon.svg" class="isa-row icon-color me-2"
                             alt="math"/>/m/math</a>
                     </li>
@@ -1710,7 +1706,7 @@ bin/metatron</code></pre>
                 the typical functional programming monad/monoid is extended with a <b class="metatron-name">"ringad"/ringoid</b> processor, where <b class="metatron-name">*</b> is function composition and <b class="metatron-name">+</b> is function branching
             </div>
             <div class="feature-modal">
-                <p><b class="metatron-name">Ring theory</b> describes the underlying algebra of metatron. The virtual machine's instructions can be serially composed (<pre>*</pre>) and parallelly branched (<pre>+</pre>) to form program structures that are subject to the axioms and theorems of <a href="https://metatron.phaseshift.studio/articles/stream-ring-theory.pdf">stream ring theory</a> (a Turing Complete stream computing algebra). Ring theorems realize execution optimization strategies (bulking coefficients), program compiler rewrites (ring equalities), and evaluation semantics (parallel, reducing, and serial execution stages).</p>
+                <p><b class="metatron-name">Ring theory</b> describes the underlying algebra of metatron. The virtual machine's instructions can be serially composed (<b>*</b>) and parallelly branched (<b>+</b>) to form program structures that are subject to the axioms and theorems of <a href="https://metatron.phaseshift.studio/articles/stream-ring-theory.pdf">stream ring theory</a> (a Turing Complete stream computing algebra). Ring theorems realize execution optimization strategies (bulking coefficients), program compiler rewrites (ring equalities), and evaluation semantics (parallel, reducing, and serial execution stages).</p>
                 <img src="images/modal/ring-modal.svg" class="img-fluid mb-3 icon-color" style="width: 500px; display: block; margin: auto;"/>
             </div>
             <script type="text/javascript">featurePanel("ring_feature");</script>
@@ -1905,6 +1901,25 @@ rec::T[?[
         defaultLanguage: 'mtron', // Set your preferred default language
         ignoreUnescapedHTML: true
     });
+    hljs.addPlugin(new CopyButtonPlugin({
+        callback: function(text, el) {
+            // Strip multi-line [== ... ==] comments
+            text = text.replace(/\[==[\s\S]*?==\]/g, '');
+            // Process line by line
+            return text.split('\n')
+                .map(function(line) {
+                    // Drop result lines (==> ...)
+                    if (/^\s*==>/.test(line)) return null;
+                    // Strip mtron> prompt
+                    line = line.replace(/^\s*mtron>\s*/, '');
+                    // Strip single-line [-- ... --] comments
+                    line = line.replace(/\[--[^\]\[]*--\]/g, '');
+                    return line.trim();
+                })
+                .filter(function(line) { return line !== null && line.length > 0; })
+                .join('\n');
+        }
+    }));
     if (!hljs.initHighlighting.called) {
         hljs.initHighlighting.called = true
         ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) {
@@ -1918,6 +1933,87 @@ rec::T[?[
     });
     document.querySelectorAll('code').forEach(block => {
         hljs.highlightBlock(block);
+    });
+
+    // ── Vanilla JS tab switching (replaces Zepto) ─────────────────
+    function initTabs() {
+        var primaries = document.querySelectorAll('.primary');
+        if (primaries.length === 0) return;
+
+        primaries.forEach(function(primary) {
+            var sw = document.createElement('div');
+            sw.className = 'switch';
+            primary.insertBefore(sw, primary.firstChild);
+
+            var titles = primary.getElementsByClassName('title');
+            var primaryTitle = titles.length > 0 ? titles[0] : null;
+            var primaryContent = primary.querySelectorAll(':scope > .content')[0];
+
+            var item = document.createElement('div');
+            item.className = 'switch--item selected';
+            item.textContent = primaryTitle ? primaryTitle.textContent : '';
+            // Click handler for the primary tab
+            item.addEventListener('click', function() {
+                var allItems = sw.querySelectorAll('.switch--item');
+                for (var i = 0; i < allItems.length; i++)
+                    allItems[i].classList.remove('selected');
+                item.classList.add('selected');
+                var allContent = primary.querySelectorAll(':scope > .content');
+                for (var j = 0; j < allContent.length; j++)
+                    allContent[j].classList.add('hidden');
+                if (primaryContent) {
+                    primaryContent.classList.remove('hidden');
+                    if (window.MathJax) MathJax.Hub.Queue(['Typeset', MathJax.Hub, primaryContent]);
+                }
+            });
+            sw.appendChild(item);
+            if (primaryTitle) primaryTitle.style.display = 'none';
+        });
+
+        document.querySelectorAll('.secondary').forEach(function(secondary) {
+            var candidate = secondary.previousElementSibling;
+            while (candidate && !candidate.classList.contains('primary'))
+                candidate = candidate.previousElementSibling;
+            if (!candidate) return;
+
+            var primary = candidate;
+            var sw = primary.querySelector('.switch');
+            if (!sw) return;
+
+            var contents = secondary.querySelectorAll(':scope > .content');
+            if (contents.length === 0) return;
+            var content = contents[0];
+            content.classList.add('hidden');
+            primary.appendChild(content);
+
+            var titles = secondary.getElementsByClassName('title');
+            var title = titles.length > 0 ? titles[0] : null;
+            var item = document.createElement('div');
+            item.className = 'switch--item';
+            item.textContent = title ? title.textContent : '';
+
+            item.addEventListener('click', function() {
+                var allItems = sw.querySelectorAll('.switch--item');
+                for (var i = 0; i < allItems.length; i++)
+                    allItems[i].classList.remove('selected');
+                item.classList.add('selected');
+                var allContent = primary.querySelectorAll(':scope > .content');
+                for (var j = 0; j < allContent.length; j++)
+                    allContent[j].classList.add('hidden');
+                content.classList.remove('hidden');
+                // Re-render math in newly visible content
+                if (window.MathJax) MathJax.Hub.Queue(['Typeset', MathJax.Hub, content]);
+            });
+
+            sw.appendChild(item);
+            secondary.parentNode.removeChild(secondary);
+        });
+    }
+
+    // Run after MathJax v2 finishes typesetting (loaded sync at page bottom,
+    // typesetting is queued, so 'load' + small delay ensures it completes)
+    window.addEventListener('load', function() {
+        setTimeout(initTabs, 200);
     });
 </script>
 </body>
