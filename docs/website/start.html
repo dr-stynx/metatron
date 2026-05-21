@@ -9,7 +9,7 @@
 <meta name="author" content="Marko A. Rodriguez">
 <meta name="copyright" content="PhaseShift Studio">
 <link rel="icon" type="image/x-icon" href="./favicon.ico">
-<title>metatron</title>
+<title>Quick Start — metatron</title>
 <style>
 :root {
     --maincolor: #000000;
@@ -608,7 +608,9 @@ em {
     max-height: 50px;
     padding: 2rem 2rem;
     padding-bottom: 1rem;
-    background-color: var(--dark);
+    background: linear-gradient(to bottom, #040404, #000000 85%);
+    border-bottom: 1px solid rgba(122, 37, 24, 0.28);
+    box-shadow: 0 1px 18px rgba(151, 2, 7, 0.06);
 }
 
 .dropdown {
@@ -641,7 +643,7 @@ em {
 }
 
 .navbar .navbar-nav .quickstart-link {
-    color: var(--myellow);
+    color: #754900;
 }
 .navbar .navbar-nav .quickstart-link:hover {
     color: var(--primary);
@@ -771,10 +773,16 @@ footer {
     box-shadow: none;
 }
 
+.footer {
+    background: linear-gradient(to top, #040404, #000000 85%);
+    border-top: 1px solid rgba(122, 37, 24, 0.28);
+    box-shadow: 0 -1px 18px rgba(151, 2, 7, 0.06);
+}
+
 .footer .copyright {
     padding: 1.5rem;
     font-size: 15px;
-    background: var(--dark);
+    background: transparent;
 }
 
 .footer .copyright a {
@@ -1533,7 +1541,7 @@ strong {
     </div>
 </div>
 <!-- NAVIGATION BAR -->
-<nav class="navbar navbar-expand-lg bg-secondary navbar-dark sticky-top py-lg-0 px-lg-5 wow fadeIn"
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top py-lg-0 px-lg-5 wow fadeIn"
      data-wow-delay="0.1s">
     <a href="http://phaseshift.studio" class="navbar-brand ms-4 ms-lg-0">
         <h2 class="mb-0 text-primary logo-text">
@@ -1702,281 +1710,127 @@ bin/metatron</code></pre>
     </div>
 </nav>
 <main class="container my-4 flex-grow-1">
-<!--------------------->
-<!----- METATRON ------>
-<!--------------------->
-<div class="container-xxl py-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-lg-8 wow fadeIn" data-wow-delay="0.1s">
-                <h1 class="text-uppercase mb-4 neon-text">metatron&trade;</h1>
-                <p class="text-primary subtitle">Interconnect Heterogeneous Data Sources and
-                    Processes</p>
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <p class="mb-0"><b class="metatron-name">metatron</b> offers a concise,
-                            expressive, and efficient way to
-                            define and manipulate data structures encoded within and between data
-                            sources.
-                            It is designed to be used across a wide range of applications, from the
-                            enthusiast's home automation project to an organization's large-scale master
-                            data
-                            management
-                            system.
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="mb-0"><b class="metatron-name">metatron</b> is founded on a
-                            referential record-oriented data model and schema. Higher-order
-                            structures are captured across a cluster of relational databases, graph
-                            databases,
-                            web servers, JSON documents, MQTT brokers, AI memory, IoT microprocessors,
-                            file systems,
-                            and more.
-                        </p>
-                    </div>
-                </div>
-                <!--<div class="row g-4">
-                    <img src="images/external/docker.svg" width="50%" alt="docker"/>
-                </div>-->
-            </div>
-            <div class="col-lg-4 wow fadeIn" data-wow-delay="0.1s">
-                <img src="images/metatron-character.png" width="100%"/>
-            </div>
-        </div>
-    </div>
+<h1 id="_quick_start" class="discrete">Quick Start</h1>
+<img src="images/metatron-character-ansi.png" width="150px" style="float:left; margin:10px;"></a>
+<div class="paragraph">
+<p><strong>metatron</strong> is a large, involved software system composed of many interacting components distributed with the main metatron distributed while supporting custom extensions written in mtron (the core language of metatron) or Java (via the exposed public Java API).</p>
 </div>
-<!-- METATRON FEATURES -->
-<div class="container">
-    <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s">
-        <h2 class="text-uppercase text-primary" style="background-color: var(--maincolor);">Features</h2>
-    </div>
-    <div class="row g-5">
-        <!-- MTRON -->
-        <div id="mtron_feature" data-title="mtron" data-icon="images/icons/mtron-icon.svg" data-back-image="images/modal/mtron-modal.svg">
-            <div class="feature-front">
-                <b class="metatron-name">mtron</b> is a functional, type-safe, data flow language capable of expressing complex data transformations within a multi-model data environment
-            </div>
-            <div class="feature-modal">
-                <p><b class="metatron-name">mtron</b> (pronounced /ɛm.trɒn/) is the primary query and transformation language for the metatron virtual machine. It provides a type-safe environment for processing data across a diverse set of spaces.</p>
-                <img src="images/modal/mtron-modal.svg" class="img-fluid mb-3 icon-color" style="width: 500px; display: block; margin: auto;"/>
-                 <p>
-                In mtron, URIs and instructions are both first class citizens. The URI's structure is capitalized on throughout the language where, for example, query parameters encode instruction domain and range types. This leads to URIs referencing code composed of URIs which provides a unique level of software reflection without abandoning a functional structure.
-                 </p>
-            </div>
-            <script type="text/javascript">featurePanel("mtron_feature");</script>
-        </div>
-        <!-- URI -->
-        <div id="uri_feature" data-title="fURI" data-icon="images/icons/link-icon.svg" data-back-image="images/modal/furi-modal.svg">
-            <div class="feature-front">
-                metatron <b class="metatron-name">objs</b> exist in a single, unified uri address space where processes can seamlessly traverse across different data sources
-            </div>
-            <div class="feature-modal">
-                <p>The <b class="metatron-name">fURI</b> (<i>functional</i> URI) is the cornerstone of metatron's memory model. Every piece of data, regardless of its underlying storage, is addressed via a consistent URI scheme. The primary ramification is that any bit of data can refer to any other bit of data regardless of its physical location and underlying storage system and format. For instance, a line of text in a <code>.txt</code> file on a hard drive can reference some specific tag in an HTML page on the web. Atop the space-based URI graph, there exists a URI-aware machine capable of processing that data in a storage-agnostic manner.
-                </p>
-                <img src="images/modal/furi-modal.svg" class="img-fluid mb-3 icon-color" style="width: 500px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("uri_feature");</script>
-        </div>
-        <!-- SPACE -->
-        <div id="space_feature" data-title="space" data-icon="images/icons/space-icon.svg" data-back-image="images/modal/space-modal.svg">
-            <div class="feature-front">
-                data sources are logically abstracted as <b class="metatron-name">spaces</b>, where each datum has a uri address enabling the stitching together of database, file system, event, and peripheral data
-            </div>
-            <div class="feature-modal">
-                <p>A <b class="metatron-name">space</b> is a storage and/or processing system that is responsible for maintaining some subset of the full URI address space. Spaces include but are not limited to, relational databases, graph databases, key/value stores, document stores,
-                file systems, large language model catalogs, and more. Spaces can range from the small (a microprocessor's on-board memory), to the large (the world wide web).</p>
-                <img src="images/modal/space-modal.svg" class="img-fluid mb-3 icon-color" style="max-height: 300px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("space_feature");</script>
-        </div>
-        <!-- RING -->
-        <div id="ring_feature" data-title="ring" data-icon="images/icons/ring-icon.svg" data-back-image="images/modal/ring-modal.svg">
-            <div class="feature-front">
-                the typical functional programming monad/monoid is extended with a <b class="metatron-name">"ringad"/ringoid</b> processor, where <b class="metatron-name">*</b> is function composition and <b class="metatron-name">+</b> is function branching
-            </div>
-            <div class="feature-modal">
-                <p><b class="metatron-name">Ring theory</b> describes the underlying algebra of metatron. The virtual machine's instructions can be serially composed (<b>*</b>) and parallelly branched (<b>+</b>) to form program structures that are subject to the axioms and theorems of <a href="https://metatron.phaseshift.studio/articles/stream-ring-theory.pdf">stream ring theory</a> (a Turing Complete stream computing algebra). Ring theorems realize execution optimization strategies (bulking coefficients), program compiler rewrites (ring equalities), and evaluation semantics (parallel, reducing, and serial execution stages).</p>
-                <img src="images/modal/ring-modal.svg" class="img-fluid mb-3 icon-color" style="width: 500px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("ring_feature");</script>
-        </div>
-        <!-- MONAD -->
-        <div id="monad_feature" data-title="monad" data-icon="images/icons/cluster-icon.svg" data-back-image="images/modal/monad-modal.svg">
-            <div class="feature-front">
-                Processes are realized as the propagation of atomic <b class="metatron-name">monads</b> maintaining a pointer to their current location in the instruction graph (program counter) and their current location in the data graph (reference in space)
-            </div>
-            <div class="feature-modal">
-                <p><b class="metatron-name">Monads</b> provide a logical abstraction that cleanly separates the evaluation of a program from the program itself, allowing swarms of monads to operate in parallel over the same instruction/data graphs, where their collective synchronization need only occur when certain "barrier instructions" are reached. The theory of monads is applicable across many areas of applied computing, such as execution stacks, exception handling, I/O management, reflection, program traces, and state history, to name but a few.</p>
-                <img src="images/modal/monad-modal.svg" class="img-fluid mb-3 icon-color" style="max-height: 300px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("monad_feature");</script>
-        </div>
-        <!-- INSTSET -->
-        <div id="instset_feature" data-title="instset" data-icon="images/icons/instset-icon.svg" data-back-image="images/modal/instset-modal.svg">
-            <div class="feature-front">
-                metatron <b class="metatron-name">instruction sets</b> (or instset) are packages that encode a domain of discourse within a set of types, instructions, constants, rewrites, and sugars.
-            </div>
-            <div class="feature-modal">
-                <p><b class="metatron-name">instsets</b> are spaces that can be read from and written to. As a space, they support query processors, with the docq query processor being of particular importance in that it associates documentation with any obj. These objs enable the automatic generation of human-readable HTML documentation as well as agent-readable tool and skill specifications.</p>
-            <table>
-                <tr>
-                  <th style="text-align: center;">*instset</th>
-                  <th style="text-align: center;">*instset?docq</th>
-                </tr>
-                <td>
-                <pre><code>
-rec::T[?[
- {?}constq =>[#::T],
- {?}type   =>[T::T],
- {?}inst   =>[inst::T],
- {?}rewrite=>[inst::T],
- {?}sugar  =>[lst::T]]]@instset
-                </code></pre>
-                </td><td>
-<pre><code>
-docs::[
- obj    =>instset::T,
- args   =>[
-  {?}type   =>"types used to structure of the instset'...",
-  {?}rewrite=>'code<=code instructions that capture th...',
-  {?}inst   =>'instructions associated with the types ...',
-  {?}sugar  =>'custom instruction syntax sugars given ...',
-  {?}constq =>'constants used across the instset'],
- desc   =>'an aggregate of consts, types, insts, r...',
- example=>[,]]
-</code></pre>
-                </td>
-</tr>
-</table>
-            </div>
-            <script type="text/javascript">featurePanel("instset_feature");</script>
-        </div>
-       <!-- EMBED -->
-        <div id="embed_feature" data-title="embed" data-icon="images/icons/storage-icon.svg" data-back-image="images/modal/embed-modal.svg">
-            <div class="feature-front">
-                A data structure can have an inter- or intra-space <b class="metatron-name">embedding</b> such that each subset of its form can take advantage of the respective time-space tradeoffs of the underlying storage system.
-            </div>
-            <div class="feature-modal">
-                <p>A data structure such as a vertex in a graph can have many incoming and outgoing edges with different edge labels and properties. Such diversity entails not all edges will require the same read/write performance characteristics. In metatron, it's possible to <b class="metatron-name">embed</b> one edge set in a space optimized for fast retrievals (e.g. an in-memory space) and another subset in a space optimized for static, long-term storage (e.g. a disk-backed space). Other considerations may include the indices associated with a space and whether certain properties of an edge can be indexed for non-linear access.</p>
-                <img src="images/modal/embed-modal.svg" class="img-fluid mb-3 icon-color" style="max-height: 300px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("embed_feature");</script>
-        </div>
-        <!-- TYPE -->
-        <div id="type_feature" data-title="type" data-icon="images/icons/type-icon.svg" data-back-image="images/type-diagram.svg">
-            <div class="feature-front">
-               objs are constrained using a <b class="metatron-name">structural type system</b> that can express inherited, refined, dependent, and recursive types with constructs for expressing cardinality, optionals, generics, predicates, and more.
-            </div>
-            <div class="feature-modal">
-                <p>The <b class="metatron-name">structural type system</b> of metatron ensures that the label ascribed to an obj's form (its nominal type) is but a secondary concern relative to the obj's relational structural within the larger data space as a whole. If an obj meets all the specified constraints of a defined type, then it is of that type and can be processed by instructions and composed within larger types requiring said type. From this vantage point, many homomorphic transformations can be realized that render the distinctions between a row in a relational database, a tag in an HTML document, a vertex in graph, and a value in a key/value store to be simply differences of name, not function.</p>
-                <img src="images/type-diagram.svg" class="img-fluid mb-3 icon-color" style="max-height: 400px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("type_feature");</script>
-        </div>
-        <!-- OLTP -->
-        <div id="oltp_feature" data-title="oltp" data-icon="images/icons/oltp-icon.svg" data-back-image="images/modal/oltp-modal.svg">
-            <div class="feature-front">
-                a <b class="metatron-name">monad iterator</b> machine supports speedy traversals over localized regions of space
-            </div>
-            <div class="feature-modal">
-                <p><b class="metatron-name">OLTP</b> (online transactional processing) provides a straightforward means for accessing a small region of space with a machine that iterates a stream of monads through code from the first instruction to the last.</p>
-                <img src="images/modal/oltp-modal.svg" class="img-fluid mb-3 icon-color" style="max-height: 300px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("oltp_feature");</script>
-        </div>
-        <!-- OLRP -->
-        <div id="olrp_feature" data-title="olrp" data-icon="images/icons/olrp-icon.svg" data-back-image="images/modal/olrp-modal.svg">
-            <div class="feature-front">
-                a <b class="metatron-name">monad swarm</b> machine supports asynchronous, parallel, distributed traversals over large regions of space
-            </div>
-            <div class="feature-modal">
-                <p><b class="metatron-name">OLRP</b> (online real-time processing) realizes computing as a swarm of asynchronous, distributed monads traversing a data graph whose paths through that graph are guided by an instruction graph. Hundreds of thousands of monads can traverse vast swathes of the data landscape, across different physical machines, all in pursuit of a solution to a problem that has been formally captured within the structure of an obj called code.</p>
-                <img src="images/modal/olrp-modal.svg" class="img-fluid mb-3 icon-color" style="max-height: 300px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("olrp_feature");</script>
-        </div>
-        <!-- OLAP -->
-        <div id="olap_feature" data-title="olap" data-icon="images/icons/olap-icon.svg" data-back-image="images/modal/olap-modal.svg">
-            <div class="feature-front">
-                a <b class="metatron-name">monad vector</b> machine supports stateful bulk synchronous processing of massive regions of space
-            </div>
-            <div class="feature-modal">
-                <p><b class="metatron-name">OLAP</b> (online analytical processing) operations are handled by a machine that frames computing as a bulk synchronous process where a series of parallelly executing stages are demarcated by serializing stateful barriers. Together, the pulse of expanding and contracting processes forms the heartbeat of the computation.</p>
-                <img src="images/modal/olap-modal.svg" class="img-fluid mb-3 icon-color" style="max-height: 300px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("olap_feature");</script>
-        </div>
-        <!-- WEB -->
-        <div id="web_feature" data-title="web" data-icon="images/icons/web-icon.svg" data-back-image="images/modal/web-modal.svg">
-            <div class="feature-front">
-                a multi-protocol <b class="metatron-name">web-oriented instset</b> expose space resources to external clients as well as realize the external web as a metatron space in and of itself.
-            </div>
-            <div class="feature-modal">
-                <p><b class="metatron-name">HTTP space</b> translates the <code>GET/PUT</code> semantics of <code>http://</code> to the read/write semantics of a metatron space -- enabling the selective access, referencing, and manipulation of HTML, XML, and JSON documents. Similarly, <b class="metatron-name">WebSocket space</b> offers session-based interactions via a simple string-based mtron evaluation protocol, or an MCP server, or a custom protocol if needed.</p>
-                <table>
-                <tr>
-                <td>
-                <pre><code>
-rec::T[?[
-     host         =>uri::T,
-     pattern      =>uri::T,
-     route        =>[uri::T=>uri::T],
-     {?}client    =>[uri::T],
-     {?}on_open   =>#::T,
-     {?}on_error  =>#::T,
-     {?}on_message=>#::T,
-     {?}on_close  =>#::T]][
-        inst?rng=wsspace&dom=#{?}(rec::T){<j>}
-     ]@/m/web/space/wsspace
-                </code></pre>
-                </td><td>
-                <img src="images/modal/web-modal.svg" class="img-fluid mb-3 icon-color" style="height: 165px; display: block; margin: auto;"/>
-                </td></tr></table>
-            </div>
-            <script type="text/javascript">featurePanel("web_feature");</script>
-        </div>
-        <!-- IOT COMPATIBLE -->
-        <div id="iot_feature" data-title="IoT" data-icon="images/icons/iot-icon.svg" data-back-image="images/modal/iot-modal.svg">
-            <div class="feature-front">
-                a <b class="metatron-name">micropython implementation</b> provides space-aware iot processors that can naturally provide and access data within the larger data space
-            </div>
-            <div class="feature-modal">
-                <p>a <b class="metatron-name">micropython</b> version of metatron enables the numerous ESP32, RapberryPI, etc. processors to maintain a section of the uri
-                 address space. These processors' memory and peripherials are accessible to any other metatron device and vice versa. Finally, a MQTT space makes integrating an IoT cluster into metatron a straightforward exercise.</p>
-                <img src="images/modal/iot-modal.svg" class="img-fluid mb-3 icon-color" style="max-height: 300px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("iot_feature");</script>
-        </div>
-        <!-- LLM COMPATIBLE -->
-        <div id="llm_feature" data-title="llm" data-icon="images/icons/llm-icon.svg" data-back-image="images/modal/llm-modal.svg">
-            <div class="feature-front">
-                <b class="metatron-name">large language models</b> and their enriching extensions are objs, where self-reflection, introspection, knowledge access, and
-                    simulation are natural consequences of metatron's unified address space.
-            </div>
-            <div class="feature-modal">
-                <p><b class="metatron-name">LLMs</b> are encoded within, operate within, and are knowledgeable about metatron spaces. LLM memory can be persisted or transient. LLM tools can be any mtron instruction, where MCP servers are represented as instructions. LLM skills can be files, web links, or composed of multiple objs across different spaces as long as the result is a markdown obj. Finally, LLM querying is an instruction that can be evaluated by humans and agents alike and/or composed into larger instruction graphs known as workflows.</p>
-                <img src="images/modal/llm-modal.svg" class="img-fluid mb-3 icon-color" style="max-height: 300px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("llm_feature");</script>
-        </div>
-        <!-- CONSOLE -->
-        <div id="console_feature" data-title="console" data-icon="images/icons/console-icon.svg" data-back-image="images/modal/console-modal.svg">
-            <div class="feature-front">
-                A terminal repl and web-based <b class="metatron-name">console</b> offer a natural way to move through and manipulate the metatron.
-            </div>
-            <div class="feature-modal">
-                <p>The <b class="metatron-name">console</b> offers a suite of useful features including syntax highlighting, "step-through" compilation, domain/range type checking, auto-complete, AI pair programming via split
-                screen collaborations, and a pluggable framework for custom extensions.</p>
-                <img src="images/dashboard-screenshot.png" class="img-fluid zoomable" style="border-style:solid; border-width:2px; border-color:var(--primarycolor); max-height: 400px; display: block; margin: auto;"/>
-            </div>
-            <script type="text/javascript">featurePanel("console_feature");</script>
-        </div>
-    </div>
-    <div style="height: 100px;"></div>
+<div class="paragraph">
+<p>In short, metatron is a <em>world</em>.</p>
+</div>
+<div class="paragraph">
+<p>With that said, a short whirlwind introduction to metatron will now be presented.</p>
+</div>
+<h2 id="_core_concepts" class="discrete">Core Concepts</h2>
+<div class="paragraph">
+<p>metatron is a data-oriented programming environment with its own data-flow language called <strong>mtron</strong>.</p>
+</div>
+<h3 id="_core_data_types" class="discrete">Core Data Types</h3>
+<div class="paragraph">
+<p>In metatron, everything is an <strong>obj</strong> (an object). There are 3 kinds of core types of objs.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>mono</strong>: objs not composed of other objs:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>bytes</strong>, <strong>bool</strong>, <strong>int</strong>, <strong>real</strong>, <strong>str</strong>, and <strong>uri</strong>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>poly</strong>: objs composed of other objs in support of nested structures:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>rel</strong>, <strong>lst</strong>, and <strong>rec</strong>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>call</strong>: objs that can be evaluated by a <em>lhs</em> obj (left-hand side) and an <em>arg</em> obj (lst or rec) to yield a <em>rhs</em> obj (right-hand side):</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>inst</strong> and <strong>code</strong>.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>\[
+\tt lhs \Rightarrow call(arg0,arg1,&#8230;&#8203;,argN) \Rightarrow rhs
+\]</p>
+</div>
+<div class="paragraph">
+<p>Finally, there is one psuedo-obj that is a mono, a poly, and a call. It is named <code>noobj</code> and serves a similar role to <code>null</code> in other programming environments save that it has an operational semantic aligned with its role as the 0-object (zero) of the algebraic ring formed by the set of all objs along with two meta operators: <code>*</code> and <code>+</code> (apply/compose and branch/split, respectively).</p>
+</div>
+<h3 id="_router_and_space" class="discrete">Router and Space</h3>
+<div class="paragraph">
+<p>There are 2 "special" <code>rec</code> structures called <strong>router</strong> and <strong>space</strong>. They are special in that while they appear as <code>rec</code> objs, they maintain an auxiliary data structure accessible only through a particular api not available to other objs.</p>
+</div>
+<div class="paragraph">
+<p><strong>router</strong>: the purpose of the router is to handle namespace prefix rewrites for local and remote dispatching of read and write calls to spaces. Every instance of metatron has a single running router.</p>
+</div>
+<div class="paragraph">
+<p><strong>space</strong>: the purpose of a space is to store objs and manage process execution. It is up to the space to determine how objs will be indexed and persisted. However, within metatron, all spaces behave in the same manner as dictated by a read/write contract.</p>
+</div>
+<div class="sect1">
+<h2 id="_installation">Installation</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Download metatron either as an <code>npm</code> package, a <code>docker</code> container, or a <code>maven</code> project.</p>
+</li>
+<li>
+<p>Load metatron using a boot file. To run a headless boot in the background, don&#8217;t add any UI objs to your boot file. For now, create the following boot loader as plain text&#8201;&#8212;&#8201;it will spawn a <code>console::T</code>.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="title">start.mtron boot loader</div>
+<div class="content">
+<pre class="highlight"><code class="language-mtron" data-lang="mtron">import(/m/web);
+memspace::[pattern  =&gt;/usr/#, q     =&gt;[docq::[=&gt;],subq::[=&gt;]]]@/sys/space/usr;
+memspace::[pattern  =&gt;g:#,    q     =&gt;[subq::[=&gt;]]]           @/sys/space/graph;
+fsspace::[pattern   =&gt;local:#,route =&gt;[local: =&gt; &lt;~/&gt;]]       @/sys/space/fs;
+httpspace::[pattern =&gt;http://#,
+            host    =&gt;http://localhost:8765,
+            route   =&gt;[/            =&gt;local:]]@/sys/space/http;
+console::[=&gt;]@/usr/ui/console;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To start a metatron instance with <code>start.boot</code>, in a terminal, execute:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ bin/metatron "[boot=&gt;start.mtron,log=&gt;info]"</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_console">Console</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>After metatron boots, the cursor should be to the right of a <code>mtron&gt;</code> prompt. This is a <code>console::T</code>. The console takes mtron expressions and creates <strong>machines</strong> to execute them. A machine can be thought of as an executing process.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-mtron" data-lang="mtron">1 + 2
+1-&lt;[_,+2,*5]&gt;-.print(_).sum()</code></pre>
+</div>
 </div>
 </main>
-<footer class="container-fluid bg-secondary fixed-bottom text-light footer wow fadeIn" data-wow-delay="0.1s">
+<footer class="container-fluid fixed-bottom text-light footer wow fadeIn" data-wow-delay="0.1s">
     <div class="d-flex pt-1 mb-0">
         <a class="btn btn-lg-square btn-dark text-primary m-1 center" href="mailto:info@phaseshift.studio"><i
                 class="fa fa-envelope-open text-primary"></i></a>
@@ -2114,6 +1968,8 @@ rec::T[?[
 <div id="modalPanel" class="modal fade" tabindex="-1"/>
 <!------------------------------------------>
 <!------------------------------------------>
+</div>
+</div>
 </div>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
