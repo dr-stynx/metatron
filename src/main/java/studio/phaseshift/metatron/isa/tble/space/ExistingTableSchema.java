@@ -161,11 +161,6 @@ public class ExistingTableSchema extends ObjSQLSerializer implements TableSchema
         }
     }
 
-    /**
-     * Reference to the schema generator — the single source of truth for FK info.
-     * Set after initialization via {@link #setSchemaGenerator(SQLSchemaGenerator)}.
-     */
-    private SQLSchemaGenerator schemaGenerator;
 
     /**
      * Temporary FK storage for FKs discovered before the schema generator is set.
